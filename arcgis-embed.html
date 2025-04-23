@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerusalem Interactive Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a3c6e, #2c5a9e);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 0;
+        }
+        
+        h1 {
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .map-container {
+            background: white;
+            padding: 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+            height: 700px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .description {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .description h2 {
+            color: #1a3c6e;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+        
+        .footer-content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .map-container {
+                height: 500px;
+            }
+            
+            .container {
+                width: 98%;
+                padding: 0.5rem 0;
+            }
+            
+            .description {
+                margin: 1rem 0;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>The Jewish Atlas</h1>
+            <p class="subtitle">Explore the geographic data of Jewish World with this interactive map</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="map-container">
+            <iframe src="https://jerus.maps.arcgis.com/apps/instant/interactivelegend/index.html?appid=5afe0e70ae394ef8a07fb5aed2d9a6d5" allowfullscreen></iframe>
+        </div>
+        
+        <div class="description">
+            <h2>About This Map</h2>
+            <p>This interactive map provides detailed geographic information about Jewish Sites. Use the interactive legend to toggle different layers and explore various aspects of the city's geography, infrastructure, and points of interest.</p>
+            <p>The map is powered by the JA company</p>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Jerusalem Interactive Map. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

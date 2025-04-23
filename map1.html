@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewish Heritage Map</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+  <style>
+    html, body, #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 10;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    #title {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    #legendDiv {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+  </style>
+  <script src="https://js.arcgis.com/4.28/"></script>
+</head>
+<body>
+  <div id="header">
+    <div id="title">Jewish Heritage Map</div>
+    <div>
+      <button onclick="view.goTo({ center: [35.2137, 31.7683], zoom: 10 })">Go to Jerusalem</button>
+    </div>
+  </div>
+  <div id="viewDiv"></div>
+  <div id="legendDiv"></div>
+ 
+  <script>
+    require(["esri/views/MapView", "esri/WebMap", "esri/widgets/Legend"], function(MapView, WebMap, Legend) {
+      const webmap = new WebMap({
+        portalItem: {
+          id: "5afe0e70ae394ef8a07fb5aed2d9a6d5"  // Replace this with your ArcGIS Online Web Map ID
+        }
+      });
+ 
+      const view = new MapView({
+        container: "viewDiv",
+        map: webmap
+      });
+ 
+      const legend = new Legend({
+        view: view,
+        container: "legendDiv"
+      });
+ 
+      window.view = view; // expose view for buttons
+    });
+  </script>
+</body>
+</html>
