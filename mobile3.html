@@ -689,215 +689,145 @@ Use the filter button in the map to filter the data points by category.
     }
   }
 </script>
-  <!-- About Section (now under the map) -->
-  <section id="about" class="about-section py-16 px-6">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900">About The Jewish Atlas</h2>
-      
-      <div class="about-card mb-8">
-        <h3 class="text-xl font-semibold mb-4 text-gray-800">Our Mission</h3>
-        <p class="mb-4">
-          The Jewish Atlas declares a mission to collect all spatial data on Jewish sites, from the beginning of history until today. The data includes many categories such as synagogues, educational institutions, restaurants, schools, events, family homes, and more.
-        </p>
-        <p class="mb-4">
-          This website serves as the main interface for the Jewish Atlas database. You can use it anywhere to explore and get familiar with Jewish heritage and present-day Jewish life. We need your help to grow — upload your Jewish site and become part of this living archive.
-        </p>
-      </div>
-      
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="about-card h-full">
-          <h3 class="text-xl font-semibold mb-4 text-gray-800">What We Document</h3>
-          <ul class="space-y-2">
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Religious sites (synagogues, mikvehs, yeshivas)</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Cultural and communal centers</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Educational institutions</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Historical landmarks and monuments</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Kosher food establishments</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Ancient and modern residential areas</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Locations of significant historical events</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div class="about-card h-full">
-          <h3 class="text-xl font-semibold mb-4 text-gray-800">Why This Matters</h3>
-          <ul class="space-y-2">
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Preserving cultural heritage for future generations</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Supporting educational initiatives and research</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Connecting travelers with Jewish sites globally</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Creating a comprehensive historical record</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Building community through shared knowledge</span>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-500 mr-2">•</span>
-              <span>Documenting patterns of Jewish life across time</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+<section id="about" class="about-section py-16 px-6">
+  <!-- Add padding-top to account for the fixed header -->
+  <div class="pt-16 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900">About The Jewish Atlas</h2>
+    
+    <div class="about-card mb-8">
+      <h3 class="text-xl font-semibold mb-4 text-gray-800">Our Mission</h3>
+      <p class="mb-4">
+        The Jewish Atlas declares a mission to collect all spatial data on Jewish sites, from the beginning of history until today. The data includes many categories such as synagogues, educational institutions, restaurants, schools, events, family homes, and more.
+      </p>
+      <p class="mb-4">
+        This website serves as the main interface for the Jewish Atlas database. You can use it anywhere to explore and get familiar with Jewish heritage and present-day Jewish life. We need your help to grow — upload your Jewish site and become part of this living archive.
+      </p>
     </div>
-  </section>
-
-  <!-- Custom error modal for location permission issues -->
-  <div id="locationErrorModal" class="modal">
-    <div class="modal-content">
-      <span class="close-button" onclick="closeModal()">&times;</span>
-      <h3 class="text-xl font-semibold mb-4">Location Permission Required</h3>
-      <p class="mb-4">To use the location features of this map, please:</p>
-      <ol class="list-decimal pl-5 mb-4">
-        <li>Make sure location services are enabled on your device</li>
-        <li>Allow this website to access your location when prompted</li>
-        <li>If you previously denied permission, you may need to reset it in your browser settings</li>
-      </ol>
-      <div class="flex justify-end">
-        <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Got it
-        </button>
+    
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="about-card h-full">
+        <h3 class="text-xl font-semibold mb-4 text-gray-800">What We Document</h3>
+        <ul class="space-y-2">
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Religious sites (synagogues, mikvehs, yeshivas)</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Cultural and communal centers</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Educational institutions</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Historical landmarks and monuments</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Kosher food establishments</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Ancient and modern residential areas</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Locations of significant historical events</span>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="about-card h-full">
+        <h3 class="text-xl font-semibold mb-4 text-gray-800">Why This Matters</h3>
+        <ul class="space-y-2">
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Preserving cultural heritage for future generations</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Supporting educational initiatives and research</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Connecting travelers with Jewish sites globally</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Creating a comprehensive historical record</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Building community through shared knowledge</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">•</span>
+            <span>Documenting patterns of Jewish life across time</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
+</section>
 
-  <footer class="bg-gray-800 text-white text-center py-6 text-sm">
-    &copy; 2025 The Jewish Atlas. All rights reserved.
-  </footer>
+<style>
+  /* Fix for header overlapping content when jumping to anchor links */
+  html {
+    scroll-padding-top: 80px; /* Adjust this value based on your header height */
+  }
+  
+  /* Style for smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Ensure the header has proper z-index */
+  header {
+    z-index: 50;
+  }
+  
+  /* About section custom styles */
+  .about-section {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .about-card {
+    border-left: 4px solid #3b82f6;
+    background-color: white;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+</style>
 
-  <script>
-    // Function to hide loading indicator when map is loaded
-    function hideLoading() {
-      document.getElementById('loading-indicator').style.display = 'none';
-      
-      // Check location permission once the map is loaded
-      checkLocationPermission();
-    }
+<script>
+  // Update navigation links to use smooth scrolling
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all links that point to an anchor
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
     
-    // Function to check if location permission is granted
-    function checkLocationPermission() {
-      // First check if the browser supports geolocation
-      if (navigator.geolocation) {
-        // Try to get user's location to trigger permission prompt if needed
-        navigator.geolocation.getCurrentPosition(
-          // Success callback - permission granted
-          function(position) {
-            console.log("Location permission granted");
-            // Optionally, we could do something here when permission is granted
-          },
-          // Error callback - permission denied or error
-          function(error) {
-            console.log("Location error:", error.code, error.message);
-            
-            // Show notification if permission is denied
-            if (error.code === error.PERMISSION_DENIED) {
-              showLocationNotification();
-            }
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      }
-    }
-    
-    // Function to show location notification
-    function showLocationNotification() {
-      const notification = document.createElement("div");
-      notification.className = "location-notification";
-      notification.innerHTML = `
-        <div class="location-notification-content">
-          <p><strong>Location access denied</strong></p>
-          <p>Please enable location services in your browser settings to use the "Find my location" feature.</p>
-          <button onclick="dismissNotification(this)">Close</button>
-        </div>
-      `;
-      document.body.appendChild(notification);
-      
-      // Auto dismiss after 10 seconds
-      setTimeout(() => {
-        if (document.body.contains(notification)) {
-          document.body.removeChild(notification);
+    anchorLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Get the target element
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+          // Scroll to the target element with smooth behavior
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
         }
-      }, 10000);
-    }
-    
-    // Function to dismiss notification
-    function dismissNotification(buttonElement) {
-      const notification = buttonElement.closest('.location-notification');
-      if (notification && notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }
-    
-    // Script to handle iframe messaging and location permission errors
-    window.addEventListener('message', function(event) {
-      // Check if the message is from our map iframe and contains a location error
-      if (event.data && event.data.type === 'locationError') {
-        showLocationErrorModal();
-      }
+      });
     });
-
-    // Function to show the modal
-    function showLocationErrorModal() {
-      document.getElementById('locationErrorModal').style.display = 'block';
-    }
-
-    // Function to close the modal
-    function closeModal() {
-      document.getElementById('locationErrorModal').style.display = 'none';
-    }
-
-    // Close the modal if the user clicks outside of it
-    window.onclick = function(event) {
-      let modal = document.getElementById('locationErrorModal');
-      if (event.target == modal) {
-        modal.style.display = 'none';
-      }
-    }
-
-    // Ensure the map is loaded over HTTPS
-    document.addEventListener('DOMContentLoaded', function() {
-      let iframe = document.getElementById('map-iframe');
-      let src = iframe.src;
-      
-      // If the iframe src doesn't start with https, update it
-      if (!src.startsWith('https://')) {
-        iframe.src = src.replace('http://', 'https://');
-      }
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
