@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jewish Sites Map</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <header class="bg-white shadow sticky top-0 z-50 p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-gray-900">The Jewish Atlas</h1>
+    <nav class="space-x-4">
+      <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
+      <a href="#upload" class="text-gray-700 font-medium hover:text-blue-600">Upload Your Jewish Site</a>
+    </nav>
+  </header>
+
+  <section class="text-center py-16 px-6 bg-gradient-to-r from-blue-100 to-white" id="about">
+    <h2 class="text-3xl font-semibold mb-4 text-gray-900">Explore Jewish Heritage Around the World</h2>
+    <p class="max-w-2xl mx-auto text-lg text-gray-600 mb-8">
+      Welcome to The Jewish Atlas. Use the map below to find synagogues, cemeteries, kosher restaurants, ghettos, yeshivas,
+      and other Jewish heritage sites globally. Each color represents a different type of site.
+    </p>
+    <button onclick="document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' })" 
+            class="bg-blue-700 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition">
+      Go to Map
+    </button>
+  </section>
+
+  <section id="map-section" class="p-6 bg-white">
+    <div class="rounded-lg shadow-lg overflow-hidden" style="height: 80vh;">
+      <iframe class="w-full h-full border-none" 
+              src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
+              title="Jewish Heritage Map"></iframe>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-white text-center py-6 text-sm">
+    &copy; 2025 The Jewish Atlas. All rights reserved.
+  </footer>
+
+</body>
+</html>
