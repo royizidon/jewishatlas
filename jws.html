@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWS - Jewish World Sites Interactive Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            animation: spin 2s linear infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="font-bold text-2xl text-blue-800">
+                            JWS
+                        </div>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" class="border-blue-800 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Map
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            About
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Contact
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <button type="button" class="bg-blue-600 p-2 rounded-full text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="ml-2">Upload Your Jewish Site</span>
+                    </button>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <!-- Mobile menu button -->
+                    <button type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" aria-expanded="false" id="mobile-menu-button">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="sm:hidden hidden" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="bg-blue-50 border-blue-800 text-blue-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Map</a>
+                <a href="#" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">About</a>
+                <a href="#" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Contact</a>
+            </div>
+            <div class="pt-4 pb-3 border-t border-gray-200">
+                <div class="flex items-center px-4">
+                    <button type="button" class="flex-shrink-0 bg-blue-600 p-1 rounded-full text-white hover:bg-blue-700 focus:outline-none w-full py-2">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        Find My Location
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-3xl font-bold mb-2">Jewish World Sites Interactive Map</h1>
+            <p class="text-blue-100">Explore the geographic data of the Jewish world with this interactive map</p>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Map Container -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+            <div class="relative h-[700px] md:h-[700px] sm:h-[500px]">
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10" id="loadingIndicator">
+                    <div class="loading-spinner w-12 h-12 border-4 border-gray-200 border-t-blue-800 rounded-full mb-4"></div>
+                    <p class="text-gray-600 font-medium">Loading map...</p>
+                </div>
+                <iframe 
+                    src="https://jerus.maps.arcgis.com/apps/instant/interactivelegend/index.html?appid=5afe0e70ae394ef8a07fb5aed2d9a6d5" 
+                    class="absolute inset-0 w-full h-full border-0"
+                    allowfullscreen 
+                    allow="geolocation" 
+                    id="mapFrame">
+                </iframe>
+            </div>
+        </div>
+        
+        <!-- About Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">About This Map</h2>
+            <p class="mb-4">This interactive map offers detailed geographic insights into Jewish heritage sites across the globe. Use the interactive legend to toggle layers and explore key locations, historical landmarks, and cultural infrastructure in each region.</p>
+            <p>The map is powered by ArcGIS, a powerful mapping and spatial analytics platform that enables the visualization and analysis of geographic data.</p>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="text-xl font-bold text-blue-300">JWS</div>
+                    <p class="text-gray-400 text-sm mt-1">Jewish World Sites Interactive Map</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-700">
+                <p class="text-sm text-gray-400">© 2025 JWS - Jewish World Sites. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Popup -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden fade-in" id="popupOverlay"></div>
+    <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 max-w-md w-11/12 overflow-hidden hidden fade-in" id="customPopup">
+        <div class="bg-gradient-to-r from-blue-900 to-blue-700 px-4 py-3 flex justify-between items-center">
+            <h3 class="text-white font-semibold" id="popupTitle">Feature Information</h3>
+            <button class="text-white text-2xl leading-none focus:outline-none" onclick="closeCustomPopup()">&times;</button>
+        </div>
+        <div class="p-4">
+            <div id="popupContent" class="prose">Loading...</div>
+            <div class="text-sm text-gray-500 mt-2" id="popupLocation"></div>
+            <div class="flex space-x-3 mt-4">
+                <button class="flex-1 bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md transition-colors" id="navigateButton">
+                    <i class="fas fa-directions mr-2"></i>Navigate Here
+                </button>
+                <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition-colors" onclick="closeCustomPopup()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Location Notification Template -->
+    <div class="fixed top-4 right-4 max-w-sm w-full bg-white rounded-lg shadow-lg z-40 hidden fade-in" id="locationNotification">
+        <div class="p-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 text-yellow-500">
+                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                </div>
+                <div class="ml-3 w-0 flex-1">
+                    <p class="text-sm font-medium text-gray-900">Location access denied</p>
+                    <p class="mt-1 text-sm text-gray-500">Please enable location services in your browser settings to use the "Find my location" feature.</p>
+                    <div class="mt-4">
+                        <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none" onclick="document.getElementById('locationNotification').classList.add('hidden')">
+                            Dismiss
+                        </button>
+                    </div>
+                </div>
+                <div class="ml-4 flex-shrink-0 flex">
+                    <button class="inline-flex text-gray-400 focus:outline-none focus:text-gray-500" onclick="document.getElementById('locationNotification').classList.add('hidden')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Function to handle geolocation errors
+        function handleLocationError() {
+            console.log("Location permission handling initialized");
+            
+            // Check if the browser supports geolocation
+            if (navigator.geolocation) {
+                // Try to get the user's location when the page loads
+                navigator.geolocation.getCurrentPosition(
+                    // Success callback
+                    function(position) {
+                        console.log("Location permission granted");
+                    },
+                    // Error callback
+                    function(error) {
+                        console.log("Location error:", error.code, error.message);
+                        
+                        // Show a notification if permission is denied
+                        if (error.code === error.PERMISSION_DENIED) {
+                            document.getElementById('locationNotification').classList.remove('hidden');
+                        }
+                    },
+                    { enableHighAccuracy: true }
+                );
+            }
+        }
+
+        // Custom popup handling
+        function showCustomPopup(title, content, location) {
+            document.getElementById('popupTitle').textContent = title || 'Feature Information';
+            document.getElementById('popupContent').innerHTML = content || '';
+            document.getElementById('popupLocation').textContent = location || '';
+            document.getElementById('popupOverlay').classList.remove('hidden');
+            document.getElementById('customPopup').classList.remove('hidden');
+            
+            // Set up navigate button action
+            document.getElementById('navigateButton').onclick = function() {
+                // Send a message to the iframe to navigate to the feature
+                const mapFrame = document.getElementById('mapFrame');
+                if (mapFrame && mapFrame.contentWindow) {
+                    // This is a simplified approach - the actual implementation would depend on ArcGIS API
+                    try {
+                        mapFrame.contentWindow.postMessage({
+                            action: 'navigate',
+                            location: location
+                        }, '*');
+                    } catch(e) {
+                        console.log('Navigation message could not be sent to map', e);
+                        // As fallback, try to click the navigate button in the original popup
+                        closeCustomPopup();
+                    }
+                }
+            };
+        }
+        
+        function closeCustomPopup() {
+            document.getElementById('popupOverlay').classList.add('hidden');
+            document.getElementById('customPopup').classList.add('hidden');
+        }
+        
+        // Monitor iframe for popup events
+        function setupPopupMonitoring() {
+            const mapFrame = document.getElementById('mapFrame');
+            
+            // Listen for messages from the iframe
+            window.addEventListener('message', function(event) {
+                // Process messages from the iframe (if ArcGIS supports postMessage)
+                console.log('Received message:', event.data);
+                
+                // If we get popup data from the map
+                if (event.data && event.data.type === 'popup') {
+                    showCustomPopup(
+                        event.data.title, 
+                        event.data.content,
+                        event.data.location
+                    );
+                }
+            });
+            
+            // Setup a MutationObserver to watch for popup changes in the iframe
+            // This is a fallback approach that would need to be customized based on the exact structure
+            try {
+                const observer = new MutationObserver(function(mutations) {
+                    // Look for popup additions
+                    // This is a simplified example - would need adjustment based on actual DOM structure
+                    for (const mutation of mutations) {
+                        if (mutation.addedNodes && mutation.addedNodes.length) {
+                            for (const node of mutation.addedNodes) {
+                                if (node.classList && (
+                                    node.classList.contains('esri-popup') || 
+                                    node.classList.contains('esri-feature') ||
+                                    node.querySelector('.esri-popup')
+                                )) {
+                                    console.log('Popup detected in iframe');
+                                    extractPopupContent(mapFrame);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Start observing the iframe content when it loads
+                mapFrame.onload = function() {
+                    try {
+                        // Access the iframe's document and observe changes
+                        const frameDoc = mapFrame.contentDocument || mapFrame.contentWindow.document;
+                        observer.observe(frameDoc.body, { 
+                            childList: true, 
+                            subtree: true 
+                        });
+                        
+                        console.log('Popup observer attached');
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                        
+                        // Also try to intercept clicks on map features
+                        frameDoc.addEventListener('click', function(e) {
+                            // Using setTimeout to let the ArcGIS popup render first
+                            setTimeout(function() {
+                                extractPopupContent(mapFrame);
+                            }, 500);
+                        });
+                    } catch (e) {
+                        console.log('Could not access iframe content due to same-origin policy', e);
+                        // Hide loading indicator after timeout anyway
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                    }
+                };
+                
+                // Make sure loading indicator gets hidden even if there's an error
+                setTimeout(function() {
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                }, 4000);
+                
+            } catch (e) {
+                console.log('Error setting up popup monitoring', e);
+                // Hide loading indicator if there's an error
+                setTimeout(function() {
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                }, 4000);
+            }
+        }
+        
+        function extractPopupContent(mapFrame) {
+            try {
+                // Try to access the iframe's document (may fail due to same-origin policy)
+                const frameDoc = mapFrame.contentDocument || mapFrame.contentWindow.document;
+                
+                // Look for popup elements (the exact selectors would depend on ArcGIS structure)
+                const popupTitle = frameDoc.querySelector('.esri-popup-header .esri-title') || 
+                                  frameDoc.querySelector('[data-node-ref="title"]');
+                
+                const popupContent = frameDoc.querySelector('.esri-popup-content') || 
+                                    frameDoc.querySelector('.esri-feature-content');
+                
+                const popupLocation = frameDoc.querySelector('.esri-popup-footer') || 
+                                     frameDoc.querySelector('.esri-feature-location');
+                
+                if (popupTitle || popupContent) {
+                    // Extract content and show our custom popup
+                    showCustomPopup(
+                        popupTitle ? popupTitle.textContent : 'Feature Information',
+                        popupContent ? popupContent.innerHTML : '',
+                        popupLocation ? popupLocation.textContent : ''
+                    );
+                    
+                    // Optionally hide the original popup
+                    const originalPopup = frameDoc.querySelector('.esri-popup-main');
+                    if (originalPopup) {
+                        originalPopup.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                console.log('Cannot access iframe content due to same-origin policy', e);
+                // Handle this case - perhaps show a message to the user
+            }
+        }
+
+        // When the page loads
+        window.onload = function() {
+            setTimeout(handleLocationError, 2000);
+            setupPopupMonitoring();
+            
+            // Add event listeners for demonstration
+            document.addEventListener('keydown', function(e) {
+                // For demonstration/testing: press 'p' to show a sample popup
+                if (e.key === 'p') {
+                    showCustomPopup(
+                        'Synagogue', 
+                        '<strong>שטיבלך</strong> is located at <strong>HaRav Haim Heller, Givat Mordekhay, Jerusalem, Jerusalem District, Israel</strong>.',
+                        'HaRav Haim Heller, Givat Mordekhay'
+                    );
+                }
+            });
+        };
+    </script>
+</body>
+</html>
