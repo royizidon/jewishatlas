@@ -200,14 +200,50 @@ iframe {
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-<header class="bg-white shadow sticky top-0 z-50 p-4 flex flex-col sm:flex-row justify-between items-center">
-  <h1 class="text-xl font-bold text-gray-900">The Jewish Atlas</h1>
-  <nav class="flex flex-wrap gap-4 mt-2 sm:mt-0">
+<header class="bg-white shadow sticky top-0 z-50 p-4">
+  <h1 class="text-xl font-bold text-gray-900 text-center mb-2">The Jewish Atlas</h1>
+  <nav class="flex justify-center gap-6">
     <a href="#map-section" class="text-gray-700 font-medium hover:text-blue-600">Map</a>
     <a href="#upload-section" class="text-orange-500 font-medium hover:text-orange-600">Upload Your Jewish Site</a>
     <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
   </nav>
 </header>
+
+<style>
+/* Improved mobile header styles */
+@media (max-width: 640px) {
+  header {
+    padding: 0.75rem 1rem;
+  }
+  
+  header h1 {
+    margin-bottom: 0.5rem;
+  }
+  
+  header nav {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 0.5rem;
+  }
+  
+  header nav a {
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+}
+
+/* Even smaller screens */
+@media (max-width: 380px) {
+  header nav {
+    gap: 0.75rem;
+  }
+  
+  header nav a {
+    font-size: 0.8rem;
+  }
+}
+</style>
 
   <section class="text-center py-16 px-6 bg-gradient-to-r from-blue-100 to-white">
     <h2 class="text-3xl font-semibold mb-4 text-gray-900">Explore Jewish Heritage Around the World</h2>
