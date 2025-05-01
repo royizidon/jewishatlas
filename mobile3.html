@@ -7,6 +7,75 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+/* Additional styles to make the map look better on mobile */
+@media (max-width: 640px) {
+  /* Adjust map container height for small screens */
+  #map-wrapper {
+    height: 60vh !important;
+    min-height: 350px !important;
+  }
+  
+  /* Make buttons larger and easier to tap on mobile */
+  #fullscreen-toggle {
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* Ensure the map section has appropriate padding */
+  #map-section {
+    padding: 1rem;
+  }
+  
+  /* Adjust header title for mobile */
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  /* Navigation links more spaced for touch */
+  header nav a {
+    padding: 6px 10px;
+    margin: 0 2px;
+  }
+}
+
+/* Improved fullscreen mode styling */
+.map-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  z-index: 9999 !important;
+}
+
+/* Styling for custom fullscreen button */
+#fullscreen-toggle {
+  transition: all 0.2s ease;
+  opacity: 0.8;
+}
+
+#fullscreen-toggle:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Fix for Safari viewport height issues */
+@supports (-webkit-touch-callout: none) {
+  #map-wrapper {
+    height: 50vh; /* Use percent of viewport height on iOS */
+    max-height: 450px;
+  }
+}
+
+/* Ensure iframe contents scale properly */
+iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
     body { font-family: 'Poppins', sans-serif; }
     
     /* Add styles for the error modal */
@@ -144,29 +213,154 @@
     </p>
   </section>
 
-  <section id="map-section" class="p-6 bg-white">
-  <div class="rounded-lg shadow-lg overflow-hidden" style="height: 65vh; max-height: 600px;">
-    <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
-      <p class="text-gray-600">Loading map...</p>
+  <section id="map-section" class="p-4 bg-white">
+  <!-- Map Container with responsive sizing -->
+  <div class="rounded-lg shadow-lg overflow-hidden relative">
+    <!-- We'll set a more appropriate height for mobile -->
+    <div id="map-wrapper" style="height: 50vh; min-height: 300px; max-height: 450px;" class="w-full relative">
+      <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600">Loading map...</p>
+      </div>
+      
+      <!-- Add a fullscreen toggle button that we control -->
+      <button id="fullscreen-toggle" class="absolute top-2 right-2 z-20 bg-white p-2 rounded-full shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="expand-icon">
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <polyline points="9 21 3 21 3 15"></polyline>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="collapse-icon hidden">
+          <polyline points="4 14 10 14 10 20"></polyline>
+          <polyline points="20 10 14 10 14 4"></polyline>
+          <line x1="14" y1="10" x2="21" y2="3"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
+      </button>
+      
+      <!-- The iframe with ArcGIS map -->
+      <iframe id="map-iframe" class="w-full h-full border-none" 
+              src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
+              allow="geolocation"
+              allowfullscreen
+              title="Jewish Heritage Map"
+              onload="hideLoading()"></iframe>
     </div>
-    <!-- Using HTTPS URL with allow="geolocation" attribute -->
-    <iframe id="map-iframe" class="w-full h-full border-none" 
-            src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
-            allow="geolocation"
-            allowfullscreen
-            title="Jewish Heritage Map"
-            onload="hideLoading()"></iframe>
   </div>
-  <div class="mt-4 text-center text-sm text-gray-600">
-    <p>If map controls are not visible, try adjusting your browser zoom level or use fullscreen mode (button in bottom right of map)</p>
+  
+  <!-- Help text -->
+  <div class="mt-3 text-center text-sm text-gray-600">
+    <p>Use the <span class="font-bold">↗️ button</span> in the top-right corner to view the map in fullscreen mode</p>
   </div>
 </section>
-  <section id="upload-section" class="p-6 bg-gray-50 text-center">
-    <h2 class="text-2xl font-semibold mb-4">Submit a New Site</h2>
-    <p class="text-gray-600 max-w-xl mx-auto">Let us know about a Jewish heritage site not yet on the map. Your submission helps preserve Jewish memory around the world.</p>
-  </section>
 
+<!-- Add this script to your page for fullscreen functionality -->
+<script>
+  // Function to hide loading indicator when map is loaded
+  function hideLoading() {
+    document.getElementById('loading-indicator').style.display = 'none';
+    
+    // Check location permission once the map is loaded
+    checkLocationPermission();
+  }
+  
+  // Toggle fullscreen functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const mapWrapper = document.getElementById('map-wrapper');
+    const fullscreenToggle = document.getElementById('fullscreen-toggle');
+    const expandIcon = fullscreenToggle.querySelector('.expand-icon');
+    const collapseIcon = fullscreenToggle.querySelector('.collapse-icon');
+    
+    // Store original styles
+    let originalStyles = {
+      height: mapWrapper.style.height,
+      minHeight: mapWrapper.style.minHeight,
+      maxHeight: mapWrapper.style.maxHeight,
+      position: mapWrapper.style.position,
+      zIndex: mapWrapper.style.zIndex
+    };
+    
+    fullscreenToggle.addEventListener('click', function() {
+      if (expandIcon.classList.contains('hidden')) {
+        // Exit fullscreen mode
+        mapWrapper.style.height = originalStyles.height;
+        mapWrapper.style.minHeight = originalStyles.minHeight;
+        mapWrapper.style.maxHeight = originalStyles.maxHeight;
+        mapWrapper.style.position = originalStyles.position;
+        mapWrapper.style.zIndex = originalStyles.zIndex;
+        mapWrapper.classList.remove('fixed', 'top-0', 'left-0', 'w-full', 'h-full');
+        
+        expandIcon.classList.remove('hidden');
+        collapseIcon.classList.add('hidden');
+        
+        // Re-enable scrolling
+        document.body.style.overflow = 'auto';
+      } else {
+        // Enter fullscreen mode
+        // Save current styles first
+        originalStyles = {
+          height: mapWrapper.style.height,
+          minHeight: mapWrapper.style.minHeight,
+          maxHeight: mapWrapper.style.maxHeight,
+          position: mapWrapper.style.position,
+          zIndex: mapWrapper.style.zIndex
+        };
+        
+        // Apply fullscreen styles
+        mapWrapper.style.position = 'fixed';
+        mapWrapper.style.top = '0';
+        mapWrapper.style.left = '0';
+        mapWrapper.style.width = '100%';
+        mapWrapper.style.height = '100%';
+        mapWrapper.style.maxHeight = 'none';
+        mapWrapper.style.zIndex = '9999';
+        
+        expandIcon.classList.add('hidden');
+        collapseIcon.classList.remove('hidden');
+        
+        // Disable scrolling while in fullscreen
+        document.body.style.overflow = 'hidden';
+      }
+    });
+    
+    // Exit fullscreen on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && expandIcon.classList.contains('hidden')) {
+        fullscreenToggle.click();
+      }
+    });
+  });
+  
+  // Function to check if location permission is granted
+  function checkLocationPermission() {
+    // First check if the browser supports geolocation
+    if (navigator.geolocation) {
+      // Try to get user's location to trigger permission prompt if needed
+      navigator.geolocation.getCurrentPosition(
+        // Success callback - permission granted
+        function(position) {
+          console.log("Location permission granted");
+          // Optionally, we could do something here when permission is granted
+        },
+        // Error callback - permission denied or error
+        function(error) {
+          console.log("Location error:", error.code, error.message);
+          
+          // Show notification if permission is denied
+          if (error.code === error.PERMISSION_DENIED) {
+            showLocationNotification();
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+  }
+</script>
   <!-- About Section (now under the map) -->
   <section id="about" class="about-section py-16 px-6">
     <div class="max-w-4xl mx-auto">
