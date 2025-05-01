@@ -96,12 +96,13 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-  <header class="bg-white shadow sticky top-0 z-50 p-4 flex flex-col sm:flex-row justify-between items-center">
-    <h1 class="text-xl font-bold text-gray-900">The Jewish Atlas</h1>
-    <nav class="flex flex-wrap gap-4 mt-2 sm:mt-0">
-      <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
-    </nav>
-  </header>
+<header class="bg-white shadow sticky top-0 z-50 p-4 flex flex-col sm:flex-row justify-between items-center">
+  <h1 class="text-xl font-bold text-gray-900">The Jewish Atlas</h1>
+  <nav class="flex flex-wrap gap-4 mt-2 sm:mt-0">
+    <a href="#map-section" class="text-gray-700 font-medium hover:text-blue-600">Map</a>
+    <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
+  </nav>
+</header>
 
   <section class="text-center py-16 px-6 bg-gradient-to-r from-blue-100 to-white">
     <h2 class="text-3xl font-semibold mb-4 text-gray-900">Explore Jewish Heritage Around the World</h2>
@@ -144,21 +145,23 @@
   </section>
 
   <section id="map-section" class="p-6 bg-white">
-    <div class="rounded-lg shadow-lg overflow-hidden" style="height: 80vh;">
-      <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
-        <p class="text-gray-600">Loading map...</p>
-      </div>
-      <!-- Using HTTPS URL with allow="geolocation" attribute -->
-      <iframe id="map-iframe" class="w-full h-full border-none" 
-              src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
-              allow="geolocation"
-              allowfullscreen
-              title="Jewish Heritage Map"
-              onload="hideLoading()"></iframe>
+  <div class="rounded-lg shadow-lg overflow-hidden" style="height: 65vh; max-height: 600px;">
+    <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600">Loading map...</p>
     </div>
-  </section>
-  
+    <!-- Using HTTPS URL with allow="geolocation" attribute -->
+    <iframe id="map-iframe" class="w-full h-full border-none" 
+            src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
+            allow="geolocation"
+            allowfullscreen
+            title="Jewish Heritage Map"
+            onload="hideLoading()"></iframe>
+  </div>
+  <div class="mt-4 text-center text-sm text-gray-600">
+    <p>If map controls are not visible, try adjusting your browser zoom level or use fullscreen mode (button in bottom right of map)</p>
+  </div>
+</section>
   <section id="upload-section" class="p-6 bg-gray-50 text-center">
     <h2 class="text-2xl font-semibold mb-4">Submit a New Site</h2>
     <p class="text-gray-600 max-w-xl mx-auto">Let us know about a Jewish heritage site not yet on the map. Your submission helps preserve Jewish memory around the world.</p>
