@@ -12,11 +12,10 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-  <header class="bg-white shadow sticky top-0 z-50 p-4 flex justify-between items-center">
+  <header class="bg-white shadow sticky top-0 z-50 p-4 flex flex-col sm:flex-row justify-between items-center">
     <h1 class="text-xl font-bold text-gray-900">The Jewish Atlas</h1>
-    <nav class="space-x-4">
+    <nav class="flex flex-wrap gap-4 mt-2 sm:mt-0">
       <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
-      <a href="#upload" class="text-gray-700 font-medium hover:text-blue-600">Upload Your Jewish Site</a>
     </nav>
   </header>
 
@@ -26,10 +25,16 @@
       Welcome to The Jewish Atlas. Use the map below to find synagogues, cemeteries, kosher restaurants, ghettos, yeshivas,
       and other Jewish heritage sites globally. Each color represents a different type of site.
     </p>
-    <button onclick="document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' })" 
-            class="bg-blue-700 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition">
-      Go to Map
-    </button>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <button onclick="document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' })" 
+              class="bg-blue-700 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition">
+        Go to Map
+      </button>
+      <button onclick="document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' })" 
+              class="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition font-semibold">
+        Upload Your Jewish Site
+      </button>
+    </div>
   </section>
 
   <section class="bg-white py-12 px-6">
@@ -49,6 +54,9 @@
       <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-700 inline-block"></span><span>Karaite Site</span></div>
       <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-blue-500 inline-block"></span><span>Kosher Restaurant</span></div>
     </div>
+    <p class="text-center text-sm text-gray-500 mt-4">
+      Tap the locator icon (top-left on the map) to zoom to your current location. If it doesn’t work, check your browser and OS location settings.
+    </p>
   </section>
 
   <section id="map-section" class="p-6 bg-white">
@@ -57,6 +65,11 @@
               src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
               title="Jewish Heritage Map"></iframe>
     </div>
+  </section>
+
+  <section id="upload-section" class="p-6 bg-gray-50 text-center">
+    <h2 class="text-2xl font-semibold mb-4">Submit a New Site</h2>
+    <p class="text-gray-600 max-w-xl mx-auto">Let us know about a Jewish heritage site not yet on the map. Your submission helps preserve Jewish memory around the world.</p>
   </section>
 
   <footer class="bg-gray-800 text-white text-center py-6 text-sm">
