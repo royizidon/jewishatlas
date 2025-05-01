@@ -7,6 +7,41 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+
+<style>
+  /* Make header navigation more mobile-friendly */
+  @media (max-width: 640px) {
+    header nav {
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    
+    header nav a {
+      padding: 0.25rem 0.5rem;
+      text-align: center;
+    }
+  }
+  
+  /* Add subtle highlight to the Upload link */
+  header nav a[href="#upload-section"] {
+    position: relative;
+    font-weight: 600;
+  }
+  
+  /* Optional animation for upload link */
+  @keyframes subtle-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+  }
+  
+  header nav a[href="#upload-section"]:hover {
+    animation: subtle-pulse 1.5s infinite;
+  }
+
+
+
 /* Additional styles to make the map look better on mobile */
 @media (max-width: 640px) {
   /* Adjust map container height for small screens */
@@ -169,6 +204,7 @@ iframe {
   <h1 class="text-xl font-bold text-gray-900">The Jewish Atlas</h1>
   <nav class="flex flex-wrap gap-4 mt-2 sm:mt-0">
     <a href="#map-section" class="text-gray-700 font-medium hover:text-blue-600">Map</a>
+    <a href="#upload-section" class="text-orange-500 font-medium hover:text-orange-600">Upload Your Jewish Site</a>
     <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
   </nav>
 </header>
