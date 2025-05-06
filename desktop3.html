@@ -96,15 +96,31 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
   <!-- HEADER -->
-  <header class="bg-white shadow sticky top-0 z-50 p-4">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between md:items-center">
-      <h1 class="text-xl font-bold text-center md:text-left text-gray-900 mb-2 md:mb-0">The Jewish Atlas</h1>
-      <nav class="flex justify-center gap-6 md:justify-end">
-        <a href="#map-section" class="text-gray-700 font-medium hover:text-blue-600">Map</a>
-        <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo / Brand -->
+      <div class="flex-shrink-0 text-xl font-bold text-gray-900 tracking-tight">
+        <a href="#" class="hover:text-blue-700 transition">The Jewish Atlas</a>
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="#map-section" class="text-gray-700 hover:text-blue-600 font-medium transition">Map</a>
+        <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition">About</a>
       </nav>
     </div>
-  </header>
+  </div>
+
+  <!-- Mobile Nav -->
+  <div class="md:hidden px-4 pb-4 pt-2 bg-white border-t border-gray-200">
+    <nav class="flex flex-col space-y-2">
+      <a href="#map-section" class="text-gray-700 hover:text-blue-600 font-medium">Map</a>
+      <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
+    </nav>
+  </div>
+</header>
+
 
   <!-- HERO SECTION -->
   <section class="text-center py-20 px-6 md:px-16 lg:px-32 bg-gradient-to-r from-blue-100 to-white">
@@ -191,28 +207,53 @@
     </p>
   </section>
 
-  <!-- ABOUT SECTION -->
-  <section id="about" class="about-section py-20 px-6 md:px-12">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-semibold mb-10 text-center text-gray-900">About The Jewish Atlas</h2>
-      <div class="grid md:grid-cols-2 gap-8">
-        <div class="about-card">
-          <h3 class="text-xl font-semibold mb-4">Our Mission</h3>
-          <p class="mb-4">The Jewish Atlas aims to collect spatial data on Jewish sites from antiquity to today—synagogues, yeshivas, events, homes, and more.</p>
-          <p>Help us build this living archive by uploading new locations and using this platform to explore Jewish heritage globally.</p>
-        </div>
-        <div class="about-card">
-          <h3 class="text-xl font-semibold mb-4">Why This Matters</h3>
-          <ul class="space-y-2">
-            <li>• Preserve Jewish culture</li>
-            <li>• Support education & research</li>
-            <li>• Help travelers explore Jewish life</li>
-            <li>• Build community knowledge</li>
-          </ul>
-        </div>
+  <section id="about" class="bg-gray-50 py-20 px-4">
+  <div class="max-w-6xl mx-auto space-y-12">
+    
+    <!-- Our Mission -->
+    <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8">
+      <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">Our Mission</h2>
+      <p class="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
+        The Jewish Atlas declares a mission to collect all spatial data on Jewish sites, from the beginning of history until today. The data includes many categories such as synagogues, educational institutions, restaurants, schools, events, family homes, and more.
+      </p>
+      <p class="text-gray-700 text-base md:text-lg leading-relaxed">
+        This website serves as the main interface for the Jewish Atlas database. You can use it anywhere to explore and get familiar with Jewish heritage and present-day Jewish life. We need your help to grow — upload your Jewish site and become part of this living archive.
+      </p>
+    </div>
+
+    <!-- Cards Row -->
+    <div class="grid md:grid-cols-2 gap-6">
+      
+      <!-- What We Document -->
+      <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8 h-full">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">What We Document</h3>
+        <ul class="list-disc list-inside text-gray-700 text-base md:text-lg space-y-2">
+          <li>Religious sites (synagogues, mikvehs, yeshivas)</li>
+          <li>Cultural and communal centers</li>
+          <li>Educational institutions</li>
+          <li>Historical landmarks and monuments</li>
+          <li>Kosher food establishments</li>
+          <li>Ancient and modern residential areas</li>
+          <li>Locations of significant historical events</li>
+        </ul>
+      </div>
+
+      <!-- Why This Matters -->
+      <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8 h-full">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Why This Matters</h3>
+        <ul class="list-disc list-inside text-gray-700 text-base md:text-lg space-y-2">
+          <li>Preserving cultural heritage for future generations</li>
+          <li>Supporting educational initiatives and research</li>
+          <li>Connecting travelers with Jewish sites globally</li>
+          <li>Creating a comprehensive historical record</li>
+          <li>Building community through shared knowledge</li>
+          <li>Documenting patterns of Jewish life across time</li>
+        </ul>
       </div>
     </div>
-  </section>
+
+  </div>
+</section>
 
   <!-- FOOTER -->
   <footer class="bg-gray-800 text-white text-center py-8 text-sm md:text-base">
