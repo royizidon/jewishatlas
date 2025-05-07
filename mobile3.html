@@ -1,925 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jewish Sites Map</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-
-<style>
-  /* Make header navigation more mobile-friendly */
-  @media (max-width: 640px) {
-    header nav {
-      width: 100%;
-      justify-content: center;
-      margin-top: 0.5rem;
-    }
-    
-    header nav a {
-      padding: 0.25rem 0.5rem;
-      text-align: center;
-    }
-  }
-  
-  /* Add subtle highlight to the Upload link */
-  header nav a[href="#upload-section"] {
-    position: relative;
-    font-weight: 600;
-  }
-  
-  /* Optional animation for upload link */
-  @keyframes subtle-pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.8; }
-    100% { opacity: 1; }
-  }
-  
-  header nav a[href="#upload-section"]:hover {
-    animation: subtle-pulse 1.5s infinite;
-  }
-
-
-
-/* Additional styles to make the map look better on mobile */
-@media (max-width: 640px) {
-  /* Adjust map container height for small screens */
-  #map-wrapper {
-    height: 60vh !important;
-    min-height: 350px !important;
-  }
-  
-  /* Make buttons larger and easier to tap on mobile */
-  #fullscreen-toggle {
-    padding: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-  
-  /* Ensure the map section has appropriate padding */
-  #map-section {
-    padding: 1rem;
-  }
-  
-  /* Adjust header title for mobile */
-  header h1 {
-    font-size: 1.5rem;
-  }
-  
-  /* Navigation links more spaced for touch */
-  header nav a {
-    padding: 6px 10px;
-    margin: 0 2px;
-  }
-}
-
-/* Improved fullscreen mode styling */
-.map-fullscreen {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-height: none !important;
-  z-index: 9999 !important;
-}
-
-/* Styling for custom fullscreen button */
-#fullscreen-toggle {
-  transition: all 0.2s ease;
-  opacity: 0.8;
-}
-
-#fullscreen-toggle:hover {
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-/* Fix for Safari viewport height issues */
-@supports (-webkit-touch-callout: none) {
-  #map-wrapper {
-    height: 50vh; /* Use percent of viewport height on iOS */
-    max-height: 450px;
-  }
-}
-
-/* Ensure iframe contents scale properly */
-iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-    body { font-family: 'Poppins', sans-serif; }
-    
-    /* Add styles for the error modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.5);
-    }
-    
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 500px;
-      border-radius: 8px;
-    }
-    
-    .close-button {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .close-button:hover,
-    .close-button:focus {
-      color: black;
-      text-decoration: none;
-    }
-    
-    /* Add styles for mobile-friendly dismissable notification */
-    .location-notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      max-width: 320px;
-      animation: slideIn 0.3s ease-out;
-    }
-    
-    .location-notification-content {
-      padding: 15px;
-    }
-    
-    .location-notification button {
-      background-color: #1a4588;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    /* About section custom styles */
-    .about-section {
-      background-color: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-    }
-    
-    .about-card {
-      border-left: 4px solid #3b82f6;
-      background-color: white;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-      border-radius: 0 0.5rem 0.5rem 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewish Atlas - Coming Soon</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;600&display=swap');
+        
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #cc9933;
+            --background-color: #f7f4ed;
+            --text-color: #333333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary-color), #005599);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .star-of-david {
+            display: inline-block;
+            position: relative;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .hero {
+            background: url('/api/placeholder/1200/600') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            color: white;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 51, 102, 0.7);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background-color: #b88a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .features {
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .feature-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature {
+            flex: 1;
+            min-width: 300px;
+            max-width: 350px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+        
+        .feature h3 {
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+        }
+        
+        .newsletter {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .newsletter h2 {
+            color: white;
+        }
+        
+        .newsletter-form {
+            max-width: 500px;
+            margin: 30px auto 0;
+            display: flex;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-family: 'Raleway', sans-serif;
+        }
+        
+        .newsletter-form button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Raleway', sans-serif;
+        }
+        
+        footer {
+            background-color: #002244;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+            
+            .newsletter-form input {
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .newsletter-form button {
+                border-radius: 5px;
+                padding: 12px;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animated {
+            animation: fadeIn 1s ease-out forwards;
+        }
+        
+        .delay-1 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+        
+        .delay-2 {
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
+        
+        .delay-3 {
+            animation-delay: 0.6s;
+            opacity: 0;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .countdown-segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 15px;
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background-color: var(--secondary-color);
+            color: white;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
-
-<header class="bg-white shadow sticky top-0 z-50 p-4">
-  <h1 class="text-xl font-bold text-gray-900 text-center mb-2">The Jewish Atlas</h1>
-  <nav class="flex justify-center gap-6">
-    <a href="#map-section" class="text-gray-700 font-medium hover:text-blue-600">Map</a>
-
-    <a href="#about" class="text-gray-700 font-medium hover:text-blue-600">About</a>
-  </nav>
-</header>
-
-<style>
-/* Improved mobile header styles */
-@media (max-width: 640px) {
-  header {
-    padding: 0.75rem 1rem;
-  }
-  
-  header h1 {
-    margin-bottom: 0.5rem;
-  }
-  
-  header nav {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 0.5rem;
-  }
-  
-  header nav a {
-    font-size: 0.9rem;
-    white-space: nowrap;
-  }
-}
-
-/* Even smaller screens */
-@media (max-width: 380px) {
-  header nav {
-    gap: 0.75rem;
-  }
-  
-  header nav a {
-    font-size: 0.8rem;
-  }
-}
-</style>
-
-  <section class="text-center py-16 px-6 bg-gradient-to-r from-blue-100 to-white">
-    <h2 class="text-3xl font-semibold mb-4 text-gray-900">Explore Jewish Heritage Around the World</h2>
-    <p class="max-w-2xl mx-auto text-lg text-gray-600 mb-8">
-      Welcome to The Jewish Atlas. Use the map below to find synagogues, cemeteries, kosher restaurants, ghettos, yeshivas,
-      and other Jewish heritage sites globally. Each color represents a different type of site.
-    </p>
-   <div class="flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-md mx-auto mt-6">
-  <button
-    onclick="document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' })"
-    class="w-full sm:w-auto bg-blue-700 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition"
-  >
-    Go to Map
-  </button>
-
-  <a
-    href="https://arcg.is/0XKXmv"
-    target="_blank"
-    class="w-full sm:w-auto"
-  >
-    <div
-      class="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition font-semibold text-center"
-    >
-      Upload Your Jewish Site
-    </div>
-  </a>
-</div>
-
-  </section>
-
-  <section class="bg-white py-12 px-6">
-    <h3 class="text-2xl font-semibold text-center mb-8 text-gray-800">Map Legend</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-red-400 inline-block"></span><span>Synagogue</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-teal-400 inline-block"></span><span>Cemetery</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-yellow-300 inline-block"></span><span>Tomb</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-purple-500 inline-block"></span><span>Monument</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-green-400 inline-block"></span><span>Heritage Site</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-orange-400 inline-block"></span><span>Yeshiva</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-pink-400 inline-block"></span><span>School</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-yellow-700 inline-block"></span><span>Jewish Quarter</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-emerald-500 inline-block"></span><span>Mikveh</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-indigo-500 inline-block"></span><span>Museum</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-500 inline-block"></span><span>Ghetto</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-700 inline-block"></span><span>Karaite Site</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-blue-500 inline-block"></span><span>Kosher Restaurant</span></div>
-    </div>
-    <p class="text-center text-sm text-gray-500 mt-4">
-      Tap the locator icon (top-left on the map) to zoom to your current location. If it doesn't work, check your browser and OS location settings.
-    </p>
-  <p class="text-center text-sm text-gray-500 mt-4">   
-Use the filter button in the map to filter the data points by category.
-          </p>
-
-  </section>
-
-  <section id="map-section" class="p-4 bg-white">
-  <!-- Map Container with responsive sizing -->
-  <div class="rounded-lg shadow-lg overflow-hidden relative">
-    <div id="map-wrapper" style="height: 50vh; min-height: 300px; max-height: 450px;" class="w-full relative">
-      <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
-        <p class="text-gray-600">Loading map...</p>
-      </div>
-      
-      <!-- The iframe with ArcGIS map -->
-      <iframe id="map-iframe" class="w-full h-full border-none" 
-              src="https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502" 
-              allow="geolocation"
-              allowfullscreen
-              title="Jewish Heritage Map"
-              onload="hideLoading()"></iframe>
-    </div>
-  </div>
-  
-  
-</section>
-
-<script>
-  // Function to hide loading indicator when map is loaded
-  function hideLoading() {
-    document.getElementById('loading-indicator').style.display = 'none';
-    checkLocationPermission();
-  }
-  
-  // Function to check if location permission is granted
-  function checkLocationPermission() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          console.log("Location permission granted");
-        },
-        function(error) {
-          if (error.code === error.PERMISSION_DENIED) {
-            showLocationNotification();
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">
+                <span class="star-of-david">✡️</span> 
+                Jewish Atlas
+            </a>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="animated">The Official Launch of the Jewish Atlas</h1>
+            <p class="subtitle animated delay-1">A comprehensive digital guide to Jewish heritage, history, and culture around the world</p>
+            
+            <div class="countdown animated delay-2">
+                <div class="countdown-segment">
+                    <div class="countdown-number" id="days">23</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-segment">
+                    <div class="countdown-number" id="hours">14</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-segment">
+                    <div class="countdown-number" id="minutes">45</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-segment">
+                    <div class="countdown-number" id="seconds">19</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+            
+            <a href="#notify" class="btn animated delay-3">Get Notified</a>
+        </div>
+    </section>
+    
+    <section class="features">
+        <div class="container">
+            <h2>Coming Soon to Explore</h2>
+            <div class="feature-container">
+                <div class="feature">
+                    <div class="feature-icon">🗺️</div>
+                    <h3>Interactive Maps</h3>
+                    <p>Explore Jewish communities, historical sites, and cultural landmarks across the globe with our detailed interactive maps.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📚</div>
+                    <h3>Rich Historical Content</h3>
+                    <p>Dive into the depth of Jewish history with comprehensive timelines, archival materials, and scholarly resources.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💼</div>
+                    <h3>Community Resources</h3>
+                    <p>Connect with Jewish communities worldwide through directories of synagogues, kosher restaurants, museums, and cultural centers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="newsletter" id="notify">
+        <div class="container">
+            <h2>Be the First to Know</h2>
+            <p>Subscribe to our newsletter to receive updates about our launch and be among the first to explore the Jewish Atlas.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Jewish Atlas. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Countdown Timer
+        function updateCountdown() {
+            // Set the launch date (for demo purposes, 23 days from now)
+            const now = new Date();
+            const launchDate = new Date();
+            launchDate.setDate(now.getDate() + 23);
+            launchDate.setHours(14, 0, 0, 0);
+            
+            const timeRemaining = launchDate - now;
+            
+            // Calculate days, hours, minutes, seconds
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            
+            // Update DOM
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
         }
-      );
-    }
-  }
-  
-  // Function to show location notification (if needed)
-  function showLocationNotification() {
-    const notification = document.createElement("div");
-    notification.className = "location-notification";
-    notification.innerHTML = `
-      <div class="location-notification-content">
-        <p><strong>Location access denied</strong></p>
-        <p>Please enable location services in your browser settings to use the "Find my location" feature.</p>
-        <button onclick="dismissNotification(this)">Close</button>
-      </div>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
-      }
-    }, 10000);
-  }
-  
-  function dismissNotification(buttonElement) {
-    const notification = buttonElement.closest('.location-notification');
-    if (notification && notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-  }
-</script>
-
-<style>
-  /* Style for our custom fullscreen button */
-  #fullscreen-toggle {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    transition: all 0.2s ease;
-    opacity: 0.9;
-  }
-  
-  #fullscreen-toggle:hover {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-  
-  /* Make fullscreen overlay cover the entire viewport */
-  .map-fullscreen-mode {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    max-height: none !important;
-    z-index: 9999 !important;
-  }
-  
-  /* Mobile optimization */
-  @media (max-width: 640px) {
-    #fullscreen-toggle {
-      padding: 12px;
-      bottom: 12px;
-      left: 12px;
-    }
-  }
-</style>
-
-<script>
-  // Function to hide loading indicator when map is loaded
-  function hideLoading() {
-    document.getElementById('loading-indicator').style.display = 'none';
-    checkLocationPermission();
-  }
-  
-  // Toggle fullscreen functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const mapWrapper = document.getElementById('map-wrapper');
-    const fullscreenToggle = document.getElementById('fullscreen-toggle');
-    const expandIcon = fullscreenToggle.querySelector('.expand-icon');
-    const collapseIcon = fullscreenToggle.querySelector('.collapse-icon');
-    
-    // Store original styles
-    let originalStyles = {
-      height: mapWrapper.style.height,
-      minHeight: mapWrapper.style.minHeight,
-      maxHeight: mapWrapper.style.maxHeight,
-      position: mapWrapper.style.position,
-      zIndex: mapWrapper.style.zIndex
-    };
-    
-    fullscreenToggle.addEventListener('click', function() {
-      if (expandIcon.classList.contains('hidden')) {
-        // Exit fullscreen mode
-        mapWrapper.classList.remove('map-fullscreen-mode');
-        mapWrapper.style.height = originalStyles.height;
-        mapWrapper.style.minHeight = originalStyles.minHeight;
-        mapWrapper.style.maxHeight = originalStyles.maxHeight;
-        mapWrapper.style.position = originalStyles.position;
-        mapWrapper.style.zIndex = originalStyles.zIndex;
         
-        expandIcon.classList.remove('hidden');
-        collapseIcon.classList.add('hidden');
-        
-        // Re-enable scrolling
-        document.body.style.overflow = 'auto';
-      } else {
-        // Enter fullscreen mode
-        // Save current styles first
-        originalStyles = {
-          height: mapWrapper.style.height,
-          minHeight: mapWrapper.style.minHeight,
-          maxHeight: mapWrapper.style.maxHeight,
-          position: mapWrapper.style.position,
-          zIndex: mapWrapper.style.zIndex
-        };
-        
-        // Apply fullscreen styles
-        mapWrapper.classList.add('map-fullscreen-mode');
-        
-        expandIcon.classList.add('hidden');
-        collapseIcon.classList.remove('hidden');
-        
-        // Disable scrolling while in fullscreen
-        document.body.style.overflow = 'hidden';
-      }
-    });
-    
-    // Exit fullscreen on escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && expandIcon.classList.contains('hidden')) {
-        fullscreenToggle.click();
-      }
-    });
-  });
-  
-  // Function to check if location permission is granted
-  function checkLocationPermission() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          console.log("Location permission granted");
-        },
-        function(error) {
-          if (error.code === error.PERMISSION_DENIED) {
-            showLocationNotification();
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    }
-  }
-  
-  // Function to show location notification (if needed)
-  function showLocationNotification() {
-    const notification = document.createElement("div");
-    notification.className = "location-notification";
-    notification.innerHTML = `
-      <div class="location-notification-content">
-        <p><strong>Location access denied</strong></p>
-        <p>Please enable location services in your browser settings to use the "Find my location" feature.</p>
-        <button onclick="dismissNotification(this)">Close</button>
-      </div>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
-      }
-    }, 10000);
-  }
-  
-  function dismissNotification(buttonElement) {
-    const notification = buttonElement.closest('.location-notification');
-    if (notification && notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-  }
-</script>
-<!-- Add this script to your page for fullscreen functionality -->
-<script>
-  // Function to hide loading indicator when map is loaded
-  function hideLoading() {
-    document.getElementById('loading-indicator').style.display = 'none';
-    
-    // Check location permission once the map is loaded
-    checkLocationPermission();
-    
-    // Try to hide ArcGIS fullscreen buttons via post-load CSS injection
-    try {
-      const iframe = document.getElementById('map-iframe');
-      if (iframe && iframe.contentWindow) {
-        // Wait a bit for the iframe content to fully load
-        setTimeout(() => {
-          const style = document.createElement('style');
-          style.textContent = `
-            .esri-component.esri-expand.esri-widget.esri-expand--auto { 
-              display: none !important; 
-            }
-            .esri-expand__container.esri-expand__container--expanded {
-              display: none !important;
-            }
-            .esri-fullscreen {
-              display: none !important;
-            }
-          `;
-          
-          // Try to inject the style into the iframe
-          try {
-            iframe.contentWindow.document.head.appendChild(style);
-          } catch (e) {
-            console.log('Could not inject styles due to cross-origin restrictions');
-          }
-        }, 1500);
-      }
-    } catch (e) {
-      console.log('Error trying to modify iframe content', e);
-    }
-  }
-  
-  // Toggle fullscreen functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const mapWrapper = document.getElementById('map-wrapper');
-    const fullscreenToggle = document.getElementById('fullscreen-toggle');
-    const expandIcon = fullscreenToggle.querySelector('.expand-icon');
-    const collapseIcon = fullscreenToggle.querySelector('.collapse-icon');
-    
-    // Store original styles
-    let originalStyles = {
-      height: mapWrapper.style.height,
-      minHeight: mapWrapper.style.minHeight,
-      maxHeight: mapWrapper.style.maxHeight,
-      position: mapWrapper.style.position,
-      zIndex: mapWrapper.style.zIndex
-    };
-    
-    fullscreenToggle.addEventListener('click', function() {
-      if (expandIcon.classList.contains('hidden')) {
-        // Exit fullscreen mode
-        mapWrapper.style.height = originalStyles.height;
-        mapWrapper.style.minHeight = originalStyles.minHeight;
-        mapWrapper.style.maxHeight = originalStyles.maxHeight;
-        mapWrapper.style.position = originalStyles.position;
-        mapWrapper.style.zIndex = originalStyles.zIndex;
-        mapWrapper.classList.remove('fixed', 'top-0', 'left-0', 'w-full', 'h-full');
-        
-        expandIcon.classList.remove('hidden');
-        collapseIcon.classList.add('hidden');
-        
-        // Re-enable scrolling
-        document.body.style.overflow = 'auto';
-      } else {
-        // Enter fullscreen mode
-        // Save current styles first
-        originalStyles = {
-          height: mapWrapper.style.height,
-          minHeight: mapWrapper.style.minHeight,
-          maxHeight: mapWrapper.style.maxHeight,
-          position: mapWrapper.style.position,
-          zIndex: mapWrapper.style.zIndex
-        };
-        
-        // Apply fullscreen styles
-        mapWrapper.style.position = 'fixed';
-        mapWrapper.style.top = '0';
-        mapWrapper.style.left = '0';
-        mapWrapper.style.width = '100%';
-        mapWrapper.style.height = '100%';
-        mapWrapper.style.maxHeight = 'none';
-        mapWrapper.style.zIndex = '9999';
-        
-        expandIcon.classList.add('hidden');
-        collapseIcon.classList.remove('hidden');
-        
-        // Disable scrolling while in fullscreen
-        document.body.style.overflow = 'hidden';
-      }
-    });
-    
-    // Exit fullscreen on escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && expandIcon.classList.contains('hidden')) {
-        fullscreenToggle.click();
-      }
-    });
-  });
-  
-  // Function to check if location permission is granted
-  function checkLocationPermission() {
-    // First check if the browser supports geolocation
-    if (navigator.geolocation) {
-      // Try to get user's location to trigger permission prompt if needed
-      navigator.geolocation.getCurrentPosition(
-        // Success callback - permission granted
-        function(position) {
-          console.log("Location permission granted");
-          // Optionally, we could do something here when permission is granted
-        },
-        // Error callback - permission denied or error
-        function(error) {
-          console.log("Location error:", error.code, error.message);
-          
-          // Show notification if permission is denied
-          if (error.code === error.PERMISSION_DENIED) {
-            showLocationNotification();
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    }
-  }
-</script>
-
-<!-- Add this script to your page for fullscreen functionality -->
-<script>
-  // Function to hide loading indicator when map is loaded
-  function hideLoading() {
-    document.getElementById('loading-indicator').style.display = 'none';
-    
-    // Check location permission once the map is loaded
-    checkLocationPermission();
-  }
-  
-  // Toggle fullscreen functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const mapWrapper = document.getElementById('map-wrapper');
-    const fullscreenToggle = document.getElementById('fullscreen-toggle');
-    const expandIcon = fullscreenToggle.querySelector('.expand-icon');
-    const collapseIcon = fullscreenToggle.querySelector('.collapse-icon');
-    
-    // Store original styles
-    let originalStyles = {
-      height: mapWrapper.style.height,
-      minHeight: mapWrapper.style.minHeight,
-      maxHeight: mapWrapper.style.maxHeight,
-      position: mapWrapper.style.position,
-      zIndex: mapWrapper.style.zIndex
-    };
-    
-    fullscreenToggle.addEventListener('click', function() {
-      if (expandIcon.classList.contains('hidden')) {
-        // Exit fullscreen mode
-        mapWrapper.style.height = originalStyles.height;
-        mapWrapper.style.minHeight = originalStyles.minHeight;
-        mapWrapper.style.maxHeight = originalStyles.maxHeight;
-        mapWrapper.style.position = originalStyles.position;
-        mapWrapper.style.zIndex = originalStyles.zIndex;
-        mapWrapper.classList.remove('fixed', 'top-0', 'left-0', 'w-full', 'h-full');
-        
-        expandIcon.classList.remove('hidden');
-        collapseIcon.classList.add('hidden');
-        
-        // Re-enable scrolling
-        document.body.style.overflow = 'auto';
-      } else {
-        // Enter fullscreen mode
-        // Save current styles first
-        originalStyles = {
-          height: mapWrapper.style.height,
-          minHeight: mapWrapper.style.minHeight,
-          maxHeight: mapWrapper.style.maxHeight,
-          position: mapWrapper.style.position,
-          zIndex: mapWrapper.style.zIndex
-        };
-        
-        // Apply fullscreen styles
-        mapWrapper.style.position = 'fixed';
-        mapWrapper.style.top = '0';
-        mapWrapper.style.left = '0';
-        mapWrapper.style.width = '100%';
-        mapWrapper.style.height = '100%';
-        mapWrapper.style.maxHeight = 'none';
-        mapWrapper.style.zIndex = '9999';
-        
-        expandIcon.classList.add('hidden');
-        collapseIcon.classList.remove('hidden');
-        
-        // Disable scrolling while in fullscreen
-        document.body.style.overflow = 'hidden';
-      }
-    });
-    
-    // Exit fullscreen on escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && expandIcon.classList.contains('hidden')) {
-        fullscreenToggle.click();
-      }
-    });
-  });
-  
-  // Function to check if location permission is granted
-  function checkLocationPermission() {
-    // First check if the browser supports geolocation
-    if (navigator.geolocation) {
-      // Try to get user's location to trigger permission prompt if needed
-      navigator.geolocation.getCurrentPosition(
-        // Success callback - permission granted
-        function(position) {
-          console.log("Location permission granted");
-          // Optionally, we could do something here when permission is granted
-        },
-        // Error callback - permission denied or error
-        function(error) {
-          console.log("Location error:", error.code, error.message);
-          
-          // Show notification if permission is denied
-          if (error.code === error.PERMISSION_DENIED) {
-            showLocationNotification();
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    }
-  }
-</script>
-  <section id="upload-section" class="p-6 bg-gray-50 text-center">
-<a href="https://arcg.is/0XKXmv" target="_blank">
-  <h2 class="text-2xl font-semibold mb-4">Submit a New Site</h2>
-</a>    <p class="text-gray-600 max-w-xl mx-auto">Let us know about a Jewish heritage site not yet on the map. Your submission helps preserve Jewish memory around the world.</p>
-  </section>
-
-<section id="about" class="about-section py-16 px-6">
-  <!-- Add padding-top to account for the fixed header -->
-  <div class="pt-16 max-w-4xl mx-auto">
-    <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900">About The Jewish Atlas</h2>
-    
-    <div class="about-card mb-8">
-      <h3 class="text-xl font-semibold mb-4 text-gray-800">Our Mission</h3>
-      <p class="mb-4">
-        The Jewish Atlas declares a mission to collect all spatial data on Jewish sites, from the beginning of history until today. The data includes many categories such as synagogues, educational institutions, restaurants, schools, events, family homes, and more.
-      </p>
-      <p class="mb-4">
-        This website serves as the main interface for the Jewish Atlas database. You can use it anywhere to explore and get familiar with Jewish heritage and present-day Jewish life. We need your help to grow — upload your Jewish site and become part of this living archive.
-      </p>
-    </div>
-    
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="about-card h-full">
-        <h3 class="text-xl font-semibold mb-4 text-gray-800">What We Document</h3>
-        <ul class="space-y-2">
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Religious sites (synagogues, mikvehs, yeshivas)</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Cultural and communal centers</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Educational institutions</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Historical landmarks and monuments</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Kosher food establishments</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Ancient and modern residential areas</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Locations of significant historical events</span>
-          </li>
-        </ul>
-      </div>
-      
-      <div class="about-card h-full">
-        <h3 class="text-xl font-semibold mb-4 text-gray-800">Why This Matters</h3>
-        <ul class="space-y-2">
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Preserving cultural heritage for future generations</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Supporting educational initiatives and research</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Connecting travelers with Jewish sites globally</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Creating a comprehensive historical record</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Building community through shared knowledge</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-blue-500 mr-2">•</span>
-            <span>Documenting patterns of Jewish life across time</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<style>
-  /* Fix for header overlapping content when jumping to anchor links */
-  html {
-    scroll-padding-top: 80px; /* Adjust this value based on your header height */
-  }
-  
-  /* Style for smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  /* Ensure the header has proper z-index */
-  header {
-    z-index: 50;
-  }
-  
-  /* About section custom styles */
-  .about-section {
-    background-color: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-  }
-  
-  .about-card {
-    border-left: 4px solid #3b82f6;
-    background-color: white;
-    padding: 1.5rem;
-    margin: 1.5rem 0;
-    border-radius: 0 0.5rem 0.5rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
-</style>
-  <footer class="bg-gray-800 text-white text-center py-6 text-sm">
-    &copy; 2025 The Jewish Atlas. All rights reserved.
-  </footer>
-
-<script>
-  // Update navigation links to use smooth scrolling
-  document.addEventListener('DOMContentLoaded', function() {
-    // Find all links that point to an anchor
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    
-    anchorLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Get the target element
-        const targetId = this.getAttribute('href').substring(1);
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-          // Scroll to the target element with smooth behavior
-          targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
-  });
-</script>
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Initial update
+    </script>
 </body>
 </html>
+
+
+
