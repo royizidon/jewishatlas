@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Redirect</title>
+    <script>
+        // Function to detect mobile devices
+        function isMobileDevice() {
+            return (window.innerWidth <= 768) || 
+                   (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+        }
+        
+        // Redirect based on device type
+        window.onload = function() {
+            if (isMobileDevice()) {
+                window.location.href = "mobile.html";
+            } else {
+                window.location.href = "desktop.html";
+            }
+        }
+    </script>
+</head>
+<body>
+    <noscript>
+        <p>JavaScript is required for this site to function properly.</p>
+        <p>Please choose a version manually:</p>
+        <ul>
+            <li><a href="mobile.html">Mobile Version</a></li>
+            <li><a href="desktop.html">Desktop Version</a></li>
+        </ul>
+    </noscript>
+    
+    <div style="text-align: center; font-family: Arial, sans-serif; margin-top: 50px;">
+        <h1>Redirecting...</h1>
+        <p>You will be redirected to the appropriate version shortly.</p>
+        <p>If you are not redirected, please click one of the links below:</p>
+        <p>
+            <a href="mobile.html">Mobile Version</a> | 
+            <a href="desktop.html">Desktop Version</a>
+        </p>
+    </div>
+</body>
+</html>
