@@ -6,6 +6,7 @@
   <title>Jewish Sites Map</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -27,128 +28,134 @@
       height: 100vh !important;
       z-index: 9999 !important;
     }
-
-    .btn-primary {
+    .btn-primary,
+    .btn-secondary {
       transition: all 0.3s ease;
     }
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
-
-    .btn-secondary {
-      transition: all 0.3s ease;
-    }
     .btn-secondary:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
     }
+    @media (max-width: 768px) {
+      header .mobile-nav {
+        text-align: center;
+      }
+      .hero-buttons .btn {
+        width: 100%;
+      }
+      #map-wrapper.map-fullscreen {
+        height: 100vh !important;
+        top: 60px !important;
+      }
+    }
   </style>
 </head>
+
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- HEADER -->
-  <header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex-shrink-0 text-xl font-bold text-gray-900 tracking-tight">
-          <a href="#" class="hover:text-blue-700 transition">The Jewish Atlas</a>
-        </div>
-        <nav class="hidden md:flex space-x-8">
-          <a href="#map-section" class="text-gray-700 hover:text-blue-600 font-medium transition">Map</a>
-          <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition">About</a>
-        </nav>
+<!-- HEADER -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Site Title -->
+      <div class="text-xl font-bold text-gray-900 tracking-tight">
+        <a href="#" class="hover:text-blue-700 transition">The Jewish Atlas</a>
       </div>
-    </div>
-    <div class="md:hidden px-4 pb-4 pt-2 bg-white border-t border-gray-200">
-      <nav class="flex flex-col space-y-2">
-        <a href="#map-section" class="text-gray-700 hover:text-blue-600 font-medium">Map</a>
-        <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="#map-section" class="text-gray-700 hover:text-blue-600 font-medium transition">Map</a>
+        <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition">About</a>
       </nav>
-    </div>
-  </header>
 
-  <!-- HERO SECTION -->
-  <section class="text-center py-20 px-6 md:px-16 lg:px-32 bg-gradient-to-r from-blue-100 to-white">
-    <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-gray-900">Explore Jewish Heritage Around the World</h2>
-    <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-600 mb-10">
-      Use the map below to find synagogues, cemeteries, kosher restaurants, ghettos, yeshivas, and other Jewish heritage sites globally.
-    </p>
-    <div class="flex flex-col sm:flex-row justify-center gap-4 md:gap-8">
-      <button onclick="document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' })" class="btn-primary bg-blue-700 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition">
-        Go to Map
+      <!-- Mobile Hamburger -->
+      <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden text-gray-700 focus:outline-none">
+        ☰
       </button>
-      <a href="https://arcg.is/0XKXmv" target="_blank">
-        <button class="btn-secondary bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition font-semibold">
-          Upload Your Jewish Site
-        </button>
-      </a>
     </div>
-  </section>
 
-  <!-- LEGEND SECTION -->
-  <section class="bg-white py-16 px-6 md:px-12">
-    <h3 class="text-2xl md:text-3xl font-semibold text-center mb-8 text-gray-800">Map Legend</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-6xl mx-auto text-left">
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-red-400 inline-block"></span><span>Synagogue</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-teal-400 inline-block"></span><span>Cemetery</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-yellow-300 inline-block"></span><span>Tomb</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-purple-500 inline-block"></span><span>Monument</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-green-400 inline-block"></span><span>Heritage Site</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-orange-400 inline-block"></span><span>Yeshiva</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-pink-400 inline-block"></span><span>School</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-yellow-700 inline-block"></span><span>Jewish Quarter</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-emerald-500 inline-block"></span><span>Mikveh</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-indigo-500 inline-block"></span><span>Museum</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-500 inline-block"></span><span>Ghetto</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-700 inline-block"></span><span>Karaite Site</span></div>
-      <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-blue-500 inline-block"></span><span>Kosher Restaurant</span></div>
+    <!-- Mobile Navigation Menu -->
+    <div id="mobile-menu" class="md:hidden hidden px-4 pb-4 pt-2 bg-white border-t border-gray-200 mobile-nav">
+      <a href="#map-section" class="block text-gray-700 hover:text-blue-600 font-medium">Map</a>
+      <a href="#about" class="block text-gray-700 hover:text-blue-600 font-medium">About</a>
     </div>
-    <p class="text-center text-sm text-gray-500 mt-6">Tap the locator icon to zoom to your location. Use the filter button to filter by category.</p>
-  </section>
-
-
-
-  <!-- MAP SECTION -->
-<section id="map-section" class="p-6 bg-white">
- <div id="map-wrapper" class="h-[50vh] md:h-[65vh] lg:h-[70vh] min-h-[400px] lg:min-h-[500px] w-full relative">
-  <!-- Loading Spinner -->
-  <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-    <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
-    <p class="text-gray-600">Loading map...</p>
   </div>
-
-  <!-- Fullscreen and Refresh Buttons -->
-<div class="absolute bottom-3 left-3 z-20 flex flex-row sm:flex-col gap-2">
-  
-<div class="absolute bottom-3 left-3 z-20 flex flex-row sm:flex-col gap-2">
-  <!-- Fullscreen Button -->
-  
-<button onclick="toggleFullscreen()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Fullscreen">
-  <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <!-- ↗ icon -->
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
-  </svg>
-</button>
-
-  <!-- Refresh Button -->
-  <button onclick="refreshMap()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Refresh Map">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M4 20l6-6M20 4l-6 6" />
-    </svg>
-  </button>
-</div>
-
-</div>
+</header>
 
 
+<!-- HERO SECTION -->
+<section class="text-center py-20 px-6 md:px-16 lg:px-32 bg-gradient-to-r from-blue-100 to-white">
+  <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-gray-900">Explore Jewish Heritage Around the World</h2>
+  <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-600 mb-10">
+    Use the map below to find synagogues, cemeteries, kosher restaurants, ghettos, yeshivas, and other Jewish heritage sites globally.
+  </p>
+  <div class="flex flex-col sm:flex-row justify-center gap-4 md:gap-8 hero-buttons">
+    <button onclick="document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' })" class="btn btn-primary bg-blue-700 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition">
+      Go to Map
+    </button>
+    <a href="https://arcg.is/0XKXmv" target="_blank" class="btn">
+      <button class="btn btn-secondary bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition font-semibold w-full">
+        Upload Your Jewish Site
+      </button>
+    </a>
+  </div>
+</section>
 
-  <!-- Embedded Map -->
-  <iframe id="map-iframe" allow="geolocation" allowfullscreen title="Jewish Heritage Map"></iframe>
-</div>
-<section>
+<!-- LEGEND SECTION -->
+<section class="bg-white py-16 px-6 md:px-12">
+  <h3 class="text-2xl md:text-3xl font-semibold text-center mb-8 text-gray-800">Map Legend</h3>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-6xl mx-auto text-left">
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-red-400 inline-block"></span><span>Synagogue</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-teal-400 inline-block"></span><span>Cemetery</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-yellow-300 inline-block"></span><span>Tomb</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-purple-500 inline-block"></span><span>Monument</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-green-400 inline-block"></span><span>Heritage Site</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-orange-400 inline-block"></span><span>Yeshiva</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-pink-400 inline-block"></span><span>School</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-yellow-700 inline-block"></span><span>Jewish Quarter</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-emerald-500 inline-block"></span><span>Mikveh</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-indigo-500 inline-block"></span><span>Museum</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-500 inline-block"></span><span>Ghetto</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-gray-700 inline-block"></span><span>Karaite Site</span></div>
+    <div class="flex items-center space-x-3"><span class="w-5 h-5 rounded-full bg-blue-500 inline-block"></span><span>Kosher Restaurant</span></div>
+  </div>
+  <p class="text-center text-sm text-gray-500 mt-6">Tap the locator icon to zoom to your location. Use the filter button to filter by category.</p>
+</section>
 
-<!-- UPLOAD SECTION (Black Link Title Only) -->
+<!-- MAP SECTION -->
+<section id="map-section" class="p-6 bg-white">
+  <div id="map-wrapper" class="h-[50vh] md:h-[65vh] lg:h-[70vh] min-h-[400px] lg:min-h-[500px] w-full relative">
+
+    <!-- Loading Spinner -->
+    <div id="loading-indicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600">Loading map...</p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="absolute bottom-3 left-3 z-20 flex flex-row sm:flex-col gap-2">
+      <button onclick="toggleFullscreen()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Fullscreen">
+        <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
+        </svg>
+      </button>
+      <button onclick="refreshMap()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Refresh Map">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M4 20l6-6M20 4l-6 6" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Map -->
+    <iframe id="map-iframe" allow="geolocation" allowfullscreen title="Jewish Heritage Map"></iframe>
+  </div>
+</section>
+
+<!-- UPLOAD SECTION -->
 <section id="upload-section" class="py-16 bg-white text-center border-t border-b border-gray-200">
   <a href="https://arcg.is/0XKXmv" target="_blank" class="block text-2xl md:text-3xl font-semibold text-black mb-4">
     Submit a New Site
@@ -158,115 +165,90 @@
   </p>
 </section>
 
-
-
-  <!-- ABOUT SECTION -->
-  <section id="about" class="bg-gray-50 py-20 px-4">
-    <div class="max-w-6xl mx-auto space-y-12">
-      <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8">
-        <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">Our Mission</h2>
-        <p class="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
-          The Jewish Atlas declares a mission to collect all spatial data on Jewish sites, from the beginning of history until today. The data includes many categories such as synagogues, educational institutions, restaurants, schools, events, family homes, and more.
-        </p>
-        <p class="text-gray-700 text-base md:text-lg leading-relaxed">
-          This website serves as the main interface for the Jewish Atlas database. You can use it anywhere to explore and get familiar with Jewish heritage and present-day Jewish life. We need your help to grow — upload your Jewish site and become part of this living archive.
-        </p>
+<!-- ABOUT SECTION -->
+<section id="about" class="bg-gray-50 py-20 px-4">
+  <div class="max-w-6xl mx-auto space-y-12">
+    <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8">
+      <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">Our Mission</h2>
+      <p class="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
+        The Jewish Atlas declares a mission to collect all spatial data on Jewish sites, from the beginning of history until today. The data includes many categories such as synagogues, educational institutions, restaurants, schools, events, family homes, and more.
+      </p>
+      <p class="text-gray-700 text-base md:text-lg leading-relaxed">
+        This website serves as the main interface for the Jewish Atlas database. You can use it anywhere to explore and get familiar with Jewish heritage and present-day Jewish life. We need your help to grow — upload your Jewish site and become part of this living archive.
+      </p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8 h-full">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">What We Document</h3>
+        <ul class="list-disc list-inside text-gray-700 text-base md:text-lg space-y-2">
+          <li>Religious sites (synagogues, mikvehs, yeshivas)</li>
+          <li>Cultural and communal centers</li>
+          <li>Educational institutions</li>
+          <li>Historical landmarks and monuments</li>
+          <li>Kosher food establishments</li>
+          <li>Ancient and modern residential areas</li>
+          <li>Locations of significant historical events</li>
+        </ul>
       </div>
-
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8 h-full">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">What We Document</h3>
-          <ul class="list-disc list-inside text-gray-700 text-base md:text-lg space-y-2">
-            <li>Religious sites (synagogues, mikvehs, yeshivas)</li>
-            <li>Cultural and communal centers</li>
-            <li>Educational institutions</li>
-            <li>Historical landmarks and monuments</li>
-            <li>Kosher food establishments</li>
-            <li>Ancient and modern residential areas</li>
-            <li>Locations of significant historical events</li>
-          </ul>
-        </div>
-
-        <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8 h-full">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">Why This Matters</h3>
-          <ul class="list-disc list-inside text-gray-700 text-base md:text-lg space-y-2">
-            <li>Preserving cultural heritage for future generations</li>
-            <li>Supporting educational initiatives and research</li>
-            <li>Connecting travelers with Jewish sites globally</li>
-            <li>Creating a comprehensive historical record</li>
-            <li>Building community through shared knowledge</li>
-            <li>Documenting patterns of Jewish life across time</li>
-          </ul>
-        </div>
+      <div class="bg-white border-l-4 border-blue-600 shadow-sm rounded-md p-6 md:p-8 h-full">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Why This Matters</h3>
+        <ul class="list-disc list-inside text-gray-700 text-base md:text-lg space-y-2">
+          <li>Preserving cultural heritage for future generations</li>
+          <li>Supporting educational initiatives and research</li>
+          <li>Connecting travelers with Jewish sites globally</li>
+          <li>Creating a comprehensive historical record</li>
+          <li>Building community through shared knowledge</li>
+          <li>Documenting patterns of Jewish life across time</li>
+        </ul>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-
+<!-- FOOTER -->
 <footer class="bg-gray-800 text-white text-sm md:text-base">
   <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-6 sm:space-y-0">
-    
-    <!-- Left side -->
     <div class="text-left space-y-1">
       <p class="font-semibold">&copy; 2025 The Jewish Atlas</p>
       <p class="text-gray-300">All rights reserved.</p>
     </div>
-
-    <!-- Right side: Email + centered Terms of Use under it -->
     <div class="flex flex-col items-end">
-      <div class="text-right">
-        <a href="mailto:jewishatlas@gmail.com" class="underline hover:text-blue-300 block">jewishatlas@gmail.com</a>
-      </div>
+      <a href="mailto:jewishatlas@gmail.com" class="underline hover:text-blue-300 block">jewishatlas@gmail.com</a>
       <div class="w-full flex justify-center mt-1">
         <a href="disclaimer.html" class="underline hover:text-blue-300">Terms of Use</a>
       </div>
     </div>
-
   </div>
 </footer>
 
+<!-- SCRIPTS -->
+<script>
+  const mapIframe = document.getElementById("map-iframe");
+  const isMobile = window.innerWidth <= 768;
 
-  <script>
-    const mapIframe = document.getElementById("map-iframe");
-    const isMobile = window.innerWidth <= 768;
+  const mapUrl = "https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502";
+  mapIframe.src = mapUrl;
 
-    const mapUrlMobile = "https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502"; // replace with actual mobile ArcGIS app URL
-    const mapUrlDesktop = "https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502";
+  mapIframe.onload = () => {
+    document.getElementById("loading-indicator").style.display = "none";
+  };
 
-    mapIframe.src = isMobile ? mapUrlMobile : mapUrlDesktop;
+  function toggleFullscreen() {
+    const mapWrapper = document.getElementById("map-wrapper");
+    const icon = document.getElementById("fullscreen-icon");
+    const isNowFullscreen = !mapWrapper.classList.contains("map-fullscreen");
+    mapWrapper.classList.toggle("map-fullscreen");
 
-    mapIframe.onload = () => {
-      document.getElementById("loading-indicator").style.display = "none";
-    };
-
-function toggleFullscreen() {
-  const mapWrapper = document.getElementById("map-wrapper");
-  const icon = document.getElementById("fullscreen-icon");
-
-  const isNowFullscreen = !mapWrapper.classList.contains("map-fullscreen");
-  mapWrapper.classList.toggle("map-fullscreen");
-
-  // Swap icon for fullscreen state
-  if (isNowFullscreen) {
-    // Collapse icon ↙ (opposite of ↗)
-    icon.innerHTML = `
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 8V4h-4M20 4l-6 6M4 16v4h4M4 20l6-6" />
-    `;
-  } else {
-    // Expand icon ↗
-    icon.innerHTML = `
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
-    `;
+    icon.innerHTML = isNowFullscreen
+      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 8V4h-4M20 4l-6 6M4 16v4h4M4 20l6-6" />`
+      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />`;
   }
-}
 
+  function refreshMap() {
+    mapIframe.src = mapIframe.src;
+    document.getElementById("loading-indicator").style.display = "flex";
+  }
+</script>
 
-function refreshMap() {
-  const iframe = document.getElementById("map-iframe");
-  iframe.src = iframe.src;
-  document.getElementById("loading-indicator").style.display = "flex";
-}
-
-  </script>
 </body>
 </html>
