@@ -230,9 +230,9 @@
   <script>
     const mapIframe = document.getElementById("map-iframe");
     const isMobile = window.innerWidth <= 768;
-const mapUrlDesktop = "https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502";
-const mapUrlMobile = mapUrlDesktop; // fallback until you have a dedicated mobile version
-appid=73dd616bdca34989966d8f1c3f03c502";
+
+    const mapUrlMobile = "https://your-mobile-map-url"; // replace with actual mobile ArcGIS app URL
+    const mapUrlDesktop = "https://jerus.maps.arcgis.com/apps/instant/media/index.html?appid=73dd616bdca34989966d8f1c3f03c502";
 
     mapIframe.src = isMobile ? mapUrlMobile : mapUrlDesktop;
 
