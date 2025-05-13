@@ -123,11 +123,13 @@
   
 <div class="absolute bottom-3 left-3 z-20 flex flex-row sm:flex-col gap-2">
   <!-- Fullscreen Button -->
-  <button onclick="toggleFullscreen()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Fullscreen">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
-    </svg>
-  </button>
+  
+<button onclick="toggleFullscreen()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Fullscreen">
+  <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- ↗ icon -->
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
+  </svg>
+</button>
 
   <!-- Refresh Button -->
   <button onclick="refreshMap()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Refresh Map">
@@ -239,12 +241,25 @@
 
 function toggleFullscreen() {
   const mapWrapper = document.getElementById("map-wrapper");
+  const icon = document.getElementById("fullscreen-icon");
+
+  const isNowFullscreen = !mapWrapper.classList.contains("map-fullscreen");
   mapWrapper.classList.toggle("map-fullscreen");
 
-  if (mapWrapper.classList.contains("map-fullscreen")) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Swap icon for fullscreen state
+  if (isNowFullscreen) {
+    // Collapse icon ↙ (opposite of ↗)
+    icon.innerHTML = `
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 8V4h-4M20 4l-6 6M4 16v4h4M4 20l6-6" />
+    `;
+  } else {
+    // Expand icon ↗
+    icon.innerHTML = `
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
+    `;
   }
 }
+
 
 function refreshMap() {
   const iframe = document.getElementById("map-iframe");
