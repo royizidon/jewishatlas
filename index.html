@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,6 +29,7 @@
       height: 100vh !important;
       z-index: 9999 !important;
     }
+
     .btn-primary,
     .btn-secondary {
       transition: all 0.3s ease;
@@ -40,6 +42,8 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
     }
+
+    /* Mobile-specific fixes */
     @media (max-width: 768px) {
       header .mobile-nav {
         text-align: center;
@@ -47,13 +51,41 @@
       .hero-buttons .btn {
         width: 100%;
       }
+      /* Disable fullscreen behavior on mobile */
       #map-wrapper.map-fullscreen {
-        height: 100vh !important;
-        top: 60px !important;
+        position: relative !important;
+        height: auto !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        z-index: auto !important;
       }
+      #fullscreen-button {
+        display: none !important;
+      }
+      #map-controls {
+        flex-direction: row !important;
+        bottom: 4rem;
+      }
+    }
+
+    /* Controls: Fullscreen & Refresh */
+    #map-controls {
+      position: absolute;
+      z-index: 20;
+      display: flex;
+      flex-direction: row;
+      bottom: 3.5rem;
+      left: 1rem;
+    }
+    #map-controls button {
+      margin-right: 0.5rem;
     }
   </style>
 </head>
+
+
+
 
 <body class="bg-gray-100 text-gray-800">
 
@@ -143,11 +175,11 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
         </svg>
       </button>
-      <button onclick="refreshMap()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Refresh Map">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M4 20l6-6M20 4l-6 6" />
-        </svg>
-      </button>
+ <button onclick="refreshMap()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Refresh Map">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+</button>
     </div>
 
     <!-- Map -->
