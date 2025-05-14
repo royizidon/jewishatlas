@@ -170,11 +170,16 @@
 
     <!-- Buttons -->
     <div class="absolute bottom-3 left-3 z-20 flex flex-row sm:flex-col gap-2">
-      <button onclick="toggleFullscreen()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Fullscreen">
-        <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
-        </svg>
-      </button>
+
+
+<button id="fullscreen-button" onclick="toggleFullscreen()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Fullscreen">
+  <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M4 4l6 6M20 16v4h-4m4 0l-6-6" />
+  </svg>
+</button>
+
+
+
  <button onclick="refreshMap()" class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow hover:bg-white transition" title="Refresh Map">
   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
