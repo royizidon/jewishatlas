@@ -188,7 +188,11 @@
     </div>
 
     <!-- Map -->
-    <iframe id="map-iframe" allow="geolocation" allowfullscreen title="Jewish Heritage Map"></iframe>
+<iframe id="map-iframe"
+        allow="geolocation"
+        allowfullscreen
+        title="Jewish Heritage Map"
+        onload="hideLoading()"></iframe>
   </div>
 </section>
 
@@ -290,6 +294,30 @@
     document.getElementById("loading-indicator").style.display = "flex";
   }
 </script>
+<!-- Add this script before your closing </body> tag -->
+<script>
+function initializeMap() {
+  // Base64 encoded URL - much harder to spot in source code
+  const mapData = 'aHR0cHM6Ly9qZXJ1cy5tYXBzLmFyY2dpcy5jb20vYXBwcy9pbnN0YW50L21lZGlhL2luZGV4Lmh0bWw/YXBwaWQ9NzNkZDYxNmJkY2EzNDk4OTk2NmQ4ZjFjM2YwM2M1MDI=';
+  
+  // Decode and set the URL
+  try {
+    const mapUrl = atob(mapData);
+    const iframe = document.getElementById('map-iframe');
+    if (iframe) {
+      iframe.src = mapUrl;
+    }
+  } catch (e) {
+    console.error('Map loading error');
+  }
+}
 
+// Load map when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeMap);
+} else {
+  initializeMap();
+}
+</script>
 </body>
 </html>
