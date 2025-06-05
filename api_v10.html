@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewish Atlas</title>
+
+  <!-- ArcGIS CSS -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
+  <!-- ArcGIS JS -->
+  <script src="https://js.arcgis.com/4.26/"></script>
+
+  <style>
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /*  Base & Layout Styles                                                   */
+    /* ───────────────────────────────────────────────────────────────────────── */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #f5f5f5;
+      overflow: hidden; /* prevent body scrolling behind the map */
+    }
+
+    /* 1) Fixed Header (50px tall) */
+    #appHeader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      z-index: 1000;
+    }
+
+    /* 2) Filter Buttons Container (≈44px tall) */
+    #filterContainer {
+      position: fixed;
+      top: 50px; /* sits immediately below the header */
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 8px 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;        /* allow horizontal scroll on narrow screens */
+      white-space: nowrap;      /* keep buttons in a single row */
+      z-index: 1000;
+    }
+
+    /* Pill‐shaped Filter Buttons */
+    .filterBtn {
+      display: inline-block;
+      padding: 6px 14px;
+      border: 2px solid #ccc;
+      border-radius: 20px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      color: #555;
+      transition: all 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;           /* prevent button from shrinking */
+    }
+    .filterBtn:hover {
+      background: #f0f0f0;
+    }
+    .filterBtn.active {
+      background: #555;
+      border-color: #555;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* 3) Map Container (push down by header + filter = 94px) */
+    #viewDiv {
+      position: absolute;
+      top: 94px; /* 50px header + ~44px filter */
+      left: 0;
+      width: 100%;
+      height: calc(100% - 94px);
+      border: 2px solid #ddd;
+      z-index: 1;
+    }
+
+    /* 4) Welcome Modal Overlay */
+    #welcomeModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.5s ease-out;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px 20px;
+      border-radius: 12px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: popUp 0.4s ease;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #2c3e50;
+    }
+    .modal-content p {
+      font-size: 14px;
+      color: #555;
+      margin: 10px 0 20px;
+    }
+    .modal-content button {
+      background: #2c3e50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes popUp {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 5) Widget Spacing (ArcGIS widgets) */
+    .esri-ui-left .esri-widget,
+    .esri-ui-top-left .esri-widget {
+      margin: 6px;
+    }
+    .esri-ui-right .esri-widget,
+    .esri-ui-top-right .esri-widget {
+      margin: 6px;
+    }
+
+    /* Custom Button Styles (Refresh & Basemap Toggle) */
+    .esri-widget.custom-button {
+      background: white;
+      border-radius: 8px;
+      padding: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .esri-widget.custom-button span {
+      font-size: 18px;
+    }
+
+    /* Search Input Styling */
+    .esri-search {
+      max-width: 90vw;
+      min-width: 250px;
+    }
+
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /*  Popup “Card” Styles                                                      */
+    /* ───────────────────────────────────────────────────────────────────────── */
+    .esri-popup .popup-card {
+      font-family: 'Helvetica Neue', sans-serif;
+      padding: 12px 16px;
+      line-height: 1.3;
+    }
+    .esri-popup .popup-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #2c3e50;
+    }
+    .esri-popup .popup-category {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: white;
+      background-color: #6c7a89;
+      padding: 4px 8px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .esri-popup .popup-address {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .esri-popup .popup-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap; /* wrap buttons if screen is narrow */
+    }
+    .esri-popup .popup-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #5DADE2;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background-color 0.15s;
+    }
+    .esri-popup .popup-button:hover {
+      background-color: #3498db;
+    }
+    .esri-popup .popup-button span.icon {
+      margin-right: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 1) Fixed Header -->
+  <div id="appHeader">Jewish Atlas</div>
+
+  <!-- 2) Filter Buttons -->
+  <div id="filterContainer">
+    <button class="filterBtn active" data-category="">All</button>
+    <button class="filterBtn" data-category="Synagogue">Synagogues</button>
+    <button class="filterBtn" data-category="Heritage">Heritage</button>
+    <button class="filterBtn" data-category="Kosher Restaurant">Kosher Food</button>
+    <button class="filterBtn" data-category="Community">Community</button>
+  </div>
+
+  <!-- 3) Map Container -->
+  <div id="viewDiv"></div>
+
+  <!-- 4) Welcome Modal Overlay -->
+  <div id="welcomeModal">
+    <div class="modal-content">
+      <h2>Welcome to Jewish Atlas</h2>
+      <p>Discover synagogues, heritage sites, kosher food and more—worldwide.</p>
+      <button onclick="closeModal()">Start Exploring</button>
+    </div>
+  </div>
+
+  <script>
+    // Hide the welcome modal when the user clicks "Start Exploring"
+    function closeModal() {
+      document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Locate",
+      "esri/widgets/Home",
+      "esri/widgets/Search"
+    ], function (Map, MapView, FeatureLayer, Locate, Home, Search) {
+
+      // 1) Create the map & view (94px top-padding for header + filter)
+      const map = new Map({ basemap: "topo-vector" });
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [35.21, 31.78], // Jerusalem
+        zoom: 7,
+        padding: { top: 94 }
+      });
+
+      // 2) Define the FeatureLayer with a “card-style” popupTemplate
+      const landmarks = new FeatureLayer({
+        url: "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/Landmarks/FeatureServer/0",
+        popupTemplate: {
+          title: "<div class='popup-title'>{Name}</div>",
+          content: `
+            <div class="popup-card">
+              <div class="popup-category">{Category}</div>
+              <div class="popup-address">{Address}</div>
+              <div class="popup-buttons">
+                <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}"
+                   target="_blank"
+                   class="popup-button">
+                  <span class="icon">📍</span>
+                  View on Google Maps
+                </a>
+                <a href="https://waze.com/ul?ll={lat},{lon}&navigate=yes"
+                   target="_blank"
+                   class="popup-button">
+                  <span class="icon">🚗</span>
+                  Navigate on Waze
+                </a>
+              </div>
+            </div>
+          `
+        },
+        renderer: {
+          type: "unique-value",
+          field: "main_category",
+          defaultSymbol: {
+            type: "simple-marker",
+            color: "gray",
+            outline: { color: "white", width: 1 }
+          },
+          uniqueValueInfos: [
+            {
+              value: "Synagogue",
+              symbol: {
+                type: "simple-marker",
+                color: "#5DADE2",
+                outline: { color: "white", width: 1 }
+              }
+            },
+            {
+              value: "Heritage",
+              symbol: {
+                type: "simple-marker",
+                color: "#EC7063",
+                outline: { color: "white", width: 1 }
+              }
+            },
+            {
+              value: "Community",
+              symbol: {
+                type: "simple-marker",
+                color: "#F5B041",
+                outline: { color: "white", width: 1 }
+              }
+            },
+            {
+              value: "Kosher Restaurant",
+              symbol: {
+                type: "simple-marker",
+                color: "#58D68D",
+                outline: { color: "white", width: 1 }
+              }
+            }
+          ],
+          visualVariables: [
+            {
+              type: "size",
+              valueExpression: "$view.scale",
+              stops: [
+                { value: 50000000, size: 2 },
+                { value: 25000000, size: 3 },
+                { value: 10000000, size: 4 },
+                { value: 5000000,  size: 5 },
+                { value: 1000000,  size: 6 },
+                { value: 500000,   size: 7 },
+                { value: 70000,    size: 7 },
+                { value: 60000,    size: 8 },
+                { value: 40000,    size: 9 },
+                { value: 20000,    size: 11 }
+              ]
+            }
+          ]
+        },
+        labelingInfo: [{
+          labelExpressionInfo: {
+            expression: "$feature.eng_name"
+          },
+          labelPlacement: "above-center",
+          symbol: {
+            type: "text",
+            color: "black",
+            haloColor: "white",
+            haloSize: 1,
+            font: {
+              family: "Arial",
+              size: 10,
+              weight: "bold"
+            }
+          },
+          minScale: 10000,
+          maxScale: 0
+        }]
+      });
+      map.add(landmarks);
+
+      // 3) Add Locate & Home widgets to the top-left
+      view.ui.add(new Locate({ view }), { position: "top-left" });
+      view.ui.add(new Home({ view }),   { position: "top-left" });
+
+      // 4) Add Refresh (🔄) & Basemap Toggle (🗺️) to the top-right
+      const refreshBtn = document.createElement("div");
+      refreshBtn.className = "esri-widget esri-widget--button esri-interactive custom-button";
+      refreshBtn.title = "Refresh Page";
+      refreshBtn.innerHTML = "<span>🔄</span>";
+      refreshBtn.onclick = () => { window.location.reload(); };
+      view.ui.add(refreshBtn, { position: "top-right" });
+
+      const toggleBtn = document.createElement("div");
+      toggleBtn.className = "esri-widget esri-widget--button esri-interactive custom-button";
+      toggleBtn.title = "Toggle Imagery Basemap";
+      toggleBtn.innerHTML = "<span>🗺️</span>";
+      let isImagery = false;
+      toggleBtn.onclick = () => {
+        map.basemap = isImagery ? "topo-vector" : "hybrid";
+        isImagery = !isImagery;
+      };
+      view.ui.add(toggleBtn, { position: "top-right" });
+
+      // 5) Add the Search widget to the top-center (94px below the top)
+      const searchWidget = new Search({
+        view: view,
+        allPlaceholder: "Search Jewish Sites...",
+        includeDefaultSources: false,
+        sources: [
+          {
+            layer: landmarks,
+            searchFields: ["eng_name"],
+            displayField: "eng_name",
+            exactMatch: false,
+            outFields: ["*"],
+            name: "Jewish Landmarks",
+            placeholder: "e.g., Mikveh Israel"
+          }
+        ]
+      });
+      view.ui.add(searchWidget, { position: "top-center", index: 0 });
+
+      // 6) Once the view is ready, zoom to user location
+      view.when(() => {
+        const locate = new Locate({ view });
+        locate.locate();
+      });
+
+      // 7) Wire up the filter buttons so they work on mobile & desktop
+      const buttons = document.querySelectorAll(".filterBtn");
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          // Remove “active” from all buttons, then add to the clicked one
+          buttons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          const category = btn.getAttribute("data-category");
+          if (category === "") {
+            // “All” => remove any definitionExpression
+            landmarks.definitionExpression = "";
+          } else {
+            // Filter by the chosen category
+            landmarks.definitionExpression = `main_category = '${category}'`;
+          }
+        });
+      });
+
+    }); // end require
+  </script>
+</body>
+</html>
