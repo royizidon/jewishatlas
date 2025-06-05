@@ -558,7 +558,9 @@
       const searchWidget = new Search({
         view: view,
         allPlaceholder: "Search places...",
-        includeDefaultSources: true,
+        includeDefaultSources: false, // Disable default sources that might include upload
+        popupEnabled: true,
+        resultGraphicEnabled: true,
         sources: [
           {
             layer: landmarks,
@@ -567,7 +569,11 @@
             exactMatch: false,
             outFields: ["*"],
             name: "Jewish Sites",
-            placeholder: "Search Jewish sites..."
+            placeholder: "Search Jewish sites...",
+            maxResults: 6,
+            maxSuggestions: 6,
+            suggestionsEnabled: true,
+            minSuggestCharacters: 2
           }
         ]
       });
@@ -582,10 +588,30 @@
       view.when(() => {
         document.getElementById('loadingIndicator').style.display = 'none';
         
-        // Auto-locate user on first load
-        locate.locate().catch(() => {
-          console.log("Location access denied");
-        });
+        // Auto-request location permission immediately
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              // Success - center map on user location
+              view.goTo({
+                center: [position.coords.longitude, position.coords.latitude],
+                zoom: 14
+              });
+            },
+            (error) => {
+              console.log("Location access denied:", error);
+              // Still try the locate widget as fallback
+              locate.locate().catch(() => {
+                console.log("Locate widget also failed");
+              });
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            }
+          );
+        }
       });
 
       // Handle offline mode
