@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
   <!-- ArcGIS JS -->
   <script src="https://js.arcgis.com/4.26/"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
     /* ───────────────────────────────────────────────────────────────────────── */
@@ -279,6 +280,21 @@
         zoom: 7,
         padding: { top: 94 }
       });
+// Ensure popup opens automatically
+view.popup.autoOpenEnabled = true;
+
+// Optional: disable docking and force full expansion of popup
+view.popup.dockEnabled = false;
+
+// When popup becomes visible, focus it to force full open (on mobile)
+view.popup.watch("visible", function (visible) {
+  if (visible) {
+    view.popup.viewModel.goToOverride = null;  // Prevent unwanted zoom
+    setTimeout(() => view.popup.focus(), 100); // Ensure full display
+  }
+});
+
+
 
       // 2) Define the FeatureLayer with a “card-style” popupTemplate
       const landmarks = new FeatureLayer({
@@ -404,7 +420,7 @@
       const toggleBtn = document.createElement("div");
       toggleBtn.className = "esri-widget esri-widget--button esri-interactive custom-button";
       toggleBtn.title = "Toggle Imagery Basemap";
-      toggleBtn.innerHTML = "<span>🗺️</span>";
+      toggleBtn.innerHTML = "<i class='fas fa-layer-group'></i>";
       let isImagery = false;
       toggleBtn.onclick = () => {
         map.basemap = isImagery ? "topo-vector" : "hybrid";
