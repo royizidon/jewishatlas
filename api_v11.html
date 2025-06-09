@@ -95,44 +95,78 @@
 
     /* 4) Welcome Modal Overlay */
     #welcomeModal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      animation: fadeIn 0.5s ease-out;
-    }
-    .modal-content {
-      background: white;
-      padding: 30px 20px;
-      border-radius: 12px;
-      max-width: 90%;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      animation: popUp 0.4s ease;
-    }
-    .modal-content h2 {
-      margin-top: 0;
-      font-size: 20px;
-      color: #2c3e50;
-    }
-    .modal-content p {
-      font-size: 14px;
-      color: #555;
-      margin: 10px 0 20px;
-    }
-    .modal-content button {
-      background: #2c3e50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px 25px;
+  border-radius: 14px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  animation: popUp 0.4s ease;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 22px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.modal-content p {
+  font-size: 16px;
+  color: #555;
+  margin: 12px 0 24px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.start-button,
+.upload-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.start-button {
+  background-color: #2D66F4;
+  color: white;
+  border: none;
+}
+
+.start-button:hover {
+  background-color: #1741b3;
+}
+
+.upload-button {
+  background-color: #F57C00;
+  color: white;
+  border: none;
+}
+
+.upload-button:hover {
+  background-color: #d45e00;
+}
+
     @keyframes fadeIn {
       from { opacity: 0; } to { opacity: 1; }
     }
@@ -269,12 +303,20 @@ padding: 16px;
 
   <!-- 4) Welcome Modal Overlay -->
   <div id="welcomeModal">
-    <div class="modal-content">
-      <h2>Welcome to Jewish Atlas</h2>
-      <p>Discover synagogues, heritage sites, kosher food and more—worldwide.</p>
-      <button onclick="closeModal()">Start Exploring</button>
+  <div class="modal-content">
+    <h2>🌍 Explore Jewish Heritage Around the World</h2>
+    <p>Use the map to find synagogues, heritage sites, kosher food and more — or contribute your own site.</p>
+    <div class="modal-buttons">
+      <button onclick="closeModal()" class="start-button">Start Exploring</button>
+      <a href="https://survey123.arcgis.com/share/304788fc266542c19d2f2ccb74cfed39"
+         target="_blank"
+         class="upload-button">
+        Upload Your Jewish Site
+      </a>
     </div>
   </div>
+</div>
+
 
   <script>
     // Hide the welcome modal when the user clicks "Start Exploring"
@@ -293,28 +335,21 @@ padding: 16px;
 
       // 1) Create the map & view (94px top-padding for header + filter)
       const map = new Map({ basemap: "topo-vector" });
-      const view = new MapView({
-        container: "viewDiv",
-        map: map,
-        center: [35.21, 31.78], // Jerusalem
-        zoom: 7,
-        padding: { top: 94 }
-      });
-// Ensure popup opens automatically
-view.popup.autoOpenEnabled = true;
 
-// Optional: disable docking and force full expansion of popup
-view.popup.dockEnabled = false;
 
-// When popup becomes visible, focus it to force full open (on mobile)
-view.popup.watch("visible", function (visible) {
-  if (visible) {
-    setTimeout(() => {
-      view.popup.focus();  // Try to shift focus
-      view.popup.dockEnabled = false;  // Prevent dock
-      const dockBtn = document.querySelector(".esri-popup__button--dock");
-      if (dockBtn) dockBtn.click(); // Auto-close docking if still docked
-    }, 300); // Slight delay ensures elements are rendered
+const view = new MapView({
+  container: "viewDiv",
+  map: map, // must be defined above
+  center: [35.21, 31.78], // Jerusalem
+  zoom: 7,
+  padding: { top: 94 },
+  popup: {
+    dockEnabled: true,
+    dockOptions: {
+      position: "top",
+      buttonEnabled: false,
+      breakpoint: false
+    }
   }
 });
 
@@ -472,7 +507,6 @@ view.popup.watch("visible", function (visible) {
       view.ui.add(searchWidget, { position: "top-center", index: 0 });
 
 // docking popup - royi
-view.popup.dockEnabled = false;
 
       // 6) Once the view is ready, zoom to user location
       view.when(() => {
