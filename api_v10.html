@@ -289,8 +289,12 @@ view.popup.dockEnabled = false;
 // When popup becomes visible, focus it to force full open (on mobile)
 view.popup.watch("visible", function (visible) {
   if (visible) {
-    view.popup.viewModel.goToOverride = null;  // Prevent unwanted zoom
-    setTimeout(() => view.popup.focus(), 100); // Ensure full display
+    setTimeout(() => {
+      view.popup.focus();  // Try to shift focus
+      view.popup.dockEnabled = false;  // Prevent dock
+      const dockBtn = document.querySelector(".esri-popup__button--dock");
+      if (dockBtn) dockBtn.click(); // Auto-close docking if still docked
+    }, 300); // Slight delay ensures elements are rendered
   }
 });
 
