@@ -447,6 +447,9 @@ view.popup.watch("visible", function (visible) {
       });
       view.ui.add(searchWidget, { position: "top-center", index: 0 });
 
+// docking popup - royi
+view.popup.dockEnabled = false;
+
       // 6) Once the view is ready, zoom to user location
       view.when(() => {
         const locate = new Locate({ view });
