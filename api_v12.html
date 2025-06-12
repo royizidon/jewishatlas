@@ -21,12 +21,23 @@
       height: 100%;
       font-family: 'Helvetica Neue', sans-serif;
       background-color: #f5f5f5;
-      overflow: hidden; /* prevent body scrolling behind the map */
+      overflow: hidden;
     }
-#mobileSearchContainer {
-  display: block;
-  min-height: 48px;
-}
+
+    /* Mobile Search Container - FIXED positioning at bottom */
+    #mobileSearchContainer {
+      display: none; /* Hidden by default */
+      position: fixed;
+      bottom: 12px;
+      left: 10px;
+      right: 10px;
+      z-index: 1001;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
 
     /* 1) Fixed Header (50px tall) */
     #appHeader {
@@ -49,7 +60,7 @@
     /* 2) Filter Buttons Container (≈44px tall) */
     #filterContainer {
       position: fixed;
-      top: 50px; /* sits immediately below the header */
+      top: 50px;
       left: 0;
       width: 100%;
       background: white;
@@ -57,8 +68,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       display: flex;
       gap: 8px;
-      overflow-x: auto;        /* allow horizontal scroll on narrow screens */
-      white-space: nowrap;      /* keep buttons in a single row */
+      overflow-x: auto;
+      white-space: nowrap;
       z-index: 1000;
     }
 
@@ -74,7 +85,7 @@
       color: #555;
       transition: all 0.15s;
       white-space: nowrap;
-      flex-shrink: 0;           /* prevent button from shrinking */
+      flex-shrink: 0;
     }
     .filterBtn:hover {
       background: #f0f0f0;
@@ -86,10 +97,10 @@
       font-weight: bold;
     }
 
-    /* 3) Map Container (push down by header + filter = 94px) */
+    /* 3) Map Container */
     #viewDiv {
       position: absolute;
-      top: 94px; /* 50px header + ~44px filter */
+      top: 94px;
       left: 0;
       width: 100%;
       height: calc(100% - 94px);
@@ -99,74 +110,85 @@
 
     /* 4) Welcome Modal Overlay */
     #welcomeModal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 14px;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      animation: popUp 0.4s ease;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #2c3e50;
+      font-weight: 700;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      color: #555;
+      margin: 12px 0 24px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+   .modal-buttons {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  animation: fadeIn 0.5s ease-out;
-}
-
-.modal-content {
-  background: white;
-  padding: 30px 25px;
-  border-radius: 14px;
-  max-width: 500px;
-  text-align: center;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  animation: popUp 0.4s ease;
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  font-size: 22px;
-  color: #2c3e50;
-  font-weight: 700;
-}
-
-.modal-content p {
-  font-size: 16px;
-  color: #555;
-  margin: 12px 0 24px;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
   flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .start-button,
 .upload-button {
-  padding: 12px 20px;
+  flex: 1 1 45%; /* Equal width, max 2 per row */
+  min-width: 140px;
+  padding: 12px 18px;
   font-size: 16px;
-  border-radius: 8px;
-  text-decoration: none;
+  border-radius: 30px;
   font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  text-align: center;
+  border: none;
+  transition: 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+/* Color styles */
 .start-button {
   background-color: #2D66F4;
   color: white;
-  border: none;
 }
-
 .start-button:hover {
   background-color: #1741b3;
+}
+.upload-button {
+  text-decoration: none !important;
 }
 
 .upload-button {
   background-color: #F57C00;
   color: white;
-  border: none;
 }
-
 .upload-button:hover {
   background-color: #d45e00;
 }
@@ -189,7 +211,7 @@
       margin: 6px;
     }
 
-    /* Custom Button Styles (Refresh & Basemap Toggle) */
+    /* Custom Button Styles */
     .esri-widget.custom-button {
       background: white;
       border-radius: 8px;
@@ -205,25 +227,65 @@
     .esri-widget.custom-button span {
       font-size: 18px;
     }
+.category-synagogue {
+  background-color: #5DADE2;
+  border-color: #5DADE2;
+  color: white;
+}
 
-    /* Search Input Styling */
+.category-heritage {
+  background-color: #EC7063;
+  border-color: #EC7063;
+  color: white;
+}
+
+.category-community {
+  background-color: #F5B041;
+  border-color: #F5B041;
+  color: white;
+}
+
+.category-kosher {
+  background-color: #58D68D;
+  border-color: #58D68D;
+  color: white;
+}
+
+.category-all {
+  background-color: #ccc;
+  border-color: #ccc;
+  color: white;
+}
+
+
+    /* Search Input Styling for Desktop */
     .esri-search {
       max-width: 90vw;
       min-width: 250px;
     }
 
+    /* Fix for desktop search widget positioning */
+    .esri-ui-top-center {
+      top: 104px !important; /* Push below header + filter */
+      z-index: 999 !important;
+    }
+
+    .esri-ui-top-center .esri-search {
+      z-index: 999 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+    }
+
     /* ───────────────────────────────────────────────────────────────────────── */
-    /*  Popup “Card” Styles                                                      */
+    /*  Popup "Card" Styles                                                      */
     /* ───────────────────────────────────────────────────────────────────────── */
     .esri-popup .popup-card {
       font-family: 'Helvetica Neue', sans-serif;
       padding: 12px 16px;
       line-height: 1.3;
-background-color: #f9f9f9;
-border-radius: 10px;
-box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-padding: 16px;
-
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 16px;
     }
     .esri-popup .popup-title {
       font-size: 18px;
@@ -250,7 +312,7 @@ padding: 16px;
       display: flex;
       gap: 8px;
       margin-top: 8px;
-      flex-wrap: wrap; /* wrap buttons if screen is narrow */
+      flex-wrap: wrap;
     }
     .esri-popup .popup-button {
       display: inline-flex;
@@ -271,38 +333,77 @@ padding: 16px;
     .esri-popup .popup-button span.icon {
       margin-right: 6px;
     }
-/* Add to .esri-popup .popup-button base */
-.popup-button.blue {
-  background-color: #2D66F4;
-}
-.popup-button.blue:hover {
-  background-color: #1741b3;
-}
 
-.popup-button.orange {
-  background-color: #F57C00;
-}
-.popup-button.orange:hover {
-  background-color: #d45e00;
-}
-@media (max-width: 768px) {
-  #mobileSearchContainer {
-    position: fixed;
-    bottom: 12px;
-    left: 10px;
-    right: 10px;
-    z-index: 1001;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-    padding: 6px 8px;
-  }
+    .popup-button.blue {
+      background-color: #2D66F4;
+    }
+    .popup-button.blue:hover {
+      background-color: #1741b3;
+    }
 
-  .esri-search {
-    width: 100% !important;
-  }
-}
+    .popup-button.orange {
+      background-color: #F57C00;
+    }
+    .popup-button.orange:hover {
+      background-color: #d45e00;
+    }
 
+    /* ───────────────────────────────────────────────────────────────────────── */
+    /*  MOBILE RESPONSIVE STYLES                                                 */
+    /* ───────────────────────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      /* Show mobile search container */
+      #mobileSearchContainer {
+        display: block !important;
+      }
+
+      /* Hide desktop search widget on mobile */
+      .esri-ui-top-center .esri-search {
+        display: none !important;
+      }
+
+      /* Make search widget take full width in mobile container */
+      #mobileSearchContainer .esri-search {
+        width: 100% !important;
+        margin: 0;
+      }
+
+      /* Adjust map padding for mobile to account for bottom search */
+      #viewDiv {
+        height: calc(100% - 94px - 70px); /* Extra 70px for bottom search */
+      }
+
+      /* Make filter buttons more mobile-friendly */
+      .filterBtn {
+        font-size: 13px;
+        padding: 5px 12px;
+      }
+
+      /* Adjust popup for mobile */
+      .esri-popup .popup-buttons {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+    /* For very small screens */
+    @media (max-width: 480px) {
+      #appHeader {
+        font-size: 16px;
+        padding: 0 10px;
+      }
+
+      .filterBtn {
+        font-size: 12px;
+        padding: 4px 10px;
+      }
+
+      #mobileSearchContainer {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+      }
+    }
   </style>
 </head>
 
@@ -312,39 +413,46 @@ padding: 16px;
 
   <!-- 2) Filter Buttons -->
   <div id="filterContainer">
-    <button class="filterBtn active" data-category="">All</button>
-    <button class="filterBtn" data-category="Synagogue">Synagogues</button>
-    <button class="filterBtn" data-category="Heritage">Heritage</button>
-    <button class="filterBtn" data-category="Kosher Restaurant">Kosher Food</button>
-    <button class="filterBtn" data-category="Community">Community</button>
+  <button class="filterBtn active category-all" data-category="">All</button>
+<button class="filterBtn category-synagogue" data-category="Synagogue">Synagogues</button>
+<button class="filterBtn category-heritage" data-category="Heritage">Heritage</button>
+<button class="filterBtn category-kosher" data-category="Kosher Restaurant">Kosher Food</button>
+<button class="filterBtn category-community" data-category="Community">Community</button>
+
   </div>
 
   <!-- 3) Map Container -->
   <div id="viewDiv"></div>
-<div id="mobileSearchContainer"></div>
 
+  <!-- 4) Mobile Search Container - Fixed at bottom -->
+  <div id="mobileSearchContainer"></div>
 
-  <!-- 4) Welcome Modal Overlay -->
+  <!-- 5) Welcome Modal Overlay -->
   <div id="welcomeModal">
-  <div class="modal-content">
-    <h2>🌍 Explore Jewish Heritage Around the World</h2>
-    <p>Use the map to find synagogues, heritage sites, kosher food and more — or contribute your own site.</p>
-    <div class="modal-buttons">
-      <button onclick="closeModal()" class="start-button">Start Exploring</button>
-      <a href="https://survey123.arcgis.com/share/304788fc266542c19d2f2ccb74cfed39"
-         target="_blank"
-         class="upload-button">
-        Upload Your Jewish Site
-      </a>
+    <div class="modal-content">
+      <h2>🌍 Explore Jewish Heritage Around the World</h2>
+      <p>Use the map to find synagogues, heritage sites, kosher food and more — or contribute your own site.</p>
+
+      <div class="modal-buttons">
+        <button onclick="closeModal()" class="start-button">Start Exploring</button>
+        <a href="https://survey123.arcgis.com/share/304788fc266542c19d2f2ccb74cfed39"
+           target="_blank"
+           class="upload-button">
+          Upload Your Jewish Site
+        </a>
+      </div>
     </div>
   </div>
-</div>
-
 
   <script>
     // Hide the welcome modal when the user clicks "Start Exploring"
     function closeModal() {
       document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    // Function to check if device is mobile
+    function isMobile() {
+      return window.innerWidth <= 768;
     }
 
     require([
@@ -356,29 +464,29 @@ padding: 16px;
       "esri/widgets/Search"
     ], function (Map, MapView, FeatureLayer, Locate, Home, Search) {
 
-      // 1) Create the map & view (94px top-padding for header + filter)
+      // 1) Create the map & view
       const map = new Map({ basemap: "topo-vector" });
 
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [35.21, 31.78], // Jerusalem
+        zoom: 7,
+        padding: { top: 94 }, // Account for header + filter
+        ui: {
+          padding: { top: 104 } // Extra padding for UI elements
+        },
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            position: "top",
+            buttonEnabled: false,
+            breakpoint: false
+          }
+        }
+      });
 
-const view = new MapView({
-  container: "viewDiv",
-  map: map, // must be defined above
-  center: [35.21, 31.78], // Jerusalem
-  zoom: 7,
-  padding: { top: 94 },
-  popup: {
-    dockEnabled: true,
-    dockOptions: {
-      position: "top",
-      buttonEnabled: false,
-      breakpoint: false
-    }
-  }
-});
-
-
-
-      // 2) Define the FeatureLayer with a “card-style” popupTemplate
+      // 2) Define the FeatureLayer
       const landmarks = new FeatureLayer({
         url: "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/Landmarks/FeatureServer/0",
         popupTemplate: {
@@ -487,11 +595,11 @@ const view = new MapView({
       });
       map.add(landmarks);
 
-      // 3) Add Locate & Home widgets to the top-left
+      // 3) Add Locate & Home widgets
       view.ui.add(new Locate({ view }), { position: "top-left" });
-      view.ui.add(new Home({ view }),   { position: "top-left" });
+      view.ui.add(new Home({ view }), { position: "top-left" });
 
-      // 4) Add Refresh (🔄) & Basemap Toggle (🗺️) to the top-right
+      // 4) Add Refresh & Basemap Toggle buttons
       const refreshBtn = document.createElement("div");
       refreshBtn.className = "esri-widget esri-widget--button esri-interactive custom-button";
       refreshBtn.title = "Refresh Page";
@@ -510,7 +618,7 @@ const view = new MapView({
       };
       view.ui.add(toggleBtn, { position: "top-right" });
 
-      // 5) Add the Search widget to the top-center (94px below the top)
+      // 5) Create Search widget
       const searchWidget = new Search({
         view: view,
         allPlaceholder: "Search Jewish Sites...",
@@ -528,47 +636,68 @@ const view = new MapView({
         ]
       });
 
+      // 6) Position search widget based on screen size
+      
 
 view.when(() => {
   const locate = new Locate({ view });
   locate.locate();
 
-  // ✅ ADD search widget properly after view and DOM are fully ready
-  const mobileContainer = document.getElementById("mobileSearchContainer");
-
-  if (window.innerWidth <= 768 && mobileContainer) {
-    // Use DOM container for mobile view
-    searchWidget.container = mobileContainer;
-  } else {
-    // Use standard UI position for desktop
-    view.ui.add(searchWidget, { position: "top-center", index: 0 });
+  function updateSearchPosition() {
+    const mobileContainer = document.getElementById("mobileSearchContainer");
+    if (isMobile()) {
+      try { view.ui.remove(searchWidget); } catch(e) {}
+      if (mobileContainer && !mobileContainer.contains(searchWidget.domNode)) {
+        mobileContainer.appendChild(searchWidget.domNode);
+        mobileContainer.style.display = 'block';
+      }
+    } else {
+      if (mobileContainer && mobileContainer.contains(searchWidget.domNode)) {
+        mobileContainer.removeChild(searchWidget.domNode);
+      }
+      if (!view.ui.find(searchWidget)) {
+        view.ui.add(searchWidget, { position: "top-center", index: 0 });
+      }
+    }
   }
+
+  // Initial placement
+  updateSearchPosition();
+
+  // Recheck on resize
+  window.addEventListener('resize', updateSearchPosition);
 });
 
-
-// docking popup - royi
-view.popup.dockEnabled = true;
-
-      // 6) Once the view is ready, zoom to user location
-      view.when(() => {
-        const locate = new Locate({ view });
-        locate.locate();
+      // 7) Handle window resize to reposition search widget
+      window.addEventListener('resize', () => {
+        const mobileContainer = document.getElementById("mobileSearchContainer");
+        
+        if (isMobile() && !mobileContainer.contains(searchWidget.domNode)) {
+          // Switch to mobile
+          try {
+            view.ui.remove(searchWidget);
+          } catch(e) {}
+          if (mobileContainer) {
+            mobileContainer.appendChild(searchWidget.domNode);
+          }
+        } else if (!isMobile() && mobileContainer.contains(searchWidget.domNode)) {
+          // Switch to desktop
+          mobileContainer.removeChild(searchWidget.domNode);
+          view.ui.add(searchWidget, { position: "top-center", index: 0 });
+        }
       });
 
-      // 7) Wire up the filter buttons so they work on mobile & desktop
+      // 8) Filter buttons functionality
       const buttons = document.querySelectorAll(".filterBtn");
       buttons.forEach(btn => {
         btn.addEventListener("click", () => {
-          // Remove “active” from all buttons, then add to the clicked one
           buttons.forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
 
           const category = btn.getAttribute("data-category");
           if (category === "") {
-            // “All” => remove any definitionExpression
             landmarks.definitionExpression = "";
           } else {
-            // Filter by the chosen category
             landmarks.definitionExpression = `main_category = '${category}'`;
           }
         });
