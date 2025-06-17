@@ -42,7 +42,7 @@
     }
 
     /* Map occupies rest of screen */
-    #viewDiv { position: absolute; top: 138px; left: 0; right: 0; bottom: 0; z-index: 1; }
+    #viewDiv { position: absolute; top: 94px; left: 0; right: 0; bottom: 0; z-index: 1; }
 
     /* Modal */
     #welcomeModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; animation: fadeIn 0.5s ease-out; }
@@ -85,7 +85,7 @@
   </div>
   
   <!-- Search bar container under filters -->
-  <div id="searchContainer"></div>
+ <!-- <div id="searchContainer"></div> -->
 
   <div id="viewDiv"></div>
 
@@ -172,14 +172,26 @@
       toggleBtn.onclick = () => { map.basemap = isImagery ? 'topo-vector' : 'hybrid'; isImagery = !isImagery; };
       view.ui.add(toggleBtn, { position: 'top-right' });
 
-      // search into container
-      new Search({
-        view: view,
-        allPlaceholder: 'Search Jewish Sites...',
-        includeDefaultSources: false,
-        container: 'searchContainer',
-        sources: [{ layer: landmarks, searchFields: ['eng_name'], displayField: 'eng_name', exactMatch: false, outFields: ['*'], name: 'Jewish Landmarks', placeholder: 'e.g., Mikveh Israel' }]
-      });
+      // Create the Search widget (do not set the container)
+const searchWidget = new Search({
+  view: view,
+  allPlaceholder: 'Search Jewish Sites...',
+  includeDefaultSources: true,
+  sources: [
+    {
+      layer: landmarks,
+      searchFields: ['eng_name'],
+      displayField: 'eng_name',
+      exactMatch: false,
+      outFields: ['*'],
+      name: 'Jewish Landmarks',
+      placeholder: 'e.g., Mikveh Israel'
+    }
+  ]
+});
+
+// Add the search widget to the map UI (top-right, but you can pick any corner)
+view.ui.add(searchWidget, { position: 'top-left', index: 0 });
 
       // filter
       document.querySelectorAll('.filterBtn').forEach(btn => {
