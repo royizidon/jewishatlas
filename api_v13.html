@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
+
     /* Base & Layout */
     html, body { margin: 0; padding: 0; height: 100%; font-family: 'Helvetica Neue', sans-serif; background: #f5f5f5; overflow: hidden; }
 
@@ -109,7 +110,7 @@
     ], function(Map, MapView, FeatureLayer, Locate, Home, Search) {
       const map = new Map({ basemap: 'topo-vector' });
       const view = new MapView({ container: 'viewDiv', map: map, center: [35.21,31.78], zoom: 7, padding: { top: 138 }, ui: { padding: { top: 138 } }, popup: { dockEnabled: true, dockOptions: { position: 'top', buttonEnabled: false, breakpoint: false } } });
-
+view.ui.move("zoom", "bottom-right"); 
       const landmarks = new FeatureLayer({
         url: 'https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/Landmarks/FeatureServer/0',
         popupTemplate: {
@@ -175,7 +176,7 @@
       // Create the Search widget (do not set the container)
 const searchWidget = new Search({
   view: view,
-  allPlaceholder: 'Search Jewish Sites...',
+  allPlaceholder: 'Search',
   includeDefaultSources: true,
   sources: [
     {
@@ -191,7 +192,7 @@ const searchWidget = new Search({
 });
 
 // Add the search widget to the map UI (top-right, but you can pick any corner)
-view.ui.add(searchWidget, { position: 'top-left', index: 0 });
+view.ui.add(searchWidget, { position: 'bottom-left', index: 0 });
 
       // filter
       document.querySelectorAll('.filterBtn').forEach(btn => {
