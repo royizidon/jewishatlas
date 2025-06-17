@@ -22,9 +22,9 @@
       overflow: hidden;
     }
 
-    /* Mobile Search Container - Enhanced for better mobile UX */
-    #mobileSearchContainer {
-      display: none;
+    /* Bottom Search Container - For all devices */
+    #bottomSearchContainer {
+      display: block;
       position: fixed;
       bottom: 16px;
       left: 12px;
@@ -123,13 +123,13 @@
       color: white;
     }
 
-    /* Map Container */
+    /* Map Container - Adjusted for bottom search */
     #viewDiv {
       position: absolute;
       top: 94px;
       left: 0;
       width: 100%;
-      height: calc(100% - 94px);
+      height: calc(100% - 94px - 90px); /* Account for bottom search bar */
       border: 2px solid #ddd;
       z-index: 1;
     }
@@ -244,20 +244,46 @@
       font-size: 18px;
     }
 
-    /* Desktop Search Styling */
-    .esri-search {
-      max-width: 90vw;
-      min-width: 250px;
+    /* Bottom Search Styling for all devices */
+    #bottomSearchContainer .esri-search {
+      width: 100% !important;
+      margin: 0;
+      border-radius: 12px;
+      overflow: hidden;
     }
 
-    .esri-ui-top-center {
-      top: 104px !important;
-      z-index: 999 !important;
+    /* Enhanced search input styling */
+    #bottomSearchContainer .esri-search__input {
+      font-size: 16px !important;
+      padding: 14px 16px !important;
+      height: 48px !important;
+      border-radius: 12px !important;
     }
 
-    .esri-ui-top-center .esri-search {
-      z-index: 999 !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+    /* Style the search button */
+    #bottomSearchContainer .esri-search__submit-button {
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 0 12px 12px 0 !important;
+      background-color: #2D66F4 !important;
+    }
+
+    /* Search suggestions styling */
+    #bottomSearchContainer .esri-search__suggestions-menu {
+      max-height: 200px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+      margin-top: 4px !important;
+    }
+
+    #bottomSearchContainer .esri-menu__list-item {
+      padding: 12px 16px !important;
+      font-size: 16px !important;
+      border-bottom: 1px solid #eee;
+    }
+
+    #bottomSearchContainer .esri-menu__list-item:hover {
+      background-color: #f8f9fa !important;
     }
 
     /* Popup Styles */
@@ -316,48 +342,8 @@
       margin-right: 6px;
     }
 
-    /* MOBILE RESPONSIVE STYLES */
+    /* RESPONSIVE STYLES - Adjustments for all screen sizes */
     @media (max-width: 768px) {
-      /* Show mobile search container */
-      #mobileSearchContainer {
-        display: block !important;
-      }
-
-      /* Hide desktop search widget on mobile */
-      .esri-ui-top-center .esri-search {
-        display: none !important;
-      }
-
-      /* Enhanced mobile search styling */
-      #mobileSearchContainer .esri-search {
-        width: 100% !important;
-        margin: 0;
-        border-radius: 12px;
-        overflow: hidden;
-      }
-
-      /* Make search input larger and more touch-friendly */
-      #mobileSearchContainer .esri-search__input {
-        font-size: 16px !important;
-        padding: 14px 16px !important;
-        height: 48px !important;
-        border-radius: 12px !important;
-      }
-
-      /* Style the search button */
-      #mobileSearchContainer .esri-search__submit-button {
-        width: 48px !important;
-        height: 48px !important;
-        border-radius: 0 12px 12px 0 !important;
-        background-color: #2D66F4 !important;
-      }
-
-      /* Adjust map padding for mobile to account for bottom search */
-      #viewDiv {
-        height: calc(100% - 94px - 90px); /* Extra space for bottom search */
-        padding-bottom: 20px;
-      }
-
       /* Make filter buttons more mobile-friendly */
       .filterBtn {
         font-size: 13px;
@@ -369,25 +355,6 @@
       .esri-popup .popup-buttons {
         flex-direction: column;
         gap: 6px;
-      }
-
-      /* Enhance mobile search suggestions */
-      #mobileSearchContainer .esri-search__suggestions-menu {
-        max-height: 200px !important;
-        border-radius: 12px !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-        margin-top: 4px !important;
-      }
-
-      /* Style search suggestions for mobile */
-      #mobileSearchContainer .esri-menu__list-item {
-        padding: 12px 16px !important;
-        font-size: 16px !important;
-        border-bottom: 1px solid #eee;
-      }
-
-      #mobileSearchContainer .esri-menu__list-item:hover {
-        background-color: #f8f9fa !important;
       }
     }
 
@@ -403,7 +370,7 @@
         padding: 4px 10px;
       }
 
-      #mobileSearchContainer {
+      #bottomSearchContainer {
         left: 8px;
         right: 8px;
         bottom: 12px;
@@ -411,12 +378,12 @@
       }
 
       /* Larger touch targets for very small screens */
-      #mobileSearchContainer .esri-search__input {
+      #bottomSearchContainer .esri-search__input {
         height: 52px !important;
         font-size: 17px !important; /* Prevents zoom on iOS */
       }
 
-      #mobileSearchContainer .esri-search__submit-button {
+      #bottomSearchContainer .esri-search__submit-button {
         width: 52px !important;
         height: 52px !important;
       }
@@ -452,8 +419,8 @@
   <!-- Map Container -->
   <div id="viewDiv"></div>
 
-  <!-- Mobile Search Container - Enhanced for mobile -->
-  <div id="mobileSearchContainer"></div>
+  <!-- Bottom Search Container - For all devices -->
+  <div id="bottomSearchContainer"></div>
 
   <!-- Welcome Modal -->
   <div id="welcomeModal">
@@ -668,61 +635,31 @@
         ]
       });
 
-      // Position search widget with enhanced mobile handling
+      // Position search widget at bottom for all devices
       view.when(() => {
         // Auto-locate user
         const locate = new Locate({ view });
         locate.locate().catch(() => {
-          // Fallback if location fails
           console.log("Location not available");
         });
 
-        function updateSearchPosition() {
-          const mobileContainer = document.getElementById("mobileSearchContainer");
-          
-          if (isMobile()) {
-            // Mobile: place in bottom container
-            try { 
-              view.ui.remove(searchWidget); 
-            } catch(e) {}
-            
-            if (mobileContainer && !mobileContainer.contains(searchWidget.domNode)) {
-              mobileContainer.appendChild(searchWidget.domNode);
-              mobileContainer.style.display = 'block';
-              
-              // Add mobile-specific enhancements
-              setTimeout(() => {
-                const searchInput = searchWidget.domNode.querySelector('.esri-search__input');
-                if (searchInput) {
-                  searchInput.setAttribute('autocomplete', 'off');
-                  searchInput.setAttribute('autocorrect', 'off');
-                  searchInput.setAttribute('autocapitalize', 'off');
-                  searchInput.setAttribute('spellcheck', 'false');
-                }
-              }, 100);
-            }
-          } else {
-            // Desktop: place in top center
-            if (mobileContainer && mobileContainer.contains(searchWidget.domNode)) {
-              mobileContainer.removeChild(searchWidget.domNode);
-              mobileContainer.style.display = 'none';
-            }
-            if (!view.ui.find(searchWidget)) {
-              view.ui.add(searchWidget, { position: "top-center", index: 0 });
-            }
-          }
-        }
-
-        // Initial setup
-        updateSearchPosition();
-
-        // Handle resize events
-        window.addEventListener('resize', updateSearchPosition);
+        const bottomContainer = document.getElementById("bottomSearchContainer");
         
-        // Handle orientation change on mobile
-        window.addEventListener('orientationchange', () => {
-          setTimeout(updateSearchPosition, 100);
-        });
+        // Always place search at bottom
+        if (bottomContainer && !bottomContainer.contains(searchWidget.domNode)) {
+          bottomContainer.appendChild(searchWidget.domNode);
+          
+          // Add enhancements for better UX
+          setTimeout(() => {
+            const searchInput = searchWidget.domNode.querySelector('.esri-search__input');
+            if (searchInput) {
+              searchInput.setAttribute('autocomplete', 'off');
+              searchInput.setAttribute('autocorrect', 'off');
+              searchInput.setAttribute('autocapitalize', 'off');
+              searchInput.setAttribute('spellcheck', 'false');
+            }
+          }, 100);
+        }
       });
 
       // Filter functionality
