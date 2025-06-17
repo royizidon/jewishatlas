@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewish Atlas</title>
+
+  <!-- ArcGIS CSS -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
+  <!-- ArcGIS JS -->
+  <script src="https://js.arcgis.com/4.26/"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* Base & Layout Styles */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #f5f5f5;
+      overflow: hidden;
+    }
+
+    /* Mobile Search Container - Enhanced for better mobile UX */
+    #mobileSearchContainer {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      left: 12px;
+      right: 12px;
+      z-index: 1001;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Fixed Header */
+    #appHeader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      z-index: 1000;
+    }
+
+    /* Filter Buttons Container */
+    #filterContainer {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 8px 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      z-index: 1000;
+    }
+
+    /* Filter Button Styles */
+    .filterBtn {
+      display: inline-block;
+      padding: 6px 14px;
+      border: 2px solid #ccc;
+      border-radius: 20px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      color: #555;
+      transition: all 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .filterBtn:hover {
+      background: #f0f0f0;
+    }
+    .filterBtn.active {
+      background: #555;
+      border-color: #555;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Category Colors */
+    .category-synagogue {
+      background-color: #5DADE2;
+      border-color: #5DADE2;
+      color: white;
+    }
+    .category-heritage {
+      background-color: #EC7063;
+      border-color: #EC7063;
+      color: white;
+    }
+    .category-community {
+      background-color: #F5B041;
+      border-color: #F5B041;
+      color: white;
+    }
+    .category-kosher {
+      background-color: #58D68D;
+      border-color: #58D68D;
+      color: white;
+    }
+    .category-all {
+      background-color: #ccc;
+      border-color: #ccc;
+      color: white;
+    }
+
+    /* Map Container */
+    #viewDiv {
+      position: absolute;
+      top: 94px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 94px);
+      border: 2px solid #ddd;
+      z-index: 1;
+    }
+
+    /* Welcome Modal */
+    #welcomeModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 14px;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      animation: popUp 0.4s ease;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #2c3e50;
+      font-weight: 700;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      color: #555;
+      margin: 12px 0 24px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .start-button,
+    .upload-button {
+      flex: 1 1 45%;
+      min-width: 140px;
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 30px;
+      font-weight: bold;
+      text-align: center;
+      border: none;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      text-decoration: none;
+    }
+
+    .start-button {
+      background-color: #2D66F4;
+      color: white;
+    }
+    .start-button:hover {
+      background-color: #1741b3;
+    }
+
+    .upload-button {
+      background-color: #F57C00;
+      color: white;
+    }
+    .upload-button:hover {
+      background-color: #d45e00;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes popUp {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Widget Spacing */
+    .esri-ui-left .esri-widget,
+    .esri-ui-top-left .esri-widget {
+      margin: 6px;
+    }
+    .esri-ui-right .esri-widget,
+    .esri-ui-top-right .esri-widget {
+      margin: 6px;
+    }
+
+    /* Custom Button Styles */
+    .esri-widget.custom-button {
+      background: white;
+      border-radius: 8px;
+      padding: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .esri-widget.custom-button span {
+      font-size: 18px;
+    }
+
+    /* Desktop Search Styling */
+    .esri-search {
+      max-width: 90vw;
+      min-width: 250px;
+    }
+
+    .esri-ui-top-center {
+      top: 104px !important;
+      z-index: 999 !important;
+    }
+
+    .esri-ui-top-center .esri-search {
+      z-index: 999 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+    }
+
+    /* Popup Styles */
+    .esri-popup .popup-card {
+      font-family: 'Helvetica Neue', sans-serif;
+      padding: 16px;
+      line-height: 1.3;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .esri-popup .popup-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #2c3e50;
+    }
+    .esri-popup .popup-category {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: white;
+      background-color: #6c7a89;
+      padding: 4px 8px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .esri-popup .popup-address {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .esri-popup .popup-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .esri-popup .popup-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #5DADE2;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background-color 0.15s;
+    }
+    .esri-popup .popup-button:hover {
+      background-color: #3498db;
+    }
+    .esri-popup .popup-button span.icon {
+      margin-right: 6px;
+    }
+
+    /* MOBILE RESPONSIVE STYLES */
+    @media (max-width: 768px) {
+      /* Show mobile search container */
+      #mobileSearchContainer {
+        display: block !important;
+      }
+
+      /* Hide desktop search widget on mobile */
+      .esri-ui-top-center .esri-search {
+        display: none !important;
+      }
+
+      /* Enhanced mobile search styling */
+      #mobileSearchContainer .esri-search {
+        width: 100% !important;
+        margin: 0;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      /* Make search input larger and more touch-friendly */
+      #mobileSearchContainer .esri-search__input {
+        font-size: 16px !important;
+        padding: 14px 16px !important;
+        height: 48px !important;
+        border-radius: 12px !important;
+      }
+
+      /* Style the search button */
+      #mobileSearchContainer .esri-search__submit-button {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 0 12px 12px 0 !important;
+        background-color: #2D66F4 !important;
+      }
+
+      /* Adjust map padding for mobile to account for bottom search */
+      #viewDiv {
+        height: calc(100% - 94px - 90px); /* Extra space for bottom search */
+        padding-bottom: 20px;
+      }
+
+      /* Make filter buttons more mobile-friendly */
+      .filterBtn {
+        font-size: 13px;
+        padding: 5px 12px;
+        min-height: 32px;
+      }
+
+      /* Adjust popup for mobile */
+      .esri-popup .popup-buttons {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      /* Enhance mobile search suggestions */
+      #mobileSearchContainer .esri-search__suggestions-menu {
+        max-height: 200px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+        margin-top: 4px !important;
+      }
+
+      /* Style search suggestions for mobile */
+      #mobileSearchContainer .esri-menu__list-item {
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        border-bottom: 1px solid #eee;
+      }
+
+      #mobileSearchContainer .esri-menu__list-item:hover {
+        background-color: #f8f9fa !important;
+      }
+    }
+
+    /* For very small screens */
+    @media (max-width: 480px) {
+      #appHeader {
+        font-size: 16px;
+        padding: 0 10px;
+      }
+
+      .filterBtn {
+        font-size: 12px;
+        padding: 4px 10px;
+      }
+
+      #mobileSearchContainer {
+        left: 8px;
+        right: 8px;
+        bottom: 12px;
+        padding: 10px;
+      }
+
+      /* Larger touch targets for very small screens */
+      #mobileSearchContainer .esri-search__input {
+        height: 52px !important;
+        font-size: 17px !important; /* Prevents zoom on iOS */
+      }
+
+      #mobileSearchContainer .esri-search__submit-button {
+        width: 52px !important;
+        height: 52px !important;
+      }
+    }
+
+    /* Prevent zoom on input focus for iOS */
+    @media screen and (max-width: 480px) {
+      select, textarea, input[type="text"], input[type="password"], 
+      input[type="datetime"], input[type="datetime-local"], 
+      input[type="date"], input[type="month"], input[type="time"], 
+      input[type="week"], input[type="number"], input[type="email"], 
+      input[type="url"], input[type="search"], input[type="tel"], 
+      input[type="color"], .esri-search__input {
+        font-size: 16px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Fixed Header -->
+  <div id="appHeader">Jewish Atlas</div>
+
+  <!-- Filter Buttons -->
+  <div id="filterContainer">
+    <button class="filterBtn active category-all" data-category="">All</button>
+    <button class="filterBtn category-synagogue" data-category="Synagogue">Synagogues</button>
+    <button class="filterBtn category-heritage" data-category="Heritage">Heritage</button>
+    <button class="filterBtn category-kosher" data-category="Kosher Restaurant">Kosher Food</button>
+    <button class="filterBtn category-community" data-category="Community">Community</button>
+  </div>
+
+  <!-- Map Container -->
+  <div id="viewDiv"></div>
+
+  <!-- Mobile Search Container - Enhanced for mobile -->
+  <div id="mobileSearchContainer"></div>
+
+  <!-- Welcome Modal -->
+  <div id="welcomeModal">
+    <div class="modal-content">
+      <h2>🌍 Explore Jewish Heritage Around the World</h2>
+      <p>Use the map to find synagogues, heritage sites, kosher food and more — or contribute your own site.</p>
+
+      <div class="modal-buttons">
+        <button onclick="closeModal()" class="start-button">Start Exploring</button>
+        <a href="https://survey123.arcgis.com/share/304788fc266542c19d2f2ccb74cfed39"
+           target="_blank"
+           class="upload-button">
+          Upload Your Jewish Site
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function closeModal() {
+      document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    function isMobile() {
+      return window.innerWidth <= 768;
+    }
+
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Locate",
+      "esri/widgets/Home",
+      "esri/widgets/Search"
+    ], function (Map, MapView, FeatureLayer, Locate, Home, Search) {
+
+      // Create map and view
+      const map = new Map({ basemap: "topo-vector" });
+
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [35.21, 31.78], // Jerusalem
+        zoom: 7,
+        padding: { top: 94 },
+        ui: {
+          padding: { top: 104 }
+        },
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            position: "top",
+            buttonEnabled: false,
+            breakpoint: false
+          }
+        }
+      });
+
+      // Feature Layer
+      const landmarks = new FeatureLayer({
+        url: "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/Landmarks/FeatureServer/0",
+        popupTemplate: {
+          title: "<div class='popup-title'>{Name}</div>",
+          content: `
+            <div class="popup-card">
+              <div class="popup-category">{Category}</div>
+              <div class="popup-address">{Address}</div>
+              <div class="popup-buttons">
+                <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}"
+                   target="_blank"
+                   class="popup-button">
+                  <span class="icon">📍</span>
+                  View on Google Maps
+                </a>
+                <a href="https://waze.com/ul?ll={lat},{lon}&navigate=yes"
+                   target="_blank"
+                   class="popup-button">
+                  <span class="icon">🚗</span>
+                  Navigate on Waze
+                </a>
+              </div>
+            </div>
+          `
+        },
+        renderer: {
+          type: "unique-value",
+          field: "main_category",
+          defaultSymbol: {
+            type: "simple-marker",
+            color: "gray",
+            outline: { color: "white", width: 1 }
+          },
+          uniqueValueInfos: [
+            {
+              value: "Synagogue",
+              symbol: {
+                type: "simple-marker",
+                color: "#5DADE2",
+                outline: { color: "white", width: 1 }
+              }
+            },
+            {
+              value: "Heritage",
+              symbol: {
+                type: "simple-marker",
+                color: "#EC7063",
+                outline: { color: "white", width: 1 }
+              }
+            },
+            {
+              value: "Community",
+              symbol: {
+                type: "simple-marker",
+                color: "#F5B041",
+                outline: { color: "white", width: 1 }
+              }
+            },
+            {
+              value: "Kosher Restaurant",
+              symbol: {
+                type: "simple-marker",
+                color: "#58D68D",
+                outline: { color: "white", width: 1 }
+              }
+            }
+          ],
+          visualVariables: [
+            {
+              type: "size",
+              valueExpression: "$view.scale",
+              stops: [
+                { value: 50000000, size: 2 },
+                { value: 25000000, size: 3 },
+                { value: 10000000, size: 4 },
+                { value: 5000000,  size: 5 },
+                { value: 1000000,  size: 6 },
+                { value: 500000,   size: 7 },
+                { value: 70000,    size: 7 },
+                { value: 60000,    size: 8 },
+                { value: 40000,    size: 9 },
+                { value: 20000,    size: 11 }
+              ]
+            }
+          ]
+        },
+        labelingInfo: [{
+          labelExpressionInfo: {
+            expression: "$feature.eng_name"
+          },
+          labelPlacement: "above-center",
+          symbol: {
+            type: "text",
+            color: "black",
+            haloColor: "white",
+            haloSize: 1,
+            font: {
+              family: "Arial",
+              size: 10,
+              weight: "bold"
+            }
+          },
+          minScale: 10000,
+          maxScale: 0
+        }]
+      });
+      map.add(landmarks);
+
+      // Add widgets
+      view.ui.add(new Locate({ view }), { position: "top-left" });
+      view.ui.add(new Home({ view }), { position: "top-left" });
+
+      // Custom buttons
+      const refreshBtn = document.createElement("div");
+      refreshBtn.className = "esri-widget esri-widget--button esri-interactive custom-button";
+      refreshBtn.title = "Refresh Page";
+      refreshBtn.innerHTML = "<span>🔄</span>";
+      refreshBtn.onclick = () => { window.location.reload(); };
+      view.ui.add(refreshBtn, { position: "top-right" });
+
+      const toggleBtn = document.createElement("div");
+      toggleBtn.className = "esri-widget esri-widget--button esri-interactive custom-button";
+      toggleBtn.title = "Toggle Imagery Basemap";
+      toggleBtn.innerHTML = "<i class='fas fa-layer-group'></i>";
+      let isImagery = false;
+      toggleBtn.onclick = () => {
+        map.basemap = isImagery ? "topo-vector" : "hybrid";
+        isImagery = !isImagery;
+      };
+      view.ui.add(toggleBtn, { position: "top-right" });
+
+      // Enhanced Search widget with better mobile configuration
+      const searchWidget = new Search({
+        view: view,
+        allPlaceholder: "Search Jewish Sites...",
+        includeDefaultSources: false,
+        popupEnabled: true,
+        resultGraphicEnabled: true,
+        sources: [
+          {
+            layer: landmarks,
+            searchFields: ["eng_name", "Name", "Address"],
+            displayField: "eng_name",
+            exactMatch: false,
+            outFields: ["*"],
+            name: "Jewish Landmarks",
+            placeholder: "Search synagogue, site, or address...",
+            maxResults: 8,
+            maxSuggestions: 6,
+            suggestionsEnabled: true,
+            minSuggestCharacters: 2
+          }
+        ]
+      });
+
+      // Position search widget with enhanced mobile handling
+      view.when(() => {
+        // Auto-locate user
+        const locate = new Locate({ view });
+        locate.locate().catch(() => {
+          // Fallback if location fails
+          console.log("Location not available");
+        });
+
+        function updateSearchPosition() {
+          const mobileContainer = document.getElementById("mobileSearchContainer");
+          
+          if (isMobile()) {
+            // Mobile: place in bottom container
+            try { 
+              view.ui.remove(searchWidget); 
+            } catch(e) {}
+            
+            if (mobileContainer && !mobileContainer.contains(searchWidget.domNode)) {
+              mobileContainer.appendChild(searchWidget.domNode);
+              mobileContainer.style.display = 'block';
+              
+              // Add mobile-specific enhancements
+              setTimeout(() => {
+                const searchInput = searchWidget.domNode.querySelector('.esri-search__input');
+                if (searchInput) {
+                  searchInput.setAttribute('autocomplete', 'off');
+                  searchInput.setAttribute('autocorrect', 'off');
+                  searchInput.setAttribute('autocapitalize', 'off');
+                  searchInput.setAttribute('spellcheck', 'false');
+                }
+              }, 100);
+            }
+          } else {
+            // Desktop: place in top center
+            if (mobileContainer && mobileContainer.contains(searchWidget.domNode)) {
+              mobileContainer.removeChild(searchWidget.domNode);
+              mobileContainer.style.display = 'none';
+            }
+            if (!view.ui.find(searchWidget)) {
+              view.ui.add(searchWidget, { position: "top-center", index: 0 });
+            }
+          }
+        }
+
+        // Initial setup
+        updateSearchPosition();
+
+        // Handle resize events
+        window.addEventListener('resize', updateSearchPosition);
+        
+        // Handle orientation change on mobile
+        window.addEventListener('orientationchange', () => {
+          setTimeout(updateSearchPosition, 100);
+        });
+      });
+
+      // Filter functionality
+      const buttons = document.querySelectorAll(".filterBtn");
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          buttons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          const category = btn.getAttribute("data-category");
+          if (category === "") {
+            landmarks.definitionExpression = "";
+          } else {
+            landmarks.definitionExpression = `main_category = '${category}'`;
+          }
+        });
+      });
+
+    });
+  </script>
+</body>
+</html>
