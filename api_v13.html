@@ -179,7 +179,7 @@ view.ui.move("zoom", "bottom-right");
       toggleBtn.innerHTML = '<i class="fas fa-layer-group"></i>';
       let isImagery = false;
       toggleBtn.onclick = () => { map.basemap = isImagery ? 'topo-vector' : 'hybrid'; isImagery = !isImagery; };
-      view.ui.add(toggleBtn, { position: 'top-right' });
+      view.ui.add(toggleBtn, { position: 'top-right',index:1 });
 
       // Create the Search widget (do not set the container)
 const searchWidget = new Search({
