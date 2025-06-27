@@ -119,41 +119,43 @@
       });
 
       // 1) landmarks layer
-      const layer = new FeatureLayer({
-        url: window.LANDMARKS_URL,
-        renderer: {
-          type: "unique-value",
-          field: "main_category",
-          defaultSymbol: {
-            type: "simple-marker", style: "circle",
-            color: "#aaa", size: 6,
-            outline: { color: "#fff", width: 1 }
-          },
-          uniqueValueInfos: [
-            { value: "Synagogue", symbol: { type: "simple-marker", style: "circle", color: "#5DADE2", size: 6 } },
-            { value: "Heritage", symbol: { type: "simple-marker", style: "circle", color: "#EC7063", size: 6 } },
-            { value: "Community", symbol: { type: "simple-marker", style: "circle", color: "#F5B041", size: 6 } },
-            { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", color: "#58D68D", size: 6 } }
-          ]
-        },
-        labelingInfo: [{
-          labelExpressionInfo: { expression: "$feature.eng_name" },
-          labelPlacement: "above-center",
-          symbol: {
-            type: "text", color: "#333",
-            haloColor: "#fff", haloSize: 1,
-            font: { size: 12, family: "Arial", weight: "bold" }
-          },
-          minScale: 15000
-        }],
-        popupTemplate: {
-          title: "{Name}",
-          content:
-            "<p><strong>Category:</strong> {main_category}</p>" +
-            "<p><strong>Address:</strong> {Address}</p>"
-        }
-      });
-      map.add(layer);
+     const layer = new FeatureLayer({
+  url: window.LANDMARKS_URL,    // your proxy endpoint
+  outFields: ["*"],              // ← tell it to return all fields & trigger feature queries
+  renderer: {
+    type: "unique-value",
+    field: "main_category",
+    defaultSymbol: {
+      type: "simple-marker", style: "circle",
+      color: "#aaa", size: 6,
+      outline: { color: "#fff", width: 1 }
+    },
+    uniqueValueInfos: [
+      { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", color: "#5DADE2", size: 6 } },
+      { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", color: "#EC7063", size: 6 } },
+      { value: "Community",         symbol: { type: "simple-marker", style: "circle", color: "#F5B041", size: 6 } },
+      { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", color: "#58D68D", size: 6 } }
+    ]
+  },
+  labelingInfo: [{
+    labelExpressionInfo: { expression: "$feature.eng_name" },
+    labelPlacement: "above-center",
+    symbol: {
+      type: "text", color: "#333",
+      haloColor: "#fff", haloSize: 1,
+      font: { size: 12, family: "Arial", weight: "bold" }
+    },
+    minScale: 15000
+  }],
+  popupTemplate: {
+    title: "{Name}",
+    content:
+      "<p><strong>Category:</strong> {main_category}</p>" +
+      "<p><strong>Address:</strong> {Address}</p>"
+  }
+});
+
+map.add(layer);
 
       // 2) Search widget
       const search = new Search({
