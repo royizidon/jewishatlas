@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jewish Atlas</title>
+
+  <script src="config.js"></script>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.26/"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%; overflow: hidden;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+    #appHeader {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 50px; background: #fff; border-bottom:1px solid #ddd;
+      display: flex; align-items:center; justify-content:center;
+      z-index:1000;
+    }
+    #viewDiv {
+      position: absolute; top: 50px; left: 0; right: 0; bottom: 0;
+    }
+    /* search styling */
+    .esri-search { width:340px!important; font-size:16px; }
+    .esri-search__container { background:#fff!important; border:none!important;
+      box-shadow:0 4px 12px rgba(0,0,0,0.15)!important; border-radius:28px!important;
+      overflow:hidden;
+    }
+    .esri-search__input { height:46px!important; padding:0 18px!important; }
+    .esri-search__submit-button { padding:0 14px!important; }
+    .esri-search__toggle-button, .esri-search__clear-button { display:none!important; }
+    /* filter toolbar */
+    .filter-div {
+      position: absolute; top:60px; right:10px;
+      display:flex; gap:6px; padding:6px 10px;
+      background:rgba(255,255,255,0.9);
+      border-radius:8px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      z-index:1000;
+    }
+    .filterBtn {
+      padding:6px 12px; border:2px solid #ccc;
+      border-radius:20px; background:#fff; color:#555;
+      font-size:14px; cursor:pointer; transition:0.15s;
+    }
+    .filterBtn.active { color:#fff; }
+    .filterBtn[data-cat="Featured"]         { --c:#f39c12; }
+    .filterBtn[data-cat="Synagogue"]        { --c:#5DADE2; }
+    .filterBtn[data-cat="Heritage"]         { --c:#EC7063; }
+    .filterBtn[data-cat="Community"]        { --c:#F5B041; }
+    .filterBtn[data-cat="Kosher Restaurant"]{ --c:#58D68D; }
+    .filter-div:not(.filtered) .filterBtn { background:var(--c); border-color:var(--c); }
+    .filter-div.filtered .filterBtn:not(.active) {
+      background:#fff; border-color:#ccc; color:#555;
+    }
+  </style>
+</head>
+<body>
+  <div id="appHeader">Jewish Atlas</div>
+  <div id="viewDiv"></div>
+
+  <script>
+    require([
+      "esri/Map","esri/views/MapView","esri/geometry/Extent",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Search","esri/widgets/Locate","esri/widgets/Home","esri/widgets/Zoom"
+    ], (Map, MapView, Extent, FeatureLayer, Search, Locate, Home, Zoom) => {
+
+      // 1) map + view
+      const map = new Map({ basemap: "topo-vector" });
+      const initialExtent = new Extent({
+        xmin:-10, ymin:-30, xmax:140, ymax:70,
+        spatialReference:{ wkid:4326 }
+      });
+      const view = new MapView({
+        container: "viewDiv", map,
+        extent: initialExtent,
+        ui: { components: [] }
+      });
+
+      // 2) make the imagery toggle button (always shown)
+      const imageBtn = document.createElement("div");
+      imageBtn.className = "esri-widget esri-widget--button esri-interactive";
+      imageBtn.title = "Toggle Imagery Basemap";
+      imageBtn.innerHTML = '<i class="fas fa-image"></i>';
+      let isImg = false;
+      imageBtn.onclick = () => {
+        map.basemap = isImg ? "topo-vector" : "hybrid";
+        isImg = !isImg;
+      };
+
+      // 3) add the static UI controls immediately
+      view.ui.add(new Zoom({ view }),    { position: "bottom-right", index: 0 });
+      view.ui.add(imageBtn,               { position: "bottom-right", index: 1 });
+      view.ui.add(new Locate({ view }),  { position: "bottom-right", index: 2 });
+      view.ui.add(new Home({ view }),    { position: "bottom-right", index: 3 });
+
+      // 4) placeholder Search (no source yet)
+      const search = new Search({
+        view,
+        allPlaceholder:  "Search Jewish Sites…",
+        includeDefaultSources: false,
+        sources: []
+      });
+      view.ui.add(search, "top-left");
+
+      // 5) build the filter toolbar (no layer binding yet)
+      const cats = [
+        { name: "Featured", cat: "Featured" },
+        { name: "All",      cat: "" },
+        { name: "Synagogues", cat: "Synagogue" },
+        { name: "Heritage",   cat: "Heritage" },
+        { name: "Kosher Food",cat: "Kosher Restaurant" },
+        { name: "Community",  cat: "Community" }
+      ];
+      const filterDiv = document.createElement("div");
+      filterDiv.className = "filter-div";
+      cats.forEach((o,i) => {
+        const btn = document.createElement("button");
+        btn.textContent = o.name;
+        btn.className = "filterBtn" + (i===0?" active":"");
+        btn.dataset.cat = o.cat;
+        filterDiv.append(btn);
+      });
+      view.ui.add(filterDiv);
+
+      // 6) load your real service to grab its styling & popups
+      const templateFL = new FeatureLayer({ url: window.LANDMARKS_URL });
+
+      templateFL.when(() => {
+
+        // 7) fetch your proxy’s 3000‐point JSON
+        const url = `${window.location.origin}/api/landmarks?where=1=1&outFields=*&f=json`;
+        fetch(url)
+          .then(r => {
+            if (!r.ok) throw new Error(r.statusText);
+            return r.json();
+          })
+          .then(data => {
+            // 8) build a client‐side layer from that JSON
+            const clientFL = new FeatureLayer({
+              source:           data.features,
+              fields:           data.fields,
+              objectIdField:    data.objectIdFieldName,
+              geometryType:     data.geometryType,
+              spatialReference: data.spatialReference,
+              renderer:         templateFL.renderer,
+              labelingInfo:     templateFL.labelingInfo,
+              popupTemplate:    templateFL.popupTemplate
+            });
+            map.add(clientFL);
+
+            // 9) hook up Search to the client layer
+            search.sources = [{
+              layer: clientFL,
+              searchFields: ["eng_name"],
+              displayField: "eng_name",
+              exactMatch: false,
+              outFields: ["*"],
+              name: "Jewish Landmarks",
+              placeholder: "e.g., Mikveh Israel"
+            }];
+
+            // 10) hook up filters to the client layer
+            filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
+              btn.addEventListener("click", () => {
+                const cat = btn.dataset.cat;
+                clientFL.definitionExpression = 
+                  cat ? `main_category='${cat}'` : "";
+                filterDiv.classList.toggle("filtered", !!cat);
+                filterDiv.querySelectorAll(".filterBtn")
+                  .forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+              });
+            });
+          })
+          .catch(err => console.error("Failed to load proxy data:", err));
+      });
+
+    });
+  </script>
+</body>
+</html>

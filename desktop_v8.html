@@ -87,21 +87,36 @@
 
   <script>
     require([
-      "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer",
-      "esri/widgets/Search", "esri/widgets/Locate",
-      "esri/widgets/Home", "esri/widgets/Zoom"
-    ], (Map, MapView, FeatureLayer, Search, Locate, Home, Zoom) => {
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/geometry/Extent",      // ← import Extent
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Search",
+      "esri/widgets/Locate",
+      "esri/widgets/Home",
+      "esri/widgets/Zoom"
+    ], (Map, MapView, Extent, FeatureLayer, Search, Locate, Home, Zoom) => {
 
+      // create the map
       const map = new Map({ basemap: "topo-vector" });
+
+      // define the exact bounding box you want on load
+const initialExtent = new Extent({
+  xmin: -10,
+  ymin:  -30,
+  xmax:  140,
+  ymax:   70,
+  spatialReference: { wkid: 4326 }
+});
+      // create the view with extent instead of center/zoom
       const view = new MapView({
         container: "viewDiv",
-        map,
-        center: [35.21, 31.78],
-        zoom: 7,
+        map: map,
+        extent: initialExtent,
         ui: { components: [] }
       });
 
-      // 1) landmarks layer with Featured symbol added
+      // 1) landmarks layer
       const layer = new FeatureLayer({
         url: window.LANDMARKS_URL,
         outFields: ["*"],
@@ -115,40 +130,26 @@
           },
           uniqueValueInfos: [
             { value: "Featured",
-              symbol: { type: "simple-marker",
-                        style: "circle",
-                        color: "#f39c12",
-                        size: 8,
-                        outline: { color: "#fff", width: 1 }
-                      }
+              symbol: { type: "simple-marker", style: "circle",
+                        color: "#f39c12", size: 8,
+                        outline: { color: "#fff", width: 1 } }
             },
             { value: "Synagogue",
-              symbol: { type: "simple-marker",
-                        style: "circle",
-                        color: "#5DADE2",
-                        size: 6
-                      }
+              symbol: { type: "simple-marker", style: "circle",
+                        color: "#5DADE2", size: 6,
+outline: { color: "#fff", width: 1 }   }
             },
             { value: "Heritage",
-              symbol: { type: "simple-marker",
-                        style: "circle",
-                        color: "#EC7063",
-                        size: 6
-                      }
+              symbol: { type: "simple-marker", style: "circle",
+                        color: "#EC7063", size: 6 , outline: { color: "#fff", width: 1 }  }
             },
             { value: "Community",
-              symbol: { type: "simple-marker",
-                        style: "circle",
-                        color: "#F5B041",
-                        size: 6
-                      }
+              symbol: { type: "simple-marker", style: "circle",
+                        color: "#F5B041", size: 6, outline: { color: "#fff", width: 1 }   }
             },
             { value: "Kosher Restaurant",
-              symbol: { type: "simple-marker",
-                        style: "circle",
-                        color: "#58D68D",
-                        size: 6
-                      }
+              symbol: { type: "simple-marker", style: "circle",
+                        color: "#58D68D", size: 6,outline: { color: "#fff", width: 1 }   }
             }
           ]
         },
@@ -199,7 +200,7 @@
         isImagery = !isImagery;
       };
 
-      // 4) Filter toolbar with Featured first
+      // 4) Filter toolbar
       const filterDiv = document.createElement("div");
       filterDiv.className = "filter-div";
       const cats = [
