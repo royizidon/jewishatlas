@@ -83,7 +83,7 @@
         ui: { components: [] }
       });
 
-      // 2) make the imagery toggle button (always shown)
+      // 2) imagery toggle
       const imageBtn = document.createElement("div");
       imageBtn.className = "esri-widget esri-widget--button esri-interactive";
       imageBtn.title = "Toggle Imagery Basemap";
@@ -93,14 +93,14 @@
         map.basemap = isImg ? "topo-vector" : "hybrid";
         isImg = !isImg;
       };
+      view.ui.add(imageBtn, { position: "bottom-right", index: 1 });
 
-      // 3) add the static UI controls immediately
+      // 3) other static UI
       view.ui.add(new Zoom({ view }),    { position: "bottom-right", index: 0 });
-      view.ui.add(imageBtn,               { position: "bottom-right", index: 1 });
       view.ui.add(new Locate({ view }),  { position: "bottom-right", index: 2 });
       view.ui.add(new Home({ view }),    { position: "bottom-right", index: 3 });
 
-      // 4) placeholder Search (no source yet)
+      // 4) placeholder Search
       const search = new Search({
         view,
         allPlaceholder:  "Search Jewish Sites…",
@@ -109,7 +109,7 @@
       });
       view.ui.add(search, "top-left");
 
-      // 5) build the filter toolbar (no layer binding yet)
+      // 5) filter toolbar (static)
       const cats = [
         { name: "Featured", cat: "Featured" },
         { name: "All",      cat: "" },
@@ -129,22 +129,23 @@
       });
       view.ui.add(filterDiv);
 
-      // 6) load your real service to grab its styling & popups
+      // 6) load real service for renderer & popups
       const templateFL = new FeatureLayer({ url: window.LANDMARKS_URL });
 
       templateFL.when(() => {
+        // 7) **correct** fetch: no stray semicolons or extra callback!
+        const url = "api/landmarks?where=1=1&outFields=*&f=json";
+        console.log("Loading landmarks from:", url);
 
-        // 7) fetch your proxy’s 3000‐point JSON
-const url = "api/landmarks?where=1=1&outFields=*&f=json";
-console.log("Loading landmarks from", url);
-fetch(url)
-  .then(r => { /* … */ })
-  .catch(err => console.error(err));(r => {
+        fetch(url)
+          .then(r => {
             if (!r.ok) throw new Error(r.statusText);
             return r.json();
           })
           .then(data => {
-            // 8) build a client‐side layer from that JSON
+            console.log("Received features:", data.features.length);
+
+            // 8) client‐side layer
             const clientFL = new FeatureLayer({
               source:           data.features,
               fields:           data.fields,
@@ -157,7 +158,7 @@ fetch(url)
             });
             map.add(clientFL);
 
-            // 9) hook up Search to the client layer
+            // 9) hook Search
             search.sources = [{
               layer: clientFL,
               searchFields: ["eng_name"],
@@ -168,12 +169,13 @@ fetch(url)
               placeholder: "e.g., Mikveh Israel"
             }];
 
-            // 10) hook up filters to the client layer
+            // 10) hook filters
             filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
               btn.addEventListener("click", () => {
                 const cat = btn.dataset.cat;
-                clientFL.definitionExpression = 
-                  cat ? `main_category='${cat}'` : "";
+                clientFL.definitionExpression = cat
+                  ? `main_category='${cat}'`
+                  : "";
                 filterDiv.classList.toggle("filtered", !!cat);
                 filterDiv.querySelectorAll(".filterBtn")
                   .forEach(b => b.classList.remove("active"));
@@ -181,7 +183,7 @@ fetch(url)
               });
             });
           })
-          .catch(err => console.error("Failed to load proxy data:", err));
+          .catch(err => console.error("landmarks fetch failed:", err));
       });
 
     });
