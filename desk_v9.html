@@ -6,8 +6,8 @@
   <title>Jewish Atlas</title>
 
   <!-- config.js defines:
-       window.LANDMARKS_SERVICE_URL = "https://services-eu1.arcgis.com/…/Landmarks/FeatureServer/0";
-       window.LANDMARKS_PROXY_URL   = "https://api.jewishatlas.org/api/landmarks";
+       window.LANDMARKS_SERVICE_URL
+       window.LANDMARKS_PROXY_URL
   -->
   <script src="config.js"></script>
 
@@ -77,14 +77,17 @@
       "esri/widgets/Search","esri/widgets/Locate","esri/widgets/Home","esri/widgets/Zoom"
     ], (Map, MapView, Extent, FeatureLayer, Search, Locate, Home, Zoom) => {
 
-      // 1) Map + View
+      // 1) Map + View — FIX: use wkid: 102100
       const map = new Map({ basemap: "topo-vector" });
       const view = new MapView({
         container: "viewDiv",
         map,
         extent: new Extent({
-          xmin: -10, ymin: -30, xmax: 140, ymax: 70,
-          spatialReference: { wkid: 4326 }
+          xmin: -20037508.34,
+          ymin: -20037508.34,
+          xmax:  20037508.34,
+          ymax:  20037508.34,
+          spatialReference: { wkid: 102100 }
         }),
         ui: { components: [] }
       });
@@ -142,7 +145,7 @@
         // 6) Fetch sampled JSON from proxy
         const proxyUrl = 
           `${window.LANDMARKS_PROXY_URL}` +
-          `?where=1=1&outFields=*&batchSample=300&f=json`;
+          `?where=1=1&outFields=*&f=json`;
         console.log("Fetching landmarks from proxy:", proxyUrl);
 
         fetch(proxyUrl)
@@ -152,7 +155,7 @@
             return r.json();
           })
           .then(data => {
-            console.log("Received features:", data.features.length);
+            console.log("✅ Received features:", data.features.length);
 
             // 7) Build client-side layer
             const clientFL = new FeatureLayer({
@@ -167,12 +170,12 @@
             });
             map.add(clientFL);
 
-            // zoom to sampled points
+            // 8) Zoom to points
             view.whenLayerView(clientFL).then(() => {
               view.goTo(clientFL.fullExtent).catch(console.error);
             });
 
-            // 8) Hook up Search
+            // 9) Hook Search
             search.sources = [{
               layer:        clientFL,
               searchFields: ["eng_name"],
@@ -183,7 +186,7 @@
               placeholder:  "e.g., Mikveh Israel"
             }];
 
-            // 9) Hook up Filters
+            // 10) Hook Filters
             filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
               btn.addEventListener("click", () => {
                 const cat = btn.dataset.cat;
