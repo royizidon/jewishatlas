@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jewish Atlas</title>
 
+  <!-- config.js defines:
+       window.LANDMARKS_SERVICE_URL = "https://services-eu1.arcgis.com/…/Landmarks/FeatureServer/0";
+       window.LANDMARKS_PROXY_URL   = "https://api.jewishatlas.org/api/landmarks";
+  -->
   <script src="config.js"></script>
+
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.26/"></script>
   <link rel="stylesheet"
@@ -23,24 +28,23 @@
       z-index:1000;
     }
     #viewDiv {
-      position: absolute; top: 50px; left: 0; right: 0; bottom: 0;
+      position: absolute; top:50px; left:0; right:0; bottom:0;
     }
-    /* search styling */
     .esri-search { width:340px!important; font-size:16px; }
-    .esri-search__container { background:#fff!important; border:none!important;
-      box-shadow:0 4px 12px rgba(0,0,0,0.15)!important; border-radius:28px!important;
-      overflow:hidden;
+    .esri-search__container {
+      background:#fff!important; border:none!important;
+      box-shadow:0 4px 12px rgba(0,0,0,0.15)!important;
+      border-radius:28px!important; overflow:hidden;
     }
     .esri-search__input { height:46px!important; padding:0 18px!important; }
     .esri-search__submit-button { padding:0 14px!important; }
     .esri-search__toggle-button, .esri-search__clear-button { display:none!important; }
-    /* filter toolbar */
+
     .filter-div {
-      position: absolute; top:60px; right:10px;
+      position:absolute; top:60px; right:10px;
       display:flex; gap:6px; padding:6px 10px;
       background:rgba(255,255,255,0.9);
-      border-radius:8px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);
       z-index:1000;
     }
     .filterBtn {
@@ -54,7 +58,9 @@
     .filterBtn[data-cat="Heritage"]         { --c:#EC7063; }
     .filterBtn[data-cat="Community"]        { --c:#F5B041; }
     .filterBtn[data-cat="Kosher Restaurant"]{ --c:#58D68D; }
-    .filter-div:not(.filtered) .filterBtn { background:var(--c); border-color:var(--c); }
+    .filter-div:not(.filtered) .filterBtn {
+      background:var(--c); border-color:var(--c);
+    }
     .filter-div.filtered .filterBtn:not(.active) {
       background:#fff; border-color:#ccc; color:#555;
     }
@@ -71,19 +77,19 @@
       "esri/widgets/Search","esri/widgets/Locate","esri/widgets/Home","esri/widgets/Zoom"
     ], (Map, MapView, Extent, FeatureLayer, Search, Locate, Home, Zoom) => {
 
-      // 1) map + view
+      // 1) Map + View
       const map = new Map({ basemap: "topo-vector" });
-      const initialExtent = new Extent({
-        xmin:-10, ymin:-30, xmax:140, ymax:70,
-        spatialReference:{ wkid:4326 }
-      });
       const view = new MapView({
-        container: "viewDiv", map,
-        extent: initialExtent,
+        container: "viewDiv",
+        map,
+        extent: new Extent({
+          xmin: -10, ymin: -30, xmax: 140, ymax: 70,
+          spatialReference: { wkid: 4326 }
+        }),
         ui: { components: [] }
       });
 
-      // 2) imagery toggle
+      // 2) Imagery toggle + other widgets
       const imageBtn = document.createElement("div");
       imageBtn.className = "esri-widget esri-widget--button esri-interactive";
       imageBtn.title = "Toggle Imagery Basemap";
@@ -93,23 +99,21 @@
         map.basemap = isImg ? "topo-vector" : "hybrid";
         isImg = !isImg;
       };
-      view.ui.add(imageBtn, { position: "bottom-right", index: 1 });
+      view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
+      view.ui.add(imageBtn,            { position: "bottom-right", index: 1 });
+      view.ui.add(new Locate({ view }),{ position: "bottom-right", index: 2 });
+      view.ui.add(new Home({ view }),  { position: "bottom-right", index: 3 });
 
-      // 3) other static UI
-      view.ui.add(new Zoom({ view }),    { position: "bottom-right", index: 0 });
-      view.ui.add(new Locate({ view }),  { position: "bottom-right", index: 2 });
-      view.ui.add(new Home({ view }),    { position: "bottom-right", index: 3 });
-
-      // 4) placeholder Search
+      // 3) Placeholder Search
       const search = new Search({
         view,
-        allPlaceholder:  "Search Jewish Sites…",
+        allPlaceholder: "Search Jewish Sites…",
         includeDefaultSources: false,
         sources: []
       });
       view.ui.add(search, "top-left");
 
-      // 5) filter toolbar (static)
+      // 4) Static Filter toolbar
       const cats = [
         { name: "Featured", cat: "Featured" },
         { name: "All",      cat: "" },
@@ -129,23 +133,28 @@
       });
       view.ui.add(filterDiv);
 
-      // 6) load real service for renderer & popups
-      const templateFL = new FeatureLayer({ url: window.LANDMARKS_URL });
+      // 5) Load real service for symbology & popups
+      const templateFL = new FeatureLayer({
+        url: window.LANDMARKS_SERVICE_URL
+      });
 
       templateFL.when(() => {
-        // 7) **correct** fetch: no stray semicolons or extra callback!
-        const url = "api/landmarks?where=1=1&outFields=*&f=json";
-        console.log("Loading landmarks from:", url);
+        // 6) Fetch sampled JSON from proxy
+        const proxyUrl = 
+          `${window.LANDMARKS_PROXY_URL}` +
+          `?where=1=1&outFields=*&batchSample=300&f=json`;
+        console.log("Fetching landmarks from proxy:", proxyUrl);
 
-        fetch(url)
+        fetch(proxyUrl)
           .then(r => {
+            console.log("Proxy response:", r.status, r.statusText);
             if (!r.ok) throw new Error(r.statusText);
             return r.json();
           })
           .then(data => {
             console.log("Received features:", data.features.length);
 
-            // 8) client‐side layer
+            // 7) Build client-side layer
             const clientFL = new FeatureLayer({
               source:           data.features,
               fields:           data.fields,
@@ -158,32 +167,36 @@
             });
             map.add(clientFL);
 
-            // 9) hook Search
+            // zoom to sampled points
+            view.whenLayerView(clientFL).then(() => {
+              view.goTo(clientFL.fullExtent).catch(console.error);
+            });
+
+            // 8) Hook up Search
             search.sources = [{
-              layer: clientFL,
+              layer:        clientFL,
               searchFields: ["eng_name"],
               displayField: "eng_name",
-              exactMatch: false,
-              outFields: ["*"],
-              name: "Jewish Landmarks",
-              placeholder: "e.g., Mikveh Israel"
+              exactMatch:   false,
+              outFields:    ["*"],
+              name:         "Jewish Landmarks",
+              placeholder:  "e.g., Mikveh Israel"
             }];
 
-            // 10) hook filters
+            // 9) Hook up Filters
             filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
               btn.addEventListener("click", () => {
                 const cat = btn.dataset.cat;
-                clientFL.definitionExpression = cat
-                  ? `main_category='${cat}'`
-                  : "";
+                clientFL.definitionExpression = 
+                  cat ? `main_category='${cat}'` : "";
                 filterDiv.classList.toggle("filtered", !!cat);
                 filterDiv.querySelectorAll(".filterBtn")
-                  .forEach(b => b.classList.remove("active"));
+                         .forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
               });
             });
           })
-          .catch(err => console.error("landmarks fetch failed:", err));
+          .catch(err => console.error("Landmarks fetch failed:", err));
       });
 
     });
