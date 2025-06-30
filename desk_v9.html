@@ -5,16 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jewish Atlas</title>
 
-  <!-- config.js defines:
-       window.LANDMARKS_SERVICE_URL
-       window.LANDMARKS_PROXY_URL
-  -->
   <script src="config.js"></script>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.26/"></script>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
     html, body {
@@ -77,16 +72,17 @@
       "esri/widgets/Search","esri/widgets/Locate","esri/widgets/Home","esri/widgets/Zoom"
     ], (Map, MapView, Extent, FeatureLayer, Search, Locate, Home, Zoom) => {
 
-      // 1) Map + View — FIX: use wkid: 102100
+      // 1) Map + View in Web Mercator
       const map = new Map({ basemap: "topo-vector" });
       const view = new MapView({
         container: "viewDiv",
         map,
+        spatialReference: { wkid: 102100 },
         extent: new Extent({
-          xmin: -20037508.34,
-          ymin: -20037508.34,
-          xmax:  20037508.34,
-          ymax:  20037508.34,
+          xmin: -5037508.34,
+          ymin: -5037508.34,
+          xmax: 5037508.34,
+          ymax: 7037508.34,
           spatialReference: { wkid: 102100 }
         }),
         ui: { components: [] }
@@ -130,7 +126,7 @@
       cats.forEach((o,i) => {
         const btn = document.createElement("button");
         btn.textContent = o.name;
-        btn.className = "filterBtn" + (i===0?" active":"");
+        btn.className = "filterBtn" + (i===0 ? " active" : "");
         btn.dataset.cat = o.cat;
         filterDiv.append(btn);
       });
@@ -143,9 +139,7 @@
 
       templateFL.when(() => {
         // 6) Fetch sampled JSON from proxy
-        const proxyUrl = 
-          `${window.LANDMARKS_PROXY_URL}` +
-          `?where=1=1&outFields=*&f=json`;
+        const proxyUrl = `${window.LANDMARKS_PROXY_URL}?where=1=1&outFields=*&f=json`;
         console.log("Fetching landmarks from proxy:", proxyUrl);
 
         fetch(proxyUrl)
@@ -157,20 +151,29 @@
           .then(data => {
             console.log("✅ Received features:", data.features.length);
 
-            // 7) Build client-side layer
+            // 7) Build client-side FeatureCollection layer
             const clientFL = new FeatureLayer({
-              source:           data.features,
-              fields:           data.fields,
-              objectIdField:    data.objectIdFieldName,
-              geometryType:     data.geometryType,
-              spatialReference: data.spatialReference,
-              renderer:         templateFL.renderer,
-              labelingInfo:     templateFL.labelingInfo,
-              popupTemplate:    templateFL.popupTemplate
+              featureCollection: {
+                layers: [{
+                  layerDefinition: {
+                    geometryType:     data.geometryType,
+                    objectIdField:    data.objectIdFieldName,
+                    fields:           data.fields,
+                    spatialReference: data.spatialReference
+                  },
+                  featureSet: {
+                    features:     data.features,
+                    geometryType: data.geometryType
+                  }
+                }]
+              },
+              renderer:      templateFL.renderer,
+              labelingInfo:  templateFL.labelingInfo,
+              popupTemplate: templateFL.popupTemplate
             });
             map.add(clientFL);
 
-            // 8) Zoom to points
+            // 8) Zoom to features
             view.whenLayerView(clientFL).then(() => {
               view.goTo(clientFL.fullExtent).catch(console.error);
             });
@@ -190,8 +193,9 @@
             filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
               btn.addEventListener("click", () => {
                 const cat = btn.dataset.cat;
-                clientFL.definitionExpression = 
-                  cat ? `main_category='${cat}'` : "";
+                clientFL.definitionExpression = cat
+                  ? `main_category='${cat}'`
+                  : "";
                 filterDiv.classList.toggle("filtered", !!cat);
                 filterDiv.querySelectorAll(".filterBtn")
                          .forEach(b => b.classList.remove("active"));
