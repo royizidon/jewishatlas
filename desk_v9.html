@@ -150,7 +150,7 @@
           })
           .then(data => {
             console.log("✅ Received features:", data.features.length);
-
+    	    window.LANDMARKS_DATA = data;
             // 7) Build client-side FeatureCollection layer
             const clientFL = new FeatureLayer({
               featureCollection: {
