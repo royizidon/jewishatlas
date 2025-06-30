@@ -5,10 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jewish Atlas</title>
 
+  <!-- LOAD CONFIG -->
   <script src="config.js"></script>
 
+  <!-- ArcGIS JS & CSS -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.26/"></script>
+
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
@@ -20,32 +24,23 @@
       position: fixed; top: 0; left: 0; right: 0;
       height: 50px; background: #fff; border-bottom:1px solid #ddd;
       display: flex; align-items:center; justify-content:center;
-      z-index:1000;
+      font-weight: bold; z-index:1000;
     }
     #viewDiv {
       position: absolute; top:50px; left:0; right:0; bottom:0;
     }
-    .esri-search { width:340px!important; font-size:16px; }
-    .esri-search__container {
-      background:#fff!important; border:none!important;
-      box-shadow:0 4px 12px rgba(0,0,0,0.15)!important;
-      border-radius:28px!important; overflow:hidden;
-    }
-    .esri-search__input { height:46px!important; padding:0 18px!important; }
-    .esri-search__submit-button { padding:0 14px!important; }
-    .esri-search__toggle-button, .esri-search__clear-button { display:none!important; }
-
     .filter-div {
       position:absolute; top:60px; right:10px;
       display:flex; gap:6px; padding:6px 10px;
-      background:rgba(255,255,255,0.9);
+      background:rgba(255,255,255,0.95);
       border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);
       z-index:1000;
     }
     .filterBtn {
       padding:6px 12px; border:2px solid #ccc;
       border-radius:20px; background:#fff; color:#555;
-      font-size:14px; cursor:pointer; transition:0.15s;
+      font-size:14px; cursor:pointer;
+      transition: background 0.2s, color 0.2s;
     }
     .filterBtn.active { color:#fff; }
     .filterBtn[data-cat="Featured"]         { --c:#f39c12; }
@@ -67,43 +62,39 @@
 
   <script>
     require([
-      "esri/Map","esri/views/MapView","esri/geometry/Extent",
-      "esri/layers/FeatureLayer",
-      "esri/widgets/Search","esri/widgets/Locate","esri/widgets/Home","esri/widgets/Zoom"
-    ], (Map, MapView, Extent, FeatureLayer, Search, Locate, Home, Zoom) => {
+      "esri/Map", "esri/views/MapView", "esri/geometry/Extent",
+      "esri/layers/FeatureLayer", "esri/Graphic",
+      "esri/widgets/Search", "esri/widgets/Locate", "esri/widgets/Home", "esri/widgets/Zoom"
+    ], (Map, MapView, Extent, FeatureLayer, Graphic, Search, Locate, Home, Zoom) => {
 
-      // 1) Map + View in Web Mercator
       const map = new Map({ basemap: "topo-vector" });
       const view = new MapView({
         container: "viewDiv",
         map,
-        spatialReference: { wkid: 102100 },
         extent: new Extent({
-          xmin: -5037508.34,
-          ymin: -3037508.34,
-          xmax: 5037508.34,
-          ymax: 10037508.34,
+          xmin: -20037508, ymin: -20037508,
+          xmax:  20037508, ymax:  20037508,
           spatialReference: { wkid: 102100 }
         }),
         ui: { components: [] }
       });
 
-      // 2) Imagery toggle + other widgets
+      // ─── UI BUTTONS ───────────────────────────────────────────
       const imageBtn = document.createElement("div");
       imageBtn.className = "esri-widget esri-widget--button esri-interactive";
       imageBtn.title = "Toggle Imagery Basemap";
       imageBtn.innerHTML = '<i class="fas fa-image"></i>';
-      let isImg = false;
+      let isImagery = false;
       imageBtn.onclick = () => {
-        map.basemap = isImg ? "topo-vector" : "hybrid";
-        isImg = !isImg;
+        map.basemap = isImagery ? "topo-vector" : "hybrid";
+        isImagery = !isImagery;
       };
-      view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
-      view.ui.add(imageBtn,            { position: "bottom-right", index: 1 });
-      view.ui.add(new Locate({ view }),{ position: "bottom-right", index: 2 });
-      view.ui.add(new Home({ view }),  { position: "bottom-right", index: 3 });
+      view.ui.add(new Zoom({ view }),    { position: "bottom-right", index: 0 });
+      view.ui.add(imageBtn,              { position: "bottom-right", index: 1 });
+      view.ui.add(new Locate({ view }),  { position: "bottom-right", index: 2 });
+      view.ui.add(new Home({ view }),    { position: "bottom-right", index: 3 });
 
-      // 3) Placeholder Search
+      // ─── SEARCH WIDGET ────────────────────────────────────────
       const search = new Search({
         view,
         allPlaceholder: "Search Jewish Sites…",
@@ -112,73 +103,67 @@
       });
       view.ui.add(search, "top-left");
 
-      // 4) Static Filter toolbar
+      // ─── FILTER TOOLBAR ───────────────────────────────────────
       const cats = [
-        { name: "Featured", cat: "Featured" },
-        { name: "All",      cat: "" },
-        { name: "Synagogues", cat: "Synagogue" },
-        { name: "Heritage",   cat: "Heritage" },
-        { name: "Kosher Food",cat: "Kosher Restaurant" },
-        { name: "Community",  cat: "Community" }
+        { name: "Featured",      cat: "Featured" },
+        { name: "All",           cat: "" },
+        { name: "Synagogues",    cat: "Synagogue" },
+        { name: "Heritage",      cat: "Heritage" },
+        { name: "Kosher Food",   cat: "Kosher Restaurant" },
+        { name: "Community",     cat: "Community" }
       ];
       const filterDiv = document.createElement("div");
       filterDiv.className = "filter-div";
       cats.forEach((o,i) => {
         const btn = document.createElement("button");
         btn.textContent = o.name;
-        btn.className = "filterBtn" + (i===0 ? " active" : "");
+        btn.className = "filterBtn" + (i === 0 ? " active" : "");
         btn.dataset.cat = o.cat;
         filterDiv.append(btn);
       });
       view.ui.add(filterDiv);
 
-      // 5) Load real service for symbology & popups
+      // ─── LOAD TEMPLATE LAYER FOR SYMBOLS & POPUPS ────────────
       const templateFL = new FeatureLayer({
         url: window.LANDMARKS_SERVICE_URL
       });
 
       templateFL.when(() => {
-        // 6) Fetch sampled JSON from proxy
-        const proxyUrl = `${window.LANDMARKS_PROXY_URL}?where=1=1&outFields=*&f=json`;
-        console.log("Fetching landmarks from proxy:", proxyUrl);
+        console.log("✅ Template layer loaded. Fetching proxy data...");
 
+        const proxyUrl = `${window.LANDMARKS_PROXY_URL}?where=1=1&outFields=*&f=json`;
         fetch(proxyUrl)
-          .then(r => {
-            console.log("Proxy response:", r.status, r.statusText);
-            if (!r.ok) throw new Error(r.statusText);
-            return r.json();
-          })
+          .then(res => res.json())
           .then(data => {
-            console.log("✅ Received features:", data.features.length);
-    	    window.LANDMARKS_DATA = data;
-            // 7) Build client-side FeatureCollection layer
+            console.log(`✅ Loaded ${data.features.length} features from proxy`);
+
+            // 1) Build an array of Graphic objects from your raw JSON
+            const graphics = data.features.map(f => new Graphic({
+              geometry:   f.geometry,
+              attributes: f.attributes
+            }));
+
+            // 2) Create a client-side FeatureLayer with `source`
             const clientFL = new FeatureLayer({
-              featureCollection: {
-                layers: [{
-                  layerDefinition: {
-                    geometryType:     data.geometryType,
-                    objectIdField:    data.objectIdFieldName,
-                    fields:           data.fields,
-                    spatialReference: data.spatialReference
-                  },
-                  featureSet: {
-                    features:     data.features,
-                    geometryType: data.geometryType
-                  }
-                }]
-              },
-              renderer:      templateFL.renderer,
-              labelingInfo:  templateFL.labelingInfo,
-              popupTemplate: templateFL.popupTemplate
+              source:               graphics,
+              fields:               data.fields,
+              objectIdField:        data.objectIdFieldName,
+              geometryType:         data.geometryType,
+              spatialReference:     { wkid: 102100 },
+              renderer:             templateFL.renderer,
+              labelingInfo:         templateFL.labelingInfo,
+              popupTemplate:        templateFL.popupTemplate
             });
+
+            // 3) Add it to the map
             map.add(clientFL);
 
-            // 8) Zoom to features
+            // 4) Zoom to your graphics when ready
             view.whenLayerView(clientFL).then(() => {
-              view.goTo(clientFL.fullExtent).catch(console.error);
+              view.goTo(graphics).catch(console.error);
             });
 
-            // 9) Hook Search
+            // 5) Hook up the Search widget
             search.sources = [{
               layer:        clientFL,
               searchFields: ["eng_name"],
@@ -189,7 +174,7 @@
               placeholder:  "e.g., Mikveh Israel"
             }];
 
-            // 10) Hook Filters
+            // 6) Wire up your filter buttons
             filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
               btn.addEventListener("click", () => {
                 const cat = btn.dataset.cat;
@@ -202,8 +187,9 @@
                 btn.classList.add("active");
               });
             });
+
           })
-          .catch(err => console.error("Landmarks fetch failed:", err));
+          .catch(err => console.error("❌ Proxy fetch failed:", err));
       });
 
     });
