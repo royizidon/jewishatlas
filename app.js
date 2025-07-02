@@ -10,6 +10,10 @@ require([
   Graphic, Point, PopupTemplate, projection, SpatialReference
 ) => {
 
+  console.log("*** REQUIRE BLOCK STARTED ***");
+  console.log("Map inside require:", typeof Map);
+  console.log("MapView inside require:", typeof MapView);
+
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
     container: "viewDiv",
@@ -18,10 +22,15 @@ require([
     zoom: 5.5,
     ui: { components: [] }
   });
-
+  
+  console.log("*** MAP AND VIEW CREATED ***");
+  console.log("View object:", view);
+  
   view.ui.add(new Zoom({ view }),   { position: "bottom-right" });
   view.ui.add(new Locate({ view }), { position: "bottom-right" });
   view.ui.add(new Home({ view }),   { position: "bottom-right" });
+  
+  // ... rest of your code
 
   const search = new Search({
     view,
