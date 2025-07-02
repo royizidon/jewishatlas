@@ -14,6 +14,223 @@ require([
   console.log("Map inside require:", typeof Map);
   console.log("MapView inside require:", typeof MapView);
 
+  // DEFINE createPopupTemplate FUNCTION FIRST
+  const createPopupTemplate = () => {
+    return {
+      title: "{eng_name}",
+      content: [{
+        type: "text",
+        text: `
+          <div style="
+            background-color: white;
+            border-radius: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+          ">
+            
+            <!-- Photo Section (if photo exists) -->
+            <div style="width: 100%; height: 200px; background-image: url({expression/has-photo}); background-size: cover; background-position: center; background-repeat: no-repeat; display: {expression/has-photo ? 'block' : 'none'};"></div>
+            
+            <!-- Header Section -->
+            <div style="padding: 20px 20px 15px 20px;">
+              <h2 style="
+                color: #2C3E50;
+                font-size: 20px;
+                font-weight: 600;
+                margin: 0 0 8px 0;
+                line-height: 1.3;
+              ">{eng_name}</h2>
+              
+              <div style="
+                display: inline-block;
+                background-color: #E8F4FD;
+                color: #2980B9;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 15px;
+              ">{main_category}</div>
+            </div>
+
+            <!-- Content Section -->
+            <div style="padding: 0 20px 15px 20px;">
+              
+              <!-- Address -->
+              <div style="margin-bottom: 12px;">
+                <div style="
+                  color: #7F8C8D;
+                  font-size: 12px;
+                  font-weight: 500;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin-bottom: 4px;
+                ">📍 ADDRESS</div>
+                <div style="
+                  color: #2C3E50;
+                  font-size: 14px;
+                  line-height: 1.4;
+                ">{Address}, {city}</div>
+              </div>
+
+              <!-- Description (if exists) -->
+              <div style="margin-bottom: 12px; display: {expression/has-description ? 'block' : 'none'};">
+                <div style="
+                  color: #7F8C8D;
+                  font-size: 12px;
+                  font-weight: 500;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin-bottom: 4px;
+                ">ℹ️ ABOUT</div>
+                <div style="
+                  color: #2C3E50;
+                  font-size: 14px;
+                  line-height: 1.5;
+                ">{expression/has-description}</div>
+              </div>
+
+              <!-- Fees & Hours (if exists) -->
+              <div style="margin-bottom: 12px; display: {expression/has-fees-hours ? 'block' : 'none'};">
+                <div style="
+                  color: #7F8C8D;
+                  font-size: 12px;
+                  font-weight: 500;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin-bottom: 4px;
+                ">🕐 HOURS & FEES</div>
+                <div style="
+                  color: #2C3E50;
+                  font-size: 14px;
+                  line-height: 1.5;
+                ">{expression/has-fees-hours}</div>
+              </div>
+
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="padding: 20px; background-color: #F8F9FA; border-top: 1px solid #E9ECEF;">
+              
+              <!-- Primary Search Button -->
+              <a href="{expression/google-search-url}" target="_blank" style="display: block; background-color: #4575B4; color: white; text-decoration: none; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 15px;">
+                🔍 Search for Details
+              </a>
+
+              <!-- Navigation Buttons Row -->
+              <div style="margin-bottom: 15px;">
+                <a href="{expression/google-maps-url}" target="_blank" style="display: inline-block; width: 48%; background-color: #34A853; color: white; text-decoration: none; padding: 12px 8px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 14px; margin-right: 4%;">
+                  📍 Google Maps
+                </a>
+                <a href="{expression/waze-url}" target="_blank" style="display: inline-block; width: 48%; background-color: #33CCFF; color: white; text-decoration: none; padding: 12px 8px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 14px;">
+                  🚗 Waze
+                </a>
+              </div>
+
+              <!-- Feedback Section -->
+              <div style="text-align: center; padding: 12px; background-color: white; border-radius: 6px; border: 1px solid #E0E0E0;">
+                <div style="color: #666; font-size: 13px; margin-bottom: 6px;">💬 Got feedback?</div>
+                <a href="{expression/feedback-url}" target="_blank" style="color: #4575B4; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  Fill our form →
+                </a>
+              </div>
+            </div>
+          </div>
+        `
+      }],
+      
+      // Expression functions for dynamic content
+      expressionInfos: [
+        // Check if photo exists and display it
+        {
+          name: "has-photo",
+          title: "Photo Section",
+          returnType: "string",
+          expression: `
+            var photoUrl = $feature.photo;
+            if (photoUrl != null && photoUrl != "" && photoUrl != " ") {
+              return photoUrl;
+            } else {
+              return "";
+            }
+          `
+        },
+        
+        // Check if description exists and display it
+        {
+          name: "has-description", 
+          title: "Description Section",
+          returnType: "string",
+          expression: `
+            var desc = $feature.description;
+            if (desc != null && desc != "" && desc != " ") {
+              return desc;
+            } else {
+              return "";
+            }
+          `
+        },
+        
+        // Check if fees/hours exists and display it
+        {
+          name: "has-fees-hours",
+          title: "Fees and Hours Section", 
+          returnType: "string",
+          expression: `
+            var feesHours = $feature.fees_opening_hours;
+            if (feesHours != null && feesHours != "" && feesHours != " ") {
+              return feesHours;
+            } else {
+              return "";
+            }
+          `
+        },
+        
+        // Google Search URL
+        {
+          name: "google-search-url",
+          title: "Google Search URL",
+          expression: `
+            return "https://www.google.com/search?q=" + $feature.eng_name + " " + $feature.Address;
+          `
+        },
+        
+        // Google Maps Navigation URL
+        {
+          name: "google-maps-url",
+          title: "Google Maps URL",
+          expression: `
+            return "https://www.google.com/maps/dir/?api=1&destination=" + $feature.lat + "," + $feature.lon;
+          `
+        },
+        
+        // Waze Navigation URL
+        {
+          name: "waze-url",
+          title: "Waze URL",
+          expression: `
+            return "https://waze.com/ul?ll=" + $feature.lat + "," + $feature.lon + "&navigate=yes";
+          `
+        },
+        
+        // Feedback Form URL
+        {
+          name: "feedback-url",
+          title: "Feedback URL",
+          expression: `
+            return "https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895=" + $feature.id;
+          `
+        }
+      ]
+    };
+  };
+
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
     container: "viewDiv",
@@ -29,8 +246,6 @@ require([
   view.ui.add(new Zoom({ view }),   { position: "bottom-right" });
   view.ui.add(new Locate({ view }), { position: "bottom-right" });
   view.ui.add(new Home({ view }),   { position: "bottom-right" });
-  
-  // ... rest of your code
 
   const search = new Search({
     view,
@@ -71,21 +286,6 @@ require([
     ]
   });
 
-  const dynamicRenderer = new UniqueValueRenderer({
-    field: "main_category",
-    defaultSymbol: {
-      type: "simple-marker", style: "square", size: 12,
-      color: "#FF0000", outline: { color: "#FFFFFF", width: 3 }
-    },
-    uniqueValueInfos: [
-      { value: "Featured", symbol: { type:"simple-marker", style:"square", size:12, color:"#FF0000", outline:{color:"#FFFFFF",width:3} } },
-      { value: "Synagogue", symbol: { type:"simple-marker", style:"square", size:12, color:"#FF0000", outline:{color:"#FFFFFF",width:3} } },
-      { value: "Heritage", symbol: { type:"simple-marker", style:"square", size:12, color:"#FF0000", outline:{color:"#FFFFFF",width:3} } },
-      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"square", size:12, color:"#FF0000", outline:{color:"#FFFFFF",width:3} } },
-      { value: "Community", symbol: { type:"simple-marker", style:"square", size:12, color:"#FF0000", outline:{color:"#FFFFFF",width:3} } }
-    ]
-  });
-
   const ZOOM_THRESHOLD = 8;
   let dynamicLayer = null;
   let currentFilter = "";
@@ -93,10 +293,7 @@ require([
   const globalLayer = new FeatureLayer({
     url: window.LANDMARKS_SERVICE_URL,
     outFields: ["*"],
-    popupTemplate: {
-      title: "{eng_name}",
-      content: "{description}"
-    },
+    popupTemplate: createPopupTemplate(),
     renderer: globalRenderer
   });
   
@@ -206,28 +403,22 @@ require([
 
     dynamicLayer = new GraphicsLayer({
       title: "Dynamic Landmarks"
-      // Remove renderer - we'll set symbols individually
     });
 
     const graphics = features.map(feature => {
-      // The geometry is already in the correct spatial reference (from outSR parameter)
       const point = new Point({
         x: feature.geometry.x,
         y: feature.geometry.y,
         spatialReference: view.spatialReference
       });
 
-      // Get the appropriate symbol for this feature's category
       const symbol = getSymbolForCategory(feature.attributes.main_category);
 
       return new Graphic({
         geometry: point,
         attributes: feature.attributes,
-        symbol: symbol,  // Apply symbol directly to graphic
-        popupTemplate: {
-          title: "{eng_name}",
-          content: "{description}"
-        }
+        symbol: symbol,
+        popupTemplate: createPopupTemplate()
       });
     });
 
@@ -258,18 +449,22 @@ require([
   }
 
   let loadingDynamic = false;
-  
+
   view.watch("zoom", async (newZoom) => {
     if (newZoom > ZOOM_THRESHOLD && !loadingDynamic) {
       loadingDynamic = true;
       console.log("Loading dynamic points...");
       
-      const center = view.center;
-      const features = await loadDynamicPoints(center);
-      await createDynamicLayer(features);
-      
-      loadingDynamic = false;
-      console.log("Loaded " + features.length + " dynamic points");
+      try {
+        const center = view.center;
+        const features = await loadDynamicPoints(center);
+        await createDynamicLayer(features);
+        console.log("Loaded " + features.length + " dynamic points");
+      } catch (error) {
+        console.error("Error loading dynamic points:", error);
+      } finally {
+        loadingDynamic = false;
+      }
     } else if (newZoom <= ZOOM_THRESHOLD && dynamicLayer) {
       map.remove(dynamicLayer);
       dynamicLayer = null;
@@ -277,35 +472,63 @@ require([
     }
   });
 
+  // Click handler for popups
+  view.on("click", async event => {
+    try {
+      const { results } = await view.hitTest(event);
+      
+      // Check if dynamicLayer exists before comparing
+      if (dynamicLayer) {
+        const hit = results.find(r => r.graphic && r.graphic.layer === dynamicLayer);
+        if (hit) {
+          view.popup.open({
+            features: [hit.graphic],
+            location: event.mapPoint
+          });
+          return; // Exit early to prevent checking other layers
+        }
+      }
+      
+      // If no dynamic layer hit, check global layer
+      const globalHit = results.find(r => r.graphic && r.graphic.layer === globalLayer);
+      if (globalHit) {
+        view.popup.open({
+          features: [globalHit.graphic],
+          location: event.mapPoint
+        });
+      }
+    } catch (error) {
+      console.error("Error handling click:", error);
+    }
+  });
+
   globalLayer.when(() => {
     view.goTo(globalLayer.fullExtent).catch(console.error);
-
     search.sources.unshift({
-      layer:        globalLayer,
+      layer: globalLayer,
       searchFields: ["eng_name"],
       displayField: "eng_name",
-      exactMatch:   false,
-      outFields:    ["*"],
-      name:         "Jewish Landmarks",
-      placeholder:  "e.g., Mikveh Israel"
-    });
-
-    filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const cat = btn.dataset.cat;
-        currentFilter = cat;
-        
-        globalLayer.definitionExpression = cat ? "main_category='" + cat + "'" : "";
-        
-        if (dynamicLayer) {
-          applyFilterToGraphicsLayer(dynamicLayer, cat);
-        }
-        
-        filterDiv.classList.toggle("filtered", !!cat);
-        filterDiv.querySelectorAll(".filterBtn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-      });
+      exactMatch: false,
+      outFields: ["*"],
+      name: "Jewish Landmarks",
+      placeholder: "e.g., Mikveh Israel"
     });
   });
 
+  filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const cat = btn.dataset.cat;
+      currentFilter = cat;
+      
+      globalLayer.definitionExpression = cat ? "main_category='" + cat + "'" : "";
+      
+      if (dynamicLayer) {
+        applyFilterToGraphicsLayer(dynamicLayer, cat);
+      }
+      
+      filterDiv.classList.toggle("filtered", !!cat);
+      filterDiv.querySelectorAll(".filterBtn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
 });
