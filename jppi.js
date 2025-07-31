@@ -28,8 +28,8 @@ const createPopupTemplate = () => {
           border-radius: 20px;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
           padding: 28px;
-          margin: 0;
-          max-width: 340px;
+          margin: -8px;
+	  width: calc(100% + 16px);
           box-shadow: 
             0 20px 60px rgba(0,0,0,0.12),
             0 8px 25px rgba(0,0,0,0.08),
@@ -262,11 +262,11 @@ view.ui.add(search, {
   // Helper function to get symbol based on category (same as global layer)
   function getSymbolForCategory(category) {
     const symbolMap = {
-      "Featured": { type:"simple-marker", style:"circle", size:6, color:"#f39c12", outline:{color:"#fff",width:1} },
-      "Synagogue": { type:"simple-marker", style:"circle", size:6, color:"#5DADE2", outline:{color:"#fff",width:1} },
-      "Heritage": { type:"simple-marker", style:"circle", size:6, color:"#EC7063", outline:{color:"#fff",width:1} },
-      "Kosher Restaurant": { type:"simple-marker", style:"circle", size:6, color:"#58D68D", outline:{color:"#fff",width:1} },
-      "Community": { type:"simple-marker", style:"circle", size:6, color:"#F5B041", outline:{color:"#fff",width:1} }
+      "Featured": { type:"simple-marker", style:"circle", size:8, color:"#f39c12", outline:{color:"#fff",width:1} },
+      "Synagogue": { type:"simple-marker", style:"circle", size:8, color:"#5DADE2", outline:{color:"#fff",width:1} },
+      "Heritage": { type:"simple-marker", style:"circle", size:8, color:"#EC7063", outline:{color:"#fff",width:1} },
+      "Kosher Restaurant": { type:"simple-marker", style:"circle", size:8, color:"#58D68D", outline:{color:"#fff",width:1} },
+      "Community": { type:"simple-marker", style:"circle", size:8, color:"#F5B041", outline:{color:"#fff",width:1} }
     };
     
     return symbolMap[category] || { type:"simple-marker", style:"circle", size:6, color:"#888", outline:{color:"#fff",width:1} };
