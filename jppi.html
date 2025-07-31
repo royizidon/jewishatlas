@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jewish Atlas - JPPI View</title>
+
+  <!-- Config: Define LANDMARKS_SERVICE_URL -->
+  <script src="config.js"></script>
+
+  <!-- ArcGIS -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css"/>
+  <script src="https://js.arcgis.com/4.26/"></script>
+
+  <!-- FontAwesome (optional for layer toggles) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Google Fonts (optional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css"/>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #viewDiv {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #filterContainer {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .filterBtn {
+      margin: 3px;
+      padding: 5px 10px;
+      font-size: 14px;
+      border: 1px solid #aaa;
+      background-color: #f8f8f8;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .filterBtn:hover {
+      background-color: #e8e8e8;
+    }
+
+    .filterBtn.active {
+      background-color: #007BFF;
+      color: white;
+      border-color: #0056b3;
+    }
+
+    /* Style the search widget */
+    .esri-search {
+      min-width: 280px;
+    }
+    
+    .esri-search__input {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Filter Buttons -->
+  <div id="filterContainer">
+    <!-- Buttons will be dynamically added by app.js -->
+  </div>
+
+  <!-- ArcGIS Map -->
+  <div id="viewDiv"></div>
+
+  <!-- Application Logic -->
+<script src="jppi.js"></script>
+</body>
+</html>

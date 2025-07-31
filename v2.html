@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jewish Atlas - JPPI View</title>
+
+  <!-- Config: Define LANDMARKS_SERVICE_URL -->
+  <script src="config.js"></script>
+
+  <!-- ArcGIS -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css"/>
+  <script src="https://js.arcgis.com/4.26/"></script>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+    }
+
+    #viewDiv {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Enhanced Filter Container */
+    #filterContainer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 15;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 16px 20px;
+      border-radius: 16px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      min-width: 320px;
+      transition: all 0.3s ease;
+    }
+
+    #filterContainer:hover {
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Filter Header */
+    .filter-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: #334155;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-header i {
+      color: #667eea;
+      font-size: 16px;
+    }
+
+    /* Filter Buttons Grid */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .filterBtn {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 2px solid transparent;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #475569;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filterBtn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .filterBtn:hover::before {
+      left: 100%;
+    }
+
+    .filterBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .filterBtn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: rgba(102, 126, 234, 0.3);
+      box-shadow: 
+        0 8px 25px rgba(102, 126, 234, 0.3),
+        0 0 0 1px rgba(102, 126, 234, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .filterBtn.active:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 12px 35px rgba(102, 126, 234, 0.4),
+        0 0 0 1px rgba(102, 126, 234, 0.2);
+    }
+
+    /* Enhanced Search Widget Styling */
+    .esri-search {
+      min-width: 350px !important;
+      max-width: 400px !important;
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border-radius: 16px !important;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.8) !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .esri-search:hover {
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .esri-search__input {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      padding: 14px 16px !important;
+      border-radius: 16px !important;
+      border: none !important;
+      background: transparent !important;
+      color: #334155 !important;
+    }
+
+    .esri-search__input::placeholder {
+      color: #94a3b8 !important;
+      font-weight: 400 !important;
+    }
+
+    .esri-search__submit-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      border-radius: 12px !important;
+      margin: 4px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .esri-search__submit-button:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    .esri-search__clear-button {
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .esri-search__suggestions-menu {
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+      border: 1px solid rgba(0, 0, 0, 0.06) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+    }
+
+    .esri-menu__list-item {
+      font-family: 'Inter', sans-serif !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .esri-menu__list-item:hover {
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%) !important;
+    }
+
+    /* Map Controls Enhancement */
+    .esri-zoom, .esri-home, .esri-locate {
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .esri-zoom .esri-widget--button,
+    .esri-home .esri-widget--button,
+    .esri-locate .esri-widget--button {
+      transition: all 0.2s ease !important;
+    }
+
+    .esri-zoom .esri-widget--button:hover,
+    .esri-home .esri-widget--button:hover,
+    .esri-locate .esri-widget--button:hover {
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%) !important;
+      transform: scale(1.05) !important;
+    }
+
+    /* Loading Animation */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      animation: pulse 2s infinite;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      #filterContainer {
+        left: 10px;
+        right: 10px;
+        width: auto;
+        min-width: auto;
+      }
+
+      .filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .esri-search {
+        min-width: 280px !important;
+        max-width: 320px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Enhanced Filter Container -->
+  <div id="filterContainer">
+    <div class="filter-header">
+      <i class="fas fa-filter"></i>
+      <span>Filter Landmarks</span>
+    </div>
+    <div class="filter-grid">
+      <!-- Buttons will be dynamically added by jppi.js -->
+    </div>
+  </div>
+
+  <!-- ArcGIS Map -->
+  <div id="viewDiv"></div>
+
+  <!-- Application Logic -->
+  <script src="v2.js"></script>
+</body>
+</html>

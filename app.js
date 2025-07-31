@@ -14,7 +14,7 @@ require([
   console.log("Map inside require:", typeof Map);
   console.log("MapView inside require:", typeof MapView);
 
-  // DEFINE createPopupTemplate FUNCTION FIRST
+  // DEFINE createPopupTemplate FUNCTION WITH GEOMETRY-BASED COORDINATES
   const createPopupTemplate = () => {
     return {
       title: "{eng_name}",
@@ -59,93 +59,233 @@ require([
               ">{main_category}</div>
             </div>
 
-            <!-- Content Section -->
-            <div style="padding: 0 20px 15px 20px;">
+            <!-- Tab Navigation -->
+            <div style="
+              display: flex;
+              background-color: #F8F9FA;
+              border-bottom: 1px solid #E9ECEF;
+              margin: 0 20px;
+              border-radius: 8px 8px 0 0;
+            ">
+              <button onclick="showTab(event, 'info-tab')" class="tab-button active" style="
+                flex: 1;
+                background: none;
+                border: none;
+                padding: 12px 16px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+                color: #2C3E50;
+                border-radius: 8px 0 0 0;
+                background-color: white;
+                border-bottom: 2px solid #4575B4;
+              ">📍 Info</button>
               
-              <!-- Address -->
-              <div style="margin-bottom: 12px;">
-                <div style="
-                  color: #7F8C8D;
-                  font-size: 12px;
-                  font-weight: 500;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin-bottom: 4px;
-                ">📍 ADDRESS</div>
-                <div style="
-                  color: #2C3E50;
-                  font-size: 14px;
-                  line-height: 1.4;
-                ">{Address}, {city}</div>
-              </div>
-
-              <!-- Description (if exists) -->
-              <div style="margin-bottom: 12px; display: {expression/has-description ? 'block' : 'none'};">
-                <div style="
-                  color: #7F8C8D;
-                  font-size: 12px;
-                  font-weight: 500;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin-bottom: 4px;
-                ">ℹ️ ABOUT</div>
-                <div style="
-                  color: #2C3E50;
-                  font-size: 14px;
-                  line-height: 1.5;
-                ">{expression/has-description}</div>
-              </div>
-
-              <!-- Fees & Hours (if exists) -->
-              <div style="margin-bottom: 12px; display: {expression/has-fees-hours ? 'block' : 'none'};">
-                <div style="
-                  color: #7F8C8D;
-                  font-size: 12px;
-                  font-weight: 500;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin-bottom: 4px;
-                ">🕐 HOURS & FEES</div>
-                <div style="
-                  color: #2C3E50;
-                  font-size: 14px;
-                  line-height: 1.5;
-                ">{expression/has-fees-hours}</div>
-              </div>
-
+              <button onclick="showTab(event, 'navigate-tab')" class="tab-button" style="
+                flex: 1;
+                background: none;
+                border: none;
+                padding: 12px 16px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+                color: #6C757D;
+                background-color: #F8F9FA;
+              ">🧭 Navigate</button>
+              
+              <button onclick="showTab(event, 'feedback-tab')" class="tab-button" style="
+                flex: 1;
+                background: none;
+                border: none;
+                padding: 12px 16px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+                color: #6C757D;
+                background-color: #F8F9FA;
+                border-radius: 0 8px 0 0;
+              ">💬 Feedback</button>
             </div>
 
-            <!-- Action Buttons -->
-            <div style="padding: 20px; background-color: #F8F9FA; border-top: 1px solid #E9ECEF;">
+            <!-- Tab Content Container -->
+            <div style="padding: 20px; background-color: white;">
               
-              <!-- Primary Search Button -->
-              <a href="{expression/google-search-url}" target="_blank" style="display: block; background-color: #4575B4; color: white; text-decoration: none; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 15px;">
-                🔍 Search for Details
-              </a>
+              <!-- Info Tab -->
+              <div id="info-tab" class="tab-content" style="display: block;">
+                <!-- Address -->
+                <div style="margin-bottom: 12px;">
+                  <div style="
+                    color: #7F8C8D;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                  ">📍 ADDRESS</div>
+                  <div style="
+                    color: #2C3E50;
+                    font-size: 14px;
+                    line-height: 1.4;
+                  ">{Address}, {city}</div>
+                </div>
 
-              <!-- Navigation Buttons Row -->
-              <div style="margin-bottom: 15px;">
-                <a href="{expression/google-maps-url}" target="_blank" style="display: inline-block; width: 48%; background-color: #34A853; color: white; text-decoration: none; padding: 12px 8px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 14px; margin-right: 4%;">
-                  📍 Google Maps
-                </a>
-                <a href="{expression/waze-url}" target="_blank" style="display: inline-block; width: 48%; background-color: #33CCFF; color: white; text-decoration: none; padding: 12px 8px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 14px;">
-                  🚗 Waze
+                <!-- Description (if exists) -->
+                <div style="margin-bottom: 12px; display: {expression/has-description ? 'block' : 'none'};">
+                  <div style="
+                    color: #7F8C8D;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                  ">ℹ️ ABOUT</div>
+                  <div style="
+                    color: #2C3E50;
+                    font-size: 14px;
+                    line-height: 1.5;
+                  ">{expression/has-description}</div>
+                </div>
+
+                <!-- Fees & Hours (if exists) -->
+                <div style="margin-bottom: 12px; display: {expression/has-fees-hours ? 'block' : 'none'};">
+                  <div style="
+                    color: #7F8C8D;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                  ">🕐 HOURS & FEES</div>
+                  <div style="
+                    color: #2C3E50;
+                    font-size: 14px;
+                    line-height: 1.5;
+                  ">{expression/has-fees-hours}</div>
+                </div>
+
+                <!-- Search Button -->
+                <a href="{expression/google-search-url}" target="_blank" style="
+                  display: block; 
+                  background-color: #4575B4; 
+                  color: white; 
+                  text-decoration: none; 
+                  padding: 12px; 
+                  border-radius: 8px; 
+                  text-align: center; 
+                  font-weight: bold; 
+                  font-size: 14px;
+                  margin-top: 15px;
+                ">
+                  🔍 Search for More Details
                 </a>
               </div>
 
-              <!-- Feedback Section -->
-              <div style="text-align: center; padding: 12px; background-color: white; border-radius: 6px; border: 1px solid #E0E0E0;">
-                <div style="color: #666; font-size: 13px; margin-bottom: 6px;">💬 Got feedback?</div>
-                <a href="{expression/feedback-url}" target="_blank" style="color: #4575B4; text-decoration: none; font-weight: bold; font-size: 14px;">
-                  Fill our form →
-                </a>
+              <!-- Navigate Tab -->
+              <div id="navigate-tab" class="tab-content" style="display: none;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                  <div style="color: #6C757D; font-size: 14px; margin-bottom: 15px;">
+                    Choose your preferred navigation app:
+                  </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div style="margin-bottom: 15px;">
+                  <a href="{expression/google-maps-url}" target="_blank" style="
+                    display: block; 
+                    width: 100%; 
+                    background-color: #34A853; 
+                    color: white; 
+                    text-decoration: none; 
+                    padding: 15px; 
+                    border-radius: 8px; 
+                    text-align: center; 
+                    font-weight: bold; 
+                    font-size: 16px;
+                    margin-bottom: 12px;
+                    box-sizing: border-box;
+                  ">
+                    📍 Open in Google Maps
+                  </a>
+                  
+                  <a href="{expression/waze-url}" target="_blank" style="
+                    display: block; 
+                    width: 100%; 
+                    background-color: #33CCFF; 
+                    color: white; 
+                    text-decoration: none; 
+                    padding: 15px; 
+                    border-radius: 8px; 
+                    text-align: center; 
+                    font-weight: bold; 
+                    font-size: 16px;
+                    box-sizing: border-box;
+                  ">
+                    🚗 Open in Waze
+                  </a>
+                </div>
+              </div>
+
+              <!-- Feedback Tab -->
+              <div id="feedback-tab" class="tab-content" style="display: none;">
+                <div style="text-align: center;">
+                  <div style="
+                    color: #6C757D;
+                    font-size: 16px;
+                    margin-bottom: 15px;
+                    line-height: 1.5;
+                  ">
+                    💬 Help us improve!<br>
+                    Share your experience or suggest updates to this location.
+                  </div>
+                  
+                  <a href="{expression/feedback-url}" target="_blank" style="
+                    display: inline-block;
+                    background-color: #4575B4;
+                    color: white;
+                    text-decoration: none;
+                    padding: 15px 25px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    font-size: 16px;
+                    box-shadow: 0 2px 8px rgba(69, 117, 180, 0.3);
+                  ">
+                    📝 Fill Feedback Form
+                  </a>
+                </div>
               </div>
             </div>
+
+            <!-- JavaScript for Tab Functionality -->
+            <script>
+              function showTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+                
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tab-content");
+                for (i = 0; i < tabcontent.length; i++) {
+                  tabcontent[i].style.display = "none";
+                }
+                
+                // Remove active class from all tab buttons
+                tablinks = document.getElementsByClassName("tab-button");
+                for (i = 0; i < tablinks.length; i++) {
+                  tablinks[i].style.backgroundColor = "#F8F9FA";
+                  tablinks[i].style.color = "#6C757D";
+                  tablinks[i].style.borderBottom = "none";
+                }
+                
+                // Show the selected tab and mark button as active
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.style.backgroundColor = "white";
+                evt.currentTarget.style.color = "#2C3E50";
+                evt.currentTarget.style.borderBottom = "2px solid #4575B4";
+              }
+            </script>
           </div>
         `
       }],
       
-      // Expression functions for dynamic content
+      // Expression functions for dynamic content - FIXED TO USE GEOMETRY
       expressionInfos: [
         // Check if photo exists and display it
         {
@@ -196,26 +336,67 @@ require([
         {
           name: "google-search-url",
           title: "Google Search URL",
+          returnType: "string",
           expression: `
             return "https://www.google.com/search?q=" + $feature.eng_name + " " + $feature.Address;
           `
         },
         
-        // Google Maps Navigation URL
+        // Google Maps Navigation URL - WITH COORDINATE CONVERSION
         {
           name: "google-maps-url",
           title: "Google Maps URL",
+          returnType: "string",
           expression: `
-            return "https://www.google.com/maps/dir/?api=1&destination=" + $feature.lat + "," + $feature.lon;
+            var geom = Geometry($feature);
+            var lat, lon;
+            
+            // Check if coordinates are in Web Mercator (3857) and convert to WGS84
+            if (geom.spatialReference.wkid == 3857) {
+              // Convert from Web Mercator to WGS84 manually
+              lon = geom.x / 20037508.34 * 180;
+              lat = geom.y / 20037508.34 * 180;
+              lat = 180 / PI() * (2 * Atan(Exp(lat * PI() / 180)) - PI() / 2);
+            } else if (geom.spatialReference.wkid == 4326) {
+              // Already in WGS84
+              lat = geom.y;
+              lon = geom.x;
+            } else {
+              // For other coordinate systems, use as-is (may not be perfect)
+              lat = geom.y;
+              lon = geom.x;
+            }
+            
+            return "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon;
           `
         },
         
-        // Waze Navigation URL
+        // Waze Navigation URL - WITH COORDINATE CONVERSION
         {
           name: "waze-url",
           title: "Waze URL",
+          returnType: "string",
           expression: `
-            return "https://waze.com/ul?ll=" + $feature.lat + "," + $feature.lon + "&navigate=yes";
+            var geom = Geometry($feature);
+            var lat, lon;
+            
+            // Check if coordinates are in Web Mercator (3857) and convert to WGS84
+            if (geom.spatialReference.wkid == 3857) {
+              // Convert from Web Mercator to WGS84 manually
+              lon = geom.x / 20037508.34 * 180;
+              lat = geom.y / 20037508.34 * 180;
+              lat = 180 / PI() * (2 * Atan(Exp(lat * PI() / 180)) - PI() / 2);
+            } else if (geom.spatialReference.wkid == 4326) {
+              // Already in WGS84
+              lat = geom.y;
+              lon = geom.x;
+            } else {
+              // For other coordinate systems, use as-is (may not be perfect)
+              lat = geom.y;
+              lon = geom.x;
+            }
+            
+            return "https://waze.com/ul?ll=" + lat + "," + lon + "&navigate=yes";
           `
         },
         
@@ -223,6 +404,7 @@ require([
         {
           name: "feedback-url",
           title: "Feedback URL",
+          returnType: "string",
           expression: `
             return "https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895=" + $feature.id;
           `
