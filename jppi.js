@@ -17,6 +17,7 @@ require([
   // DEFINE createPopupTemplate FUNCTION WITH GEOMETRY-BASED COORDINATES
   // DEFINE createPopupTemplate FUNCTION WITH IMPROVED DESIGN
 // DEFINE createPopupTemplate FUNCTION WITH IMPROVED DESIGN
+
 const createPopupTemplate = () => {
   return {
     title: "{eng_name}",
@@ -56,12 +57,59 @@ const createPopupTemplate = () => {
             {main_category}
           </div>
 
+          <!-- Location Information -->
+          <div style="
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+          ">
+            <!-- Address -->
+            <div style="
+              display: flex;
+              align-items: flex-start;
+              gap: 16px;
+              margin-bottom: 12px;
+              color: #374151;
+              font-size: 14px;
+              line-height: 1.5;
+            ">
+              <i class="fas fa-map-marker-alt" style="font-size: 14px; color: #667eea; margin-top: 2px; min-width: 16px; margin-right: 4px;"></i>
+              <span style="font-weight: 500;">{Address}</span>
+            </div>
+            
+            <!-- City -->
+            <div style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin-bottom: 12px;
+              color: #374151;
+              font-size: 14px;
+            ">
+              <i class="fas fa-city" style="font-size: 14px; color: #667eea; min-width: 16px; margin-right: 4px;"></i>
+              <span style="font-weight: 500;">{city}</span>
+            </div>
+            
+            <!-- Country -->
+            <div style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              color: #374151;
+              font-size: 14px;
+            ">
+              <i class="fas fa-globe" style="font-size: 14px; color: #667eea; min-width: 16px; margin-right: 4px;"></i>
+              <span style="font-weight: 500;">{country}</span>
+            </div>
+          </div>
+
           <!-- Google Search Button -->
           <a href="{expression/google-search-url}" target="_blank" style="
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
             background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
             color: white;
             text-decoration: none;
@@ -78,9 +126,11 @@ const createPopupTemplate = () => {
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
           " onmouseover="this.style.transform='translateY(-2px) scale(1.02)'; this.style.boxShadow='0 12px 30px rgba(66, 133, 244, 0.35), 0 4px 12px rgba(66, 133, 244, 0.2)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 20px rgba(66, 133, 244, 0.25), 0 2px 8px rgba(66, 133, 244, 0.15)'"
           >
-            <i class="fas fa-search" style="font-size: 14px;"></i>
+            <i class="fas fa-search" style="font-size: 14px; margin-right: 10px;"></i>
             Search on Google
           </a>
         </div>
@@ -94,12 +144,14 @@ const createPopupTemplate = () => {
         title: "Google Search URL",
         returnType: "string",
         expression: `
-          return "https://www.google.com/search?q=" + $feature.eng_name + " " + $feature.Address;
+          return "https://www.google.com/search?q=" + $feature.eng_name + " " + $feature.Address + " " + $feature.city + " " + $feature.country;
         `
       }
     ]
   };
 };
+
+
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
     container: "viewDiv",
@@ -113,7 +165,7 @@ const createPopupTemplate = () => {
   console.log("View object:", view);
   
   view.ui.add(new Zoom({ view }),   { position: "bottom-right" });
-  view.ui.add(new Locate({ view }), { position: "bottom-right" });
+ // view.ui.add(new Locate({ view }), { position: "bottom-right" });
   view.ui.add(new Home({ view }),   { position: "bottom-right" });
 
 
@@ -202,7 +254,7 @@ view.ui.add(search, {
       const requestBody = new URLSearchParams({
         f: "json",
         where: "1=1",
-        outFields: "*",
+        outFields: "eng_name,Address,address,city,country,main_category",
         geometry: JSON.stringify(geometryObj),
         geometryType: "esriGeometryEnvelope",
         spatialRel: "esriSpatialRelIntersects",
@@ -273,52 +325,62 @@ view.ui.add(search, {
   }
 
   async function createDynamicLayer(features) {
-    if (dynamicLayer) {
-      map.remove(dynamicLayer);
-      dynamicLayer = null;
-    }
-
-    if (features.length === 0) return;
-
-    console.log("Creating dynamic layer with", features.length, "features");
-
-    dynamicLayer = new GraphicsLayer({
-      title: "Dynamic Landmarks"
-    });
-
-    const graphics = features.map(feature => {
-      const point = new Point({
-        x: feature.geometry.x,
-        y: feature.geometry.y,
-        spatialReference: view.spatialReference
-      });
-
-      const symbol = getSymbolForCategory(feature.attributes.main_category);
-
-      return new Graphic({
-        geometry: point,
-        attributes: feature.attributes,
-        symbol: symbol,
-        popupTemplate: createPopupTemplate()
-      });
-    });
-
-    dynamicLayer.addMany(graphics);
-
-    if (currentFilter) {
-      applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
-    }
-
-    map.add(dynamicLayer);
-    console.log("Dynamic layer added to map with", graphics.length, "graphics");
-    
-    // Log first few graphics to verify coordinates and symbols
-    if (graphics.length > 0) {
-      console.log("First graphic coordinates:", graphics[0].geometry.x, graphics[0].geometry.y);
-      console.log("First graphic category:", graphics[0].attributes.main_category);
-      console.log("First graphic symbol:", graphics[0].symbol);
-    }
+  if (dynamicLayer) {
+    map.remove(dynamicLayer);
+    dynamicLayer = null;
   }
+
+  if (features.length === 0) return;
+
+  console.log("Creating dynamic layer with", features.length, "features");
+
+  dynamicLayer = new GraphicsLayer({
+    title: "Dynamic Landmarks"
+  });
+
+const graphics = features.map(feature => {
+  const a = feature.attributes || {};
+
+  // Normalize keys (handles different casings/aliases from the proxy)
+  const attrs = {
+    eng_name:      a.eng_name ?? a.ENG_NAME ?? a.name ?? "",
+    Address:       a.Address  ?? a.address  ?? a.ADDRESS ?? "",
+    city:          a.city     ?? a.City     ?? a.CITY    ?? "",
+    country:       a.country  ?? a.Country  ?? a.COUNTRY ?? "",
+    main_category: a.main_category ?? a.category ?? a.CATEGORY ?? ""
+  };
+
+  const point = new Point({
+    x: feature.geometry.x,
+    y: feature.geometry.y,
+    spatialReference: view.spatialReference
+  });
+
+  return new Graphic({
+    geometry: point,
+    attributes: attrs, // ← use normalized keys that your popup template references
+    symbol: getSymbolForCategory(attrs.main_category),
+    popupTemplate: createPopupTemplate()
+  });
+});
+
+
+  dynamicLayer.addMany(graphics);
+
+  if (currentFilter) {
+    applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
+  }
+
+  map.add(dynamicLayer);
+  console.log("Dynamic layer added to map with", graphics.length, "graphics");
+  
+  // Log first graphic to verify all attributes are present
+  if (graphics.length > 0) {
+    console.log("First graphic coordinates:", graphics[0].geometry.x, graphics[0].geometry.y);
+    console.log("First graphic category:", graphics[0].attributes.main_category);
+    console.log("First graphic all attributes:", graphics[0].attributes);
+  }
+}
 
   function applyFilterToGraphicsLayer(layer, category) {
     if (!layer || !layer.graphics) return;
