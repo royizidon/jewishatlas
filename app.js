@@ -422,6 +422,23 @@ require([
     ui: { components: [] }
   });
   
+// Force popup to always expand on mobile
+  
+view.when(() => {
+  view.popup.collapseEnabled = false;     // no expand/collapse chevron
+  view.popup.dockEnabled = true;          // keep popup docked
+  view.popup.dockOptions = {
+    position: "bottom-center",            // still mobile-friendly at bottom
+    breakpoint: false,                    // don't auto-collapse at small sizes
+    buttonEnabled: false                  // hide the dock toggle button
+  };
+
+  // Make sure it never stays collapsed if opened
+  view.popup.watch("visible", (v) => {
+    if (v) view.popup.collapsed = false;
+  });
+});
+
   console.log("*** MAP AND VIEW CREATED ***");
   console.log("View object:", view);
   
