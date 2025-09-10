@@ -252,3 +252,58 @@ html, body {
   }
 }
 
+/* --- Mobile fixes for header/search/filters --- */
+@media (max-width: 640px) {
+  /* Make row1 stack cleanly and give the search full width */
+  #headerRow1 {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  #searchContainer {
+    order: 3;              /* place search below the nav/logo on small screens */
+    width: 100%;
+    min-width: 0;          /* allow it to shrink on very small devices */
+    position: relative;    /* so z-index applies */
+    z-index: 2;            /* keep search above chips if they get close */
+  }
+
+  /* Filters: full-width block, below the search, no overlap */
+  #filterContainer {
+    order: 4;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  /* Chips smaller, two per row */
+  .filterBtn {
+    flex: 1 1 46%;         /* ~two per line */
+    max-width: 46%;
+    padding: 6px 10px;
+    font-size: 13px;
+    min-height: 36px;      /* was 40–44px; tighten for mobile */
+    border-width: 2px;
+    white-space: nowrap;
+  }
+}
+
+/* OPTIONAL: if you prefer a single scrollable row instead of wrapping,
+   comment the flex lines above and use this on mobile:
+@media (max-width: 640px) {
+  #filterContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filterBtn { flex: 0 0 auto; max-width: none; }
+}
+*/
