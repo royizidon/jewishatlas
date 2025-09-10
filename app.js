@@ -343,7 +343,7 @@ require([
   if (!filterDiv) console.warn("[filters] #filterContainer not found");
   const categories = [
     { name: "All",          cat: "" },
-    { name: "Highlights",    cat: "Highlight" },
+    { name: "Highlight",    cat: "Highlights" },
     { name: "Synagogues",   cat: "Synagogue" },
     { name: "Heritage",     cat: "Heritage" },
     { name: "Kosher Food",  cat: "Kosher Restaurant" },
