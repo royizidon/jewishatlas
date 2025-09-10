@@ -190,7 +190,7 @@ view.ui.add(search, {
   const filterDiv = document.getElementById("filterContainer");
   const categories = [
     { name: "All",         cat: "" },
-    { name: "Featured",    cat: "Featured" },
+    { name: "Highlight",    cat: "Highlights" },
     { name: "Synagogues",  cat: "Synagogue" },
     { name: "Heritage",    cat: "Heritage" },
     { name: "Kosher Food", cat: "Kosher Restaurant" },
@@ -211,7 +211,7 @@ view.ui.add(search, {
       color: "#888", outline: { color: "#fff", width: 1 }
     },
     uniqueValueInfos: [
-      { value: "Featured", symbol: { type:"simple-marker", style:"circle", size:6, color:"#f39c12", outline:{color:"#fff",width:1} } },
+      { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:6, color:"#f39c12", outline:{color:"#fff",width:1} } },
       { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:6, color:"#5DADE2", outline:{color:"#fff",width:1} } },
       { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:6, color:"#EC7063", outline:{color:"#fff",width:1} } },
       { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:8, color:"#58D68D", outline:{color:"#fff",width:1} } },
@@ -314,7 +314,7 @@ view.ui.add(search, {
   // Helper function to get symbol based on category (same as global layer)
   function getSymbolForCategory(category) {
     const symbolMap = {
-      "Featured": { type:"simple-marker", style:"circle", size:8, color:"#f39c12", outline:{color:"#fff",width:1} },
+      "Highlight": { type:"simple-marker", style:"circle", size:8, color:"#f39c12", outline:{color:"#fff",width:1} },
       "Synagogue": { type:"simple-marker", style:"circle", size:8, color:"#5DADE2", outline:{color:"#fff",width:1} },
       "Heritage": { type:"simple-marker", style:"circle", size:8, color:"#EC7063", outline:{color:"#fff",width:1} },
       "Kosher Restaurant": { type:"simple-marker", style:"circle", size:8, color:"#58D68D", outline:{color:"#fff",width:1} },

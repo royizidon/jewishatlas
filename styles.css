@@ -20,14 +20,14 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
-  height: 50px;
+  padding: 16px 20px;              /* INCREASED: from 12px to 16px for more breathing room */
+  height: 64px;                    /* INCREASED: from 50px to 64px for taller header */
 }
 
 #headerRow2 {
   display: flex;
   justify-content: center;
-  padding: 8px 20px 12px;
+  padding: 12px 20px 16px;         /* INCREASED: bottom padding from 12px to 16px */
   border-top: 1px solid #f1f5f9;
   background: #fafbfc;
 }
@@ -36,7 +36,7 @@ html, body {
 #headerLeft {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 30px;                       /* KEPT: this spacing is already good */
 }
 
 #siteTitle {
@@ -54,11 +54,11 @@ html, body {
 
 #navButtons {
   display: flex;
-  gap: 8px;
+  gap: 12px;                       /* INCREASED: from 8px to 12px for less cramped buttons */
 }
 
 .navBtn {
-  padding: 8px 16px;
+  padding: 10px 18px;              /* INCREASED: from 8px 16px to 10px 18px for larger buttons */
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   background: #fff;
@@ -88,17 +88,16 @@ html, body {
   position: relative;
   min-width: 320px;
 }
-
+/* Simple Filter Container - Just Positioning */
 #filterContainer {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
 }
 
+/* Clean Filter Buttons */
 .filterBtn {
   padding: 8px 16px;
   border: 2px solid #e2e8f0;
@@ -111,6 +110,10 @@ html, body {
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
   white-space: nowrap;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filterBtn:hover {
@@ -125,22 +128,22 @@ html, body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* assign each category its color */
-.filterBtn[data-cat=""]                 { --c: #64748b; }       /* All */
-.filterBtn[data-cat="Featured"]         { --c: #f59e0b; }
-.filterBtn[data-cat="Synagogue"]        { --c: #3b82f6; }
-.filterBtn[data-cat="Heritage"]         { --c: #ef4444; }
-.filterBtn[data-cat="Community"]        { --c: #f59e0b; }
-.filterBtn[data-cat="Kosher Restaurant"]{ --c: #10b981; }
+/* Category Colors */
+.filterBtn[data-cat=""] { --c: #64748b; }
+.filterBtn[data-cat="Highlights"] { --c: #f59e0b; }
+.filterBtn[data-cat="Synagogue"] { --c: #3b82f6; }
+.filterBtn[data-cat="Heritage"] { --c: #ef4444; }
+.filterBtn[data-cat="Community"] { --c: #f59e0b; }
+.filterBtn[data-cat="Kosher Restaurant"] { --c: #10b981; }
 
-/* unfiltered = all buttons colored */
+/* Unfiltered = all buttons colored */
 #filterContainer:not(.filtered) .filterBtn {
   background: var(--c);
   border-color: var(--c);
   color: #fff;
 }
 
-/* filtered = only the active button colored */
+/* Filtered = only active button colored */
 #filterContainer.filtered .filterBtn:not(.active) {
   background: #fff;
   border-color: #e2e8f0;
@@ -153,10 +156,23 @@ html, body {
   color: #fff;
 }
 
+/* Mobile */
+@media (max-width: 640px) {
+  #filterContainer {
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  
+  .filterBtn {
+    padding: 6px 12px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+}
 /* ─── MAP ─────────────────────────────────────────────────────────── */
 #viewDiv {
   position: absolute;
-  top: 95px;   /* sits just below the two header rows */
+  top: 115px;                      /* INCREASED: from 95px to 115px to account for taller header */
   left: 0; right: 0; bottom: 0;
 }
 
@@ -175,11 +191,11 @@ html, body {
   }
   
   #navButtons {
-    gap: 6px;
+    gap: 8px;                      /* REDUCED: back to 8px on tablet */
   }
   
   .navBtn {
-    padding: 6px 12px;
+    padding: 8px 14px;             /* REDUCED: smaller on tablet */
     font-size: 13px;
   }
   
@@ -194,11 +210,29 @@ html, body {
   }
   
   #viewDiv {
-    top: 140px; /* Adjust for taller header on mobile */
+    top: 150px;                    /* ADJUSTED: for taller responsive header */
   }
 }
 
 @media (max-width: 640px) {
+  #headerRow1 {
+    padding: 12px 16px;            /* SMALLER: compact padding on mobile */
+    height: 50px;                  /* REDUCED: back to compact height on mobile */
+  }
+  
+  #headerLeft {
+    gap: 20px;                     /* REDUCED: tighter spacing on mobile */
+  }
+  
+  #navButtons {
+    gap: 6px;                      /* TIGHT: minimal spacing on mobile */
+  }
+  
+  .navBtn {
+    padding: 6px 10px;             /* COMPACT: smaller buttons on mobile */
+    font-size: 12px;
+  }
+  
   #siteTitle {
     font-size: 24px;
   }
@@ -212,4 +246,9 @@ html, body {
     padding: 6px 12px;
     font-size: 13px;
   }
+  
+  #viewDiv {
+    top: 130px;                    /* ADJUSTED: for mobile header height */
+  }
 }
+

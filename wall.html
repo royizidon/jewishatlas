@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>The Wall · Jewish Atlas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --header-h:72px; --ring:rgba(79,70,229,.15); --ink:#0f172a;
+      --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0; --gray-300:#cbd5e1; --gray-600:#475569;
+      --indigo:#4f46e5; --indigo-dark:#4338ca;
+      --brick:#f1ede3; --mortar:#d9d4c8; --brick-ink:#223;
+    }
+    html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+    body{background:#f6f7fb;color:var(--ink);padding-top:var(--header-h)}
+    .ja-container{max-width:1200px;margin:0 auto;padding:0 16px}
+
+    /* Header (same as upload) */
+    #appHeader{position:fixed;inset:0 0 auto 0;z-index:1000;background:#fff;border-bottom:1px solid var(--gray-300);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    #headerRow1{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px;padding:12px 16px;box-sizing:border-box}
+    #headerLeft{display:flex;align-items:center;gap:12px}
+    #appHeader,#headerRow1,#headerLeft{overflow:visible}
+    #siteTitle{
+      display:inline-block;margin:0;line-height:1.2;font:800 28px/1 "Playfair Display",serif;letter-spacing:-.3px;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+      padding-left:.34em;padding-bottom:.1em
+    }
+    #navButtons{display:flex;gap:24px}
+    #navButtons .navBtn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--gray-200);background:#fff;color:#334155;font-weight:700;cursor:pointer;text-decoration:none;transition:background .15s ease}
+    #navButtons .navBtn:hover{background:var(--gray-100)}
+    #navButtons .active{border-color:#c7d2fe;background:#eef2ff;color:#312e81}
+
+    /* Hero */
+    .hero{text-align:center;padding:34px 12px 10px}
+    .hero h1{margin:0 0 10px;font:800 40px/1.3 "Playfair Display",serif;background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+    .hero p{margin:0 auto;max-width:760px;color:var(--gray-600);font-size:18px}
+    .toolbar{margin:18px auto 8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+    .searchBox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--gray-200);border-radius:999px;padding:10px 14px;min-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+    .searchBox input{border:none;outline:none;width:280px;font-size:15px}
+    .filterBtn{border:1px solid var(--gray-200);background:#fff;padding:10px 14px;border-radius:999px;font-weight:600;cursor:pointer}
+    .filterBtn.active{border-color:#c7d2fe;background:#eef2ff;color:#312e81}
+
+    /* Wall */
+    .wallWrap{background:linear-gradient(180deg,#f7f6f2,#f3efe7);border:1px solid var(--gray-200);border-radius:18px;box-shadow:0 12px 26px rgba(15,23,42,.06);padding:18px;margin:16px auto 40px}
+    .brickGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;background:var(--mortar);padding:10px;border-radius:12px}
+    .brick{background:var(--brick);border:1px solid #ccbfae;border-radius:8px;padding:14px 12px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.05),0 2px 2px rgba(0,0,0,.04);cursor:pointer;user-select:none;display:flex;flex-direction:column;justify-content:center;gap:6px;min-height:92px;transition:transform .08s ease,box-shadow .1s ease}
+    .brick:hover{transform:translateY(-1px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.04),0 4px 10px rgba(0,0,0,.06)}
+    .brick .kind{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5b5b5b}
+    .brick .name{font-weight:800;letter-spacing:.02em;color:var(--brick-ink);font-family:"Playfair Display",serif;font-size:18px;line-height:1.15}
+    .brick .hebrew{font-weight:700;color:#2a2a2a;line-height:1.1;direction:rtl}
+    .empty{text-align:center;color:#64748b;padding:30px 12px}
+
+    /* Modal */
+    .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.22);display:none;align-items:flex-start;justify-content:center;overflow:auto;z-index:1100;backdrop-filter:saturate(120%) blur(2px)}
+    .backdrop.show{display:flex}
+    .sheet{margin-top:80px;background:#fff;width:min(760px,92vw);border-radius:18px;border:1px solid var(--gray-200);box-shadow:0 20px 50px rgba(0,0,0,.18);overflow:hidden}
+    .sheetHeader{display:flex;align-items:center;gap:14px;padding:18px;border-bottom:1px solid var(--gray-200)}
+    .avatar{width:64px;height:64px;border-radius:12px;object-fit:cover;background:#f3f4f6;border:1px solid var(--gray-200)}
+    .titleBlock .line1{margin:0;font:800 24px/1.2 "Playfair Display",serif}
+    .titleBlock .he{margin:2px 0 0;font-weight:700;direction:rtl}
+    .sheetBody{padding:18px}
+    .meta{display:flex;flex-wrap:wrap;gap:10px 16px;color:#334155}
+    .meta .pill{background:#f1f5ff;color:#312e81;border:1px solid #dbeafe;border-radius:999px;padding:6px 10px;font-weight:600}
+    .notes{margin-top:12px;color:#475569;line-height:1.5}
+    .closeBtn{margin-left:auto;border:1px solid var(--gray-200);background:#fff;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+    @media (max-width:640px){.hero h1{font-size:32px}#navButtons{gap:12px}.searchBox input{width:200px}}
+  </style>
+</head>
+<body>
+  <header id="appHeader">
+    <div id="headerRow1" class="ja-container">
+      <div id="headerLeft">
+        <h1 id="siteTitle">Jewish Atlas</h1>
+        <nav id="navButtons">
+  <button class="navBtn" id="aboutBtn"  type="button">About</button>
+  <button class="navBtn" id="uploadBtn" type="button">Upload Your Site</button>
+  <button class="navBtn" id="backBtn"   type="button">Back to Map</button>
+</nav>
+
+      </div>
+      <div id="searchContainer" aria-hidden="true"></div>
+    </div>
+  </header>
+
+  <section class="hero ja-container">
+    <h1>The Wall of Memory & Honor</h1>
+    <p>Each brick represents a dedication—an act of memory, love, gratitude, or support. Tap a brick to see details in English and Hebrew.</p>
+    <div class="toolbar">
+      <div class="searchBox">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.3-4.3M11 19a8 8 0 100-16 8 8 0 000 16z" stroke="#64748b" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" type="text" placeholder="Search names…" />
+      </div>
+      <button class="filterBtn active" data-filter="all">All</button>
+      <button class="filterBtn" data-filter="memorial">Memorial</button>
+      <button class="filterBtn" data-filter="tribute">Tribute</button>
+    </div>
+  </section>
+
+  <main class="ja-container">
+    <div class="wallWrap">
+      <div id="brickGrid" class="brickGrid" role="list"></div>
+      <div id="emptyState" class="empty" style="display:none">No bricks match your search.</div>
+    </div>
+  </main>
+
+  <!-- Detail panel -->
+  <div id="backdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sheet" role="document">
+      <div class="sheetHeader">
+        <img id="detailPhoto" class="avatar" alt="">
+        <div class="titleBlock">
+          <h3 id="detailName" class="line1"></h3>
+          <div id="detailHeb" class="he"></div>
+        </div>
+        <button id="closeBtn" class="closeBtn" type="button">Close</button>
+      </div>
+      <div class="sheetBody">
+        <div id="detailMeta" class="meta"></div>
+        <div id="detailNotes" class="notes"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('backBtn').addEventListener('click',  ()=>location.href='index.html');
+document.getElementById('aboutBtn').addEventListener('click', ()=>location.href='about.html');
+document.getElementById('uploadBtn').addEventListener('click',()=>location.href='upload.html');
+
+
+    const GRID = document.getElementById('brickGrid');
+    const EMPTY = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtns = [...document.querySelectorAll('.filterBtn')];
+
+    let BRICKS = [];
+    let FILTER = 'all';
+    let QUERY = '';
+
+    const hasHebrew = s => /[\u0590-\u05FF]/.test(String(s||''));
+
+    // --------- ArcGIS loader (table + attachments) ----------
+    const FEATURE_TABLE_URL = "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/JewishAtlas_Wall_20250908_090410/FeatureServer/0";
+
+    const fmtDate = ms => !ms ? "" :
+      new Date(ms).toLocaleDateString("en-GB", {year:"numeric", month:"2-digit", day:"2-digit"});
+
+    function mapFeature(feat){
+      const a = feat.attributes || {};
+      const b = {
+        oid: a.OBJECTID,
+        eng_name:        (a.eng_name || "").trim(),
+        hebrew_name:     (a.hebrew_name || "").trim(),
+        born:            fmtDate(a.born),
+        death:           fmtDate(a.death),
+        born_he:         (a.born_he || "").trim(),
+        death_he:        (a.death_he || "").trim(),
+        comment:         (a.comment || "").trim(),
+        dedicator_email: (a.dedicator_email || "").trim(),
+        type_:           (a.type_ || "").trim().toLowerCase(),
+        photo:           ""
+      };
+      const hasAnyDate = !!(b.born || b.death || b.born_he || b.death_he);
+      b.kind = b.type_ ? b.type_ : (hasAnyDate ? "memorial" : "tribute");
+      return b;
+    }
+
+    async function loadFromArcGIS(){
+      try {
+        // 1) attributes
+        const outFields = "OBJECTID,eng_name,hebrew_name,born,death,born_he,death_he,comment,dedicator_email,type_";
+        const qUrl = `${FEATURE_TABLE_URL}/query?where=${encodeURIComponent("1=1")}&outFields=${encodeURIComponent(outFields)}&orderByFields=${encodeURIComponent("eng_name ASC")}&f=json`;
+        const r = await fetch(qUrl);
+        const j = await r.json();
+        const feats = j.features || [];
+        BRICKS = feats.map(mapFeature);
+
+        // 2) attachments: first attachment per record (if any)
+        if (feats.length){
+          const ids = feats.map(f => f.attributes.OBJECTID).join(",");
+          const aUrl = `${FEATURE_TABLE_URL}/queryAttachments?objectIds=${ids}&f=json`;
+          const ar = await fetch(aUrl);
+          const aj = await ar.json();
+          const groups = aj.attachmentGroups || [];
+          const attByOid = new Map();
+          for (const g of groups){
+            const infos = g.attachmentInfos || [];
+            if (infos.length){
+              const first = infos[0];
+              const url = `${FEATURE_TABLE_URL}/${g.parentObjectId}/attachments/${first.id}`;
+              attByOid.set(g.parentObjectId, url);
+            }
+          }
+          BRICKS.forEach(b => { b.photo = attByOid.get(b.oid) || ""; });
+        }
+      } catch (e){
+        console.warn("Failed to load from ArcGIS:", e);
+        BRICKS = [];
+        EMPTY.style.display='block';
+        EMPTY.textContent = 'Could not load Wall data from ArcGIS.';
+      }
+      render();
+    }
+
+    // ---------- UI helpers ----------
+    function matchFilter(b){ return FILTER==='all' ? true : b.kind===FILTER; }
+    function matchQuery(b){
+      if(!QUERY) return true;
+      const q = QUERY.toLowerCase();
+      return [b.eng_name,b.hebrew_name,b.comment].some(x=>String(x||'').toLowerCase().includes(q));
+    }
+
+    function render(){
+      GRID.innerHTML = '';
+      const data = BRICKS.filter(b=>matchFilter(b) && matchQuery(b));
+      if(!data.length){ EMPTY.style.display='block'; return; }
+      EMPTY.style.display='none';
+
+      for(const b of data){
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'brick';
+        el.setAttribute('role','listitem');
+
+        const kindLabel = b.kind==='memorial' ? 'In Memory Of' : 'In Honor Of';
+        const heb = b.hebrew_name ? `<div class="hebrew" dir="${hasHebrew(b.hebrew_name)?'rtl':'auto'}">${b.hebrew_name}</div>` : '';
+
+        el.innerHTML = `
+          <div class="kind">${kindLabel}</div>
+          <div class="name">${b.eng_name || b.hebrew_name || '—'}</div>
+          ${heb}
+        `;
+        el.addEventListener('click', ()=>openDetail(b));
+        GRID.appendChild(el);
+      }
+    }
+
+    // modal
+    const BD = document.getElementById('backdrop');
+    const closeBtn = document.getElementById('closeBtn');
+    const detailPhoto = document.getElementById('detailPhoto');
+    const detailName = document.getElementById('detailName');
+    const detailHeb  = document.getElementById('detailHeb');
+    const detailMeta = document.getElementById('detailMeta');
+    const detailNotes= document.getElementById('detailNotes');
+
+    function openDetail(b){
+      detailName.textContent = b.eng_name || (b.hebrew_name ? '' : 'Dedication');
+      detailHeb.textContent  = b.hebrew_name || '';
+      detailHeb.style.display = b.hebrew_name ? 'block':'none';
+      if(b.hebrew_name) detailHeb.setAttribute('dir', hasHebrew(b.hebrew_name)?'rtl':'auto');
+
+      if(b.photo){ detailPhoto.src = b.photo; detailPhoto.style.display='block'; }
+      else { detailPhoto.removeAttribute('src'); detailPhoto.style.display='none'; }
+
+      const pills = [];
+      pills.push(`<span class="pill">${b.kind==='memorial'?'Memorial':'Tribute'}</span>`);
+      const engLife = (b.born || b.death) ? `${b.born || '—'} – ${b.death || '—'}` : '';
+      const hebLife = (b.born_he || b.death_he) ? `${b.born_he || '—'} – ${b.death_he || '—'}` : '';
+      if(engLife) pills.push(`<span class="pill">${engLife}</span>`);
+      if(hebLife) pills.push(`<span class="pill" dir="${hasHebrew(hebLife)?'rtl':'auto'}">${hebLife}</span>`);
+      if(b.dedicator_email){
+        const mail = b.dedicator_email.replace(/^mailto:/i,'');
+        pills.push(`<a class="pill" href="mailto:${mail}">Dedicator Email</a>`);
+      }
+      detailMeta.innerHTML = pills.join('');
+
+      detailNotes.textContent = b.comment || '';
+      detailNotes.style.display = b.comment ? 'block' : 'none';
+
+      BD.classList.add('show'); BD.setAttribute('aria-hidden','false');
+    }
+    function closeDetail(){ BD.classList.remove('show'); BD.setAttribute('aria-hidden','true'); }
+    closeBtn.addEventListener('click', closeDetail);
+    BD.addEventListener('click', e=>{ if(e.target===BD) closeDetail(); });
+    window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
+
+    // search & filter
+    searchInput.addEventListener('input', ()=>{ QUERY = searchInput.value.trim(); render(); });
+    filterBtns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        filterBtns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        FILTER = btn.dataset.filter;
+        render();
+      });
+    });
+
+    // Load from ArcGIS on startup
+    loadFromArcGIS();
+  </script>
+</body>
+</html>
