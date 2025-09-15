@@ -176,6 +176,8 @@ html, body {
   left: 0; right: 0; bottom: 0;
 }
 
+/* Replace the existing mobile section in your styles.css with this improved version */
+
 /* ─── RESPONSIVE DESIGN ──────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   #headerRow1 {
@@ -191,11 +193,11 @@ html, body {
   }
   
   #navButtons {
-    gap: 8px;                      /* REDUCED: back to 8px on tablet */
+    gap: 8px;
   }
   
   .navBtn {
-    padding: 8px 14px;             /* REDUCED: smaller on tablet */
+    padding: 8px 14px;
     font-size: 13px;
   }
   
@@ -210,45 +212,126 @@ html, body {
   }
   
   #viewDiv {
-    top: 150px;                    /* ADJUSTED: for taller responsive header */
+    top: 150px;
   }
 }
 
 @media (max-width: 640px) {
+  /* Header adjustments */
   #headerRow1 {
-    padding: 12px 16px;            /* SMALLER: compact padding on mobile */
-    height: 50px;                  /* REDUCED: back to compact height on mobile */
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  
+  #headerRow2 {
+    padding: 8px 16px 12px;
   }
   
   #headerLeft {
-    gap: 20px;                     /* REDUCED: tighter spacing on mobile */
+    gap: 16px;
   }
   
   #navButtons {
-    gap: 6px;                      /* TIGHT: minimal spacing on mobile */
+    gap: 6px;
   }
   
   .navBtn {
-    padding: 6px 10px;             /* COMPACT: smaller buttons on mobile */
+    padding: 6px 10px;
     font-size: 12px;
   }
   
   #siteTitle {
-    font-size: 24px;
+    font-size: 22px;
   }
   
+  /* Search widget - ensure it's visible and properly sized */
+  #searchContainer {
+    width: 100%;
+    min-width: 0;
+    order: 2;
+    margin-top: 8px;
+  }
+  
+  /* Make search widget input smaller on mobile */
+  #searchContainer .esri-search {
+    width: 100%;
+  }
+  
+  #searchContainer .esri-search__input {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+  }
+  
+  /* Filter buttons - single row, compact */
   #filterContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     gap: 6px;
     padding: 6px 8px;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  #filterContainer::-webkit-scrollbar {
+    display: none;
   }
   
   .filterBtn {
+    flex: 0 0 auto;
     padding: 6px 12px;
-    font-size: 13px;
+    font-size: 12px;
+    min-height: 32px;
+    white-space: nowrap;
+    border-radius: 16px;
+    min-width: fit-content;
+  }
+  
+  /* Adjust map position for mobile */
+  #viewDiv {
+    top: 120px;
+  }
+  
+  /* Make sure header doesn't overlap content */
+  #appHeader {
+    z-index: 1001;
+  }
+}
+
+/* Even smaller screens */
+@media (max-width: 480px) {
+  #headerRow1 {
+    padding: 10px 12px;
+  }
+  
+  #headerRow2 {
+    padding: 6px 12px 10px;
+  }
+  
+  #siteTitle {
+    font-size: 20px;
+  }
+  
+  .navBtn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  
+  .filterBtn {
+    padding: 5px 10px;
+    font-size: 11px;
+    min-height: 30px;
+  }
+  
+  #filterContainer {
+    gap: 4px;
+    padding: 4px 6px;
   }
   
   #viewDiv {
-    top: 130px;                    /* ADJUSTED: for mobile header height */
+    top: 110px;
   }
 }
 
@@ -306,4 +389,33 @@ html, body {
   }
   .filterBtn { flex: 0 0 auto; max-width: none; }
 }
-*/
+
+/* One-line, scrollable chip row with subtle hints */
+@media (max-width: 640px) {
+  #filterContainer{
+    display: flex;
+    gap: 6px;
+    padding: 4px 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+  }
+  #filterContainer::-webkit-scrollbar{ display:none; }
+  .filterBtn{
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    padding: 4px 10px;
+    font-size: 12px;
+    min-height: 28px;
+    border-radius: 14px;
+  }
+}
+/* Extra-tight for the narrowest phones */
+@media (max-width: 380px){
+  .filterBtn{ padding: 3px 8px; font-size: 11px; min-height: 24px; }
+}
+
+

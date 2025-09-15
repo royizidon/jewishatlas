@@ -199,7 +199,7 @@ require([
       }
     } catch (e) { console.error("[Locate/Track] toggle failed:", e); }
   });
-  view.ui.add(locateTrackBtn, { position: "bottom-right", index: 0 });
+  view.ui.add(locateTrackBtn, { position: "bottom-right", index: 2 });
 
   // -------- Popup behavior --------
   view.when(() => {
@@ -210,7 +210,7 @@ require([
   });
 
   // -------- Other UI widgets --------
-  view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 2 });
+  view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
   view.ui.add(new Home({ view }), { position: "bottom-right", index: 1 });
 
   // -------- Search --------
