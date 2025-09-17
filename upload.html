@@ -135,6 +135,73 @@
       .ja-heroText .hero-title{ font-size:32px; }
       .ja-heroText{ padding:28px 12px 20px; }
     }
+/* Mobile search bar improvements for upload page */
+@media (max-width: 768px) {
+  /* Make search dock much smaller and less prominent on mobile */
+  #searchDock {
+    width: min(80vw, 320px) !important; /* Even narrower */
+    top: 3px !important; /* Very close to top */
+  }
+  
+  /* Make search input much more compact */
+  #searchDock .esri-search__input-container {
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important; /* Remove shadow completely */
+    height: 28px !important; /* Very compact */
+    border-radius: 20px !important; /* Smaller rounded corners */
+  }
+  
+  #searchDock .esri-input {
+    height: 26px !important; /* Very small height */
+    font-size: 13px !important; /* Smaller text */
+    padding: 0 8px !important; /* Minimal padding */
+    line-height: 26px !important;
+  }
+  
+  #searchDock .esri-search__submit-button {
+    height: 26px !important;
+    width: 30px !important; /* Narrow button */
+    border-left: 1px solid #d1d5db !important;
+    border-radius: 0 20px 20px 0 !important;
+  }
+  
+  #searchDock .esri-search__submit-button .esri-icon-search {
+    font-size: 11px !important; /* Tiny icon */
+  }
+  
+  /* Make suggestions menu compact */
+  #searchDock .esri-search__suggestions-menu {
+    margin-top: 1px !important;
+    max-height: 30vh !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+  }
+  
+  /* Bigger map since search is smaller */
+  #viewDiv {
+    height: 48vh !important; /* Slightly bigger map */
+    border-radius: 12px !important;
+  }
+  
+  /* Form adjustments */
+  .ja-card {
+    padding: 14px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .ja-input, .ja-select, .ja-textarea {
+    font-size: 16px !important;
+    padding: 9px 11px !important;
+  }
+  
+  /* Compact helper text */
+  #viewWrap + p {
+    font-size: 12px !important;
+    margin: 4px 2px 0 !important;
+  }
+}
+
+
 /* --- CLEANER SEARCH BAR --- */
 #searchDock .esri-search__input-container {
   border: 1.5px solid #3b82f6;       /* thinner blue border */
@@ -184,7 +251,7 @@
         <nav id="navButtons">
           <button class="navBtn" id="aboutBtn" type="button">About</button>
           <button class="navBtn" id="wallBtn"  type="button">The Wall</button>
-          <button class="navBtn" id="backBtn"  type="button">Back to Map</button>
+          <button class="navBtn" id="backBtn"  type="button">Map</button>
         </nav>
       </div>
       <div id="searchContainer" aria-hidden="true"></div>
@@ -257,17 +324,17 @@
 <!-- Contact details for the site (optional) -->
 <div class="ja-field ja-two-col">
   <div>
-    <label for="sitePhone" class="ja-label">Phone</label>
+    <label for="sitePhone" class="ja-label">Site Phone</label>
     <input id="sitePhone" class="ja-input" type="tel" inputmode="tel" placeholder="+1 212-555-0123" />
   </div>
   <div>
-    <label for="siteWebsite" class="ja-label">Website </label>
+    <label for="siteWebsite" class="ja-label">Site Website </label>
     <input id="siteWebsite" class="ja-input" type="url" placeholder="https://example.org" />
   </div>
 </div>
 
 <div class="ja-field">
-  <label for="siteEmail" class="ja-label">Email </label>
+  <label for="siteEmail" class="ja-label">Site Email </label>
   <input id="siteEmail" class="ja-input" type="email" inputmode="email" autocomplete="email" placeholder="contact@example.org" />
 </div>
 

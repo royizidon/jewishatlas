@@ -237,9 +237,9 @@ const map = new Map({ basemap: "osm" });
     }
   });
 
-  view.ui.add(locate, { position: "bottom-left", index: 0 });
+  view.ui.add(locate, { position: "bottom-left", index: 2 });
   view.ui.add(home,   { position: "bottom-left", index: 1 });
-  view.ui.add(zoom,   { position: "bottom-left", index: 2 });
+  view.ui.add(zoom,   { position: "bottom-left", index: 0 });
   view.ui.move("attribution", "bottom-right"); // attribution below buttons
 
   // Accept a picked suggestion

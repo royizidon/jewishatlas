@@ -201,14 +201,49 @@ require([
   });
   view.ui.add(locateTrackBtn, { position: "bottom-right", index: 2 });
 
-  // -------- Popup behavior --------
-  view.when(() => {
-    view.popup.collapseEnabled = false;
-    view.popup.dockEnabled = true;
-    view.popup.dockOptions = { position: "bottom-center", breakpoint: false, buttonEnabled: false };
-    view.popup.watch("visible", (v) => { if (v) view.popup.collapsed = false; });
+// -------- Popup behavior --------
+// Replace your existing popup configuration with this:
+view.when(() => {
+  // Enhanced popup configuration for mobile
+  view.popup.dockEnabled = true;
+  view.popup.collapseEnabled = false;
+  
+  // Check if mobile/tablet
+  const isMobile = window.innerWidth <= 768;
+  
+  view.popup.dockOptions = {
+    position: isMobile ? "bottom" : "top-left",
+    breakpoint: false, // Always dock
+    buttonEnabled: false
+  };
+
+  // Force full screen on mobile
+  if (isMobile) {
+    view.popup.set({
+      dockEnabled: true,
+      dockOptions: {
+        position: "bottom",
+        breakpoint: false,
+        buttonEnabled: false
+      }
+    });
+  }
+
+  // If it ever collapses, immediately uncollapse it
+  view.popup.watch("collapsed", (isCollapsed) => {
+    if (isCollapsed) view.popup.collapsed = false;
   });
 
+  // Handle window resize to adjust popup behavior
+  window.addEventListener('resize', () => {
+    const isMobileNow = window.innerWidth <= 768;
+    view.popup.dockOptions = {
+      position: isMobileNow ? "bottom" : "top-left",
+      breakpoint: false,
+      buttonEnabled: false
+    };
+  });
+});
   // -------- Other UI widgets --------
   view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
   view.ui.add(new Home({ view }), { position: "bottom-right", index: 1 });
