@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>The Wall of Memory · Jewish Atlas</title>
+  <title>The Wall · Jewish Atlas</title>
   <link rel="stylesheet" href="header.css">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,7 +17,7 @@
       --header-h:72px; --ring:rgba(79,70,229,.15); --ink:#0f172a;
       --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0; --gray-300:#cbd5e1; --gray-600:#475569;
       --indigo:#4f46e5; --indigo-dark:#4338ca;
-      --brick:#f8f8f6; --mortar:#d9d4c8; --brick-ink:#223;
+      --brick:#f1ede3; --mortar:#d9d4c8; --brick-ink:#223;
     }
     html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
     body{background:#f6f7fb;color:var(--ink);padding-top:var(--header-h)}
@@ -31,6 +31,8 @@
     .toolbar{margin:18px auto 8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
     .searchBox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--gray-200);border-radius:999px;padding:10px 14px;min-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
     .searchBox input{border:none;outline:none;width:280px;font-size:15px}
+    .filterBtn{border:1px solid var(--gray-200);background:#fff;padding:10px 14px;border-radius:999px;font-weight:600;cursor:pointer}
+    .filterBtn.active{border-color:#c7d2fe;background:#eef2ff;color:#312e81}
 
     /* Wall */
     .wallWrap{background:linear-gradient(180deg,#f7f6f2,#f3efe7);border:1px solid var(--gray-200);border-radius:18px;box-shadow:0 12px 26px rgba(15,23,42,.06);padding:18px;margin:16px auto 40px}
@@ -57,15 +59,15 @@
   text-align: left !important;
 }
 .avatar {
-  width: 80px;
-  height: 100px;
+  width: 64px;
+  height: 64px;
   border-radius: 12px;
   object-fit: cover;
-  object-position: center top;
   background: #f3f4f6;
   border: 1px solid var(--gray-200);
   flex-shrink: 0; /* Prevent photo from shrinking */
 }
+
 .titleBlock {
   display: flex;
   flex-direction: column;
@@ -171,20 +173,23 @@
 </header>
 
   <section class="hero ja-container">
-    <h1>The Wall of Memory</h1>
-    <p>Each brick represents a beloved soul remembered with love. A sacred space to honor those who remain in our hearts forever. Tap a brick to see their story.</p>
+    <h1>The Wall of Memory & Honor</h1>
+    <p>Each brick represents a dedication—an act of memory, love, gratitude, or support. Tap a brick to see details in English and Hebrew.</p>
     <div class="toolbar">
       <div class="searchBox">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.3-4.3M11 19a8 8 0 100-16 8 8 0 000 16z" stroke="#64748b" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="searchInput" type="text" placeholder="Search names…" />
       </div>
+      <button class="filterBtn active" data-filter="all">All</button>
+      <button class="filterBtn" data-filter="memorial">Memorial</button>
+      <button class="filterBtn" data-filter="tribute">Tribute</button>
     </div>
   </section>
 
   <main class="ja-container">
     <div class="wallWrap">
       <div id="brickGrid" class="brickGrid" role="list"></div>
-      <div id="emptyState" class="empty" style="display:none">No memorial bricks match your search.</div>
+      <div id="emptyState" class="empty" style="display:none">No bricks match your search.</div>
     </div>
   </main>
 
@@ -216,8 +221,10 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
     const GRID = document.getElementById('brickGrid');
     const EMPTY = document.getElementById('emptyState');
     const searchInput = document.getElementById('searchInput');
+    const filterBtns = [...document.querySelectorAll('.filterBtn')];
 
     let BRICKS = [];
+    let FILTER = 'all';
     let QUERY = '';
 
     const hasHebrew = s => /[\u0590-\u05FF]/.test(String(s||''));
@@ -243,8 +250,8 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
         type_:           (a.type_ || "").trim().toLowerCase(),
         photo:           ""
       };
-      // Since this is now memory-only, we can simplify the logic
-      b.kind = "memorial";
+      const hasAnyDate = !!(b.born || b.death || b.born_he || b.death_he);
+      b.kind = b.type_ ? b.type_ : (hasAnyDate ? "memorial" : "tribute");
       return b;
     }
 
@@ -280,12 +287,13 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
         console.warn("Failed to load from ArcGIS:", e);
         BRICKS = [];
         EMPTY.style.display='block';
-        EMPTY.textContent = 'Could not load memorial data from ArcGIS.';
+        EMPTY.textContent = 'Could not load Wall data from ArcGIS.';
       }
       render();
     }
 
     // ---------- UI helpers ----------
+    function matchFilter(b){ return FILTER==='all' ? true : b.kind===FILTER; }
     function matchQuery(b){
       if(!QUERY) return true;
       const q = QUERY.toLowerCase();
@@ -294,7 +302,7 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
 
     function render(){
       GRID.innerHTML = '';
-      const data = BRICKS.filter(b=>matchQuery(b));
+      const data = BRICKS.filter(b=>matchFilter(b) && matchQuery(b));
       if(!data.length){ EMPTY.style.display='block'; return; }
       EMPTY.style.display='none';
 
@@ -304,10 +312,11 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
         el.className = 'brick';
         el.setAttribute('role','listitem');
 
+        const kindLabel = b.kind==='memorial' ? 'In Memory Of' : 'In Honor Of';
         const heb = b.hebrew_name ? `<div class="hebrew" dir="${hasHebrew(b.hebrew_name)?'rtl':'auto'}">${b.hebrew_name}</div>` : '';
 
         el.innerHTML = `
-          <div class="kind">In Memory Of</div>
+          <div class="kind">${kindLabel}</div>
           <div class="name">${b.eng_name || b.hebrew_name || '—'}</div>
           ${heb}
         `;
@@ -327,7 +336,7 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
     const detailNotes= document.getElementById('detailNotes');
 
     function openDetail(b){
-      detailName.textContent = b.eng_name || (b.hebrew_name ? '' : 'Beloved Soul');
+      detailName.textContent = b.eng_name || (b.hebrew_name ? '' : 'Dedication');
       detailHeb.textContent  = b.hebrew_name || '';
       detailHeb.style.display = b.hebrew_name ? 'block':'none';
       if(b.hebrew_name) detailHeb.setAttribute('dir', hasHebrew(b.hebrew_name)?'rtl':'auto');
@@ -335,7 +344,7 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
       if(b.photo){ detailPhoto.src = b.photo; detailPhoto.style.display='block'; }
       else { detailPhoto.removeAttribute('src'); detailPhoto.style.display='none'; }
 
-      // Format dates
+      // NEW: Format dates using Option 1
       const dateLines = [];
       if (b.born || b.born_he) {
         let bornLine = '<strong>Born:</strong> ';
@@ -377,8 +386,16 @@ document.getElementById('uploadBtn').addEventListener('click',()=>location.href=
     BD.addEventListener('click', e=>{ if(e.target===BD) closeDetail(); });
     window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
 
-    // search only (no filters)
+    // search & filter
     searchInput.addEventListener('input', ()=>{ QUERY = searchInput.value.trim(); render(); });
+    filterBtns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        filterBtns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        FILTER = btn.dataset.filter;
+        render();
+      });
+    });
 
     // Load from ArcGIS on startup
     loadFromArcGIS();
