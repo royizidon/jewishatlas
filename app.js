@@ -187,6 +187,7 @@ function isMobileDevice() {
 // Get current location once
 function getCurrentLocation() {
   if ("geolocation" in navigator) {
+    console.log("Requesting location...");
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const longitude = position.coords.longitude;
@@ -214,18 +215,37 @@ function getCurrentLocation() {
         
         locationLayer.add(locationGraphic);
         
-        // On first location (auto-start), center map
-        if (!tracking) {
-          view.goTo({
-            center: [longitude, latitude],
-            zoom: 12
-          });
-        }
+        // Center map on location
+        view.goTo({
+          center: [longitude, latitude],
+          zoom: Math.max(view.zoom, 12) // Don't zoom out if already zoomed in
+        });
       },
       (error) => {
-        console.warn("Location error:", error);
-        // On mobile, show a subtle notification
-        if (isMobileDevice()) {
+        console.error("Location error:", error);
+        
+        // Show error message to user
+        let errorMessage = "";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enable location access in your browser.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again.";
+            break;
+          default:
+            errorMessage = "An unknown location error occurred.";
+            break;
+        }
+        
+        // Show error notification
+        showNotification(errorMessage, "error");
+        
+        // On mobile, show location prompt
+        if (isMobileDevice() && error.code === error.PERMISSION_DENIED) {
           showLocationPrompt();
         }
       },
@@ -235,12 +255,45 @@ function getCurrentLocation() {
         maximumAge: 30000 // Accept cached location up to 30 seconds
       }
     );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+    showNotification("Geolocation is not supported by this browser.", "error");
   }
+}
+
+// Show notification helper
+function showNotification(message, type = "info") {
+  const notification = document.createElement('div');
+  const bgColor = type === "error" ? "#e74c3c" : "#2C3E50";
+  
+  notification.style.cssText = `
+    position: fixed;
+    top: ${document.getElementById('appHeader')?.offsetHeight + 10 || 105}px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: ${bgColor};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 90%;
+    text-align: center;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.remove();
+    }
+  }, 5000);
 }
 
 // Show a subtle prompt for location access
 function showLocationPrompt() {
-  // Create a subtle notification
   const notification = document.createElement('div');
   notification.style.cssText = `
     position: fixed;
@@ -282,6 +335,7 @@ function showLocationPrompt() {
 function startLocationTracking() {
   if (tracking) return;
   
+  console.log("Starting location tracking...");
   tracking = true;
   locateTrackBtn.classList.add("is-tracking");
   locateTrackBtn.title = "Stop tracking";
@@ -299,6 +353,7 @@ function startLocationTracking() {
 function stopLocationTracking() {
   if (!tracking) return;
   
+  console.log("Stopping location tracking...");
   tracking = false;
   locateTrackBtn.classList.remove("is-tracking");
   locateTrackBtn.title = "Start location tracking";
@@ -326,6 +381,7 @@ locateTrackBtn.setAttribute("aria-label", "Location tracking");
 
 // Button click handler
 locateTrackBtn.addEventListener("click", () => {
+  console.log("Location button clicked, tracking:", tracking);
   if (!tracking) {
     startLocationTracking();
   } else {
@@ -336,7 +392,7 @@ locateTrackBtn.addEventListener("click", () => {
 // Add button to UI
 view.ui.add(locateTrackBtn, { position: "bottom-right", index: 2 });
 
-// 🎯 AUTO-START LOGIC
+// 🎯 AUTO-START LOGIC (Mobile only)
 view.when(() => {
   // Small delay to let the map fully load
   setTimeout(() => {
@@ -377,17 +433,21 @@ view.when(() => {
           `;
           document.body.appendChild(trackingPrompt);
           
-          setTimeout(() => trackingPrompt.remove(), 6000);
+          setTimeout(() => {
+            if (trackingPrompt.parentElement) {
+              trackingPrompt.remove();
+            }
+          }, 6000);
         }
       }, 2000);
+    } else {
+      console.log("Desktop device detected - location available via button");
     }
   }, 1000);
 });
 
 // Make functions global so they can be called from inline onclick handlers
 window.startLocationTracking = startLocationTracking;
-
-
 // -------- Popup behavior --------
 // Replace your existing popup configuration with this:
 view.when(() => {

@@ -3,11 +3,58 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jewish Atlas</title>
+  <title>Jewish Atlas - Interactive Map of Jewish Heritage Sites & Communities Worldwide</title>
+  <meta name="description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide. Interactive map featuring thousands of Jewish landmarks and cultural sites.">
+  <meta name="keywords" content="jewish map, jewish atlas, jewish heritage, jewish communities, synagogue finder, kosher restaurants, jewish landmarks, jewish history, judaism map">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Social Media Tags -->
+  <meta property="og:title" content="Jewish Atlas - Interactive Map of Jewish Heritage Sites">
+  <meta property="og:description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jewishatlas.org/">
+  
+  <!-- Twitter Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Jewish Atlas - Interactive Map of Jewish Heritage Sites">
+  <meta name="twitter:description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide.">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Jewish Atlas",
+    "description": "Interactive map of Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide",
+    "url": "https://jewishatlas.org",
+    "applicationCategory": "MapApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Jewish heritage sites",
+      "Synagogue locations", 
+      "Kosher restaurant finder",
+      "Jewish community centers",
+      "Holocaust memorials",
+      "Jewish museums",
+      "Interactive mapping"
+    ],
+    "keywords": "jewish map, jewish atlas, jewish heritage, synagogue finder, kosher restaurants",
+    "author": {
+      "@type": "Organization",
+      "name": "Jewish Atlas"
+    }
+  }
+  </script>
 
   <!-- Your app config (if you use it elsewhere) -->
   <script src="config.js"></script>
-
+  
+  <!-- Rest of your existing code... -->
   <!-- ArcGIS -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css"/>
   <script src="https://js.arcgis.com/4.26/"></script>

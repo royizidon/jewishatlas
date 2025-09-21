@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Allow all search engines to crawl everything
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://jewishatlas.org/sitemap.xml
+
+# Block any admin or private areas (if you have them)
+# Disallow: /admin/
+# Disallow: /private/
