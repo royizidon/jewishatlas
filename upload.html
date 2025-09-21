@@ -23,7 +23,6 @@
   display: none !important; 
 }
     :root{
-      --header-h: 72px;                 /* will be measured in JS */
       --hero-a: #0f1838;                /* deep navy */
       --hero-b: #202a74;                /* indigo */
       --hero-c: #3b32cc;                /* royal purple */
@@ -34,7 +33,7 @@
 
     /* Base */
     html, body { margin:0; height:100%; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body       { background:#f6f7fb; color:var(--ink); overflow:auto; padding-top:var(--header-h); }
+    body       { background:#f6f7fb; color:var(--ink); overflow:auto; header-h: 72px; }
     .ja-container{ max-width:1100px; margin:0 auto; padding:0 16px; }
 
     
@@ -219,7 +218,7 @@
 <body class="upload-page">
   <!-- Header -->
   <header id="appHeader">
-    <div id="headerRow1" class="ja-container">
+    <div id="headerRow1" >
       <div id="headerLeft">
         <h1 id="siteTitle">Jewish Atlas</h1>
         <nav id="navButtons">

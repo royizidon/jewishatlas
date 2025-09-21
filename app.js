@@ -25,7 +25,6 @@ require([
   "esri/PopupTemplate",                // ok to keep though not used directly
   "esri/geometry/projection",
   "esri/geometry/SpatialReference",
-  "esri/widgets/Track"
 ], function (
   Map,
   MapView,
@@ -39,8 +38,7 @@ require([
   Point,
   PopupTemplate,
   projection,
-  SpatialReference,
-  Track
+  SpatialReference
 ) {
   console.log("*** REQUIRE BLOCK STARTED ***");
 
@@ -162,44 +160,233 @@ require([
     view.padding = { ...view.padding, top: h };
   });
 
-  // -------- Single Locate/Track button --------
-  const locationSymbol = {
-    type: "simple-marker",
-    style: "circle",
-    size: 14,
-    color: "#FFD166",
-    outline: { color: "#ffffff", width: 3 }
-  };
-  const track = new Track({
-    view,
-    graphic: new Graphic({ symbol: locationSymbol }),
-    useHeadingEnabled: true,
-    goToLocationEnabled: true,
-    geolocationOptions: { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
-  });
+  // -------- Smart Location Auto-Start for Mobile --------
+const locationSymbol = {
+  type: "simple-marker",
+  style: "circle",
+  size: 14,
+  color: "#FFD166",
+  outline: { color: "#ffffff", width: 3 }
+};
 
-  const locateTrackBtn = document.createElement("button");
-  locateTrackBtn.className = "esri-widget esri-widget--button esri-interactive esri-icon-locate";
-  locateTrackBtn.title = "Locate & Track";
-  locateTrackBtn.setAttribute("aria-label", "Locate & Track");
+// Create graphics layer for location marker
+const locationLayer = new GraphicsLayer({ title: "User Location" });
+map.add(locationLayer);
 
-  let tracking = false;
-  locateTrackBtn.addEventListener("click", async () => {
-    try {
-      if (!tracking) {
-        await track.start();
-        tracking = true;
-        locateTrackBtn.title = "Stop tracking";
-        locateTrackBtn.classList.add("is-tracking");
-      } else {
-        await track.stop();
-        tracking = false;
-        locateTrackBtn.title = "Locate & Track";
-        locateTrackBtn.classList.remove("is-tracking");
+let locationGraphic = null;
+let locationInterval = null;
+let tracking = false;
+const UPDATE_INTERVAL = 50000; // 50 seconds
+
+// Detect if user is on mobile
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || window.innerWidth <= 768;
+}
+
+// Get current location once
+function getCurrentLocation() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const longitude = position.coords.longitude;
+        const latitude = position.coords.latitude;
+        
+        console.log(`Location updated: ${latitude}, ${longitude}`);
+        
+        // Create point geometry
+        const point = new Point({
+          longitude: longitude,
+          latitude: latitude,
+          spatialReference: { wkid: 4326 }
+        });
+        
+        // Remove existing location graphic
+        if (locationGraphic) {
+          locationLayer.remove(locationGraphic);
+        }
+        
+        // Create new location graphic
+        locationGraphic = new Graphic({
+          geometry: point,
+          symbol: locationSymbol
+        });
+        
+        locationLayer.add(locationGraphic);
+        
+        // On first location (auto-start), center map
+        if (!tracking) {
+          view.goTo({
+            center: [longitude, latitude],
+            zoom: 12
+          });
+        }
+      },
+      (error) => {
+        console.warn("Location error:", error);
+        // On mobile, show a subtle notification
+        if (isMobileDevice()) {
+          showLocationPrompt();
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000 // Accept cached location up to 30 seconds
       }
-    } catch (e) { console.error("[Locate/Track] toggle failed:", e); }
-  });
-  view.ui.add(locateTrackBtn, { position: "bottom-right", index: 2 });
+    );
+  }
+}
+
+// Show a subtle prompt for location access
+function showLocationPrompt() {
+  // Create a subtle notification
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: ${document.getElementById('appHeader')?.offsetHeight + 10 || 105}px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2C3E50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 90%;
+    text-align: center;
+  `;
+  notification.innerHTML = `
+    📍 Enable location to find nearby Jewish landmarks
+    <button onclick="this.parentElement.remove(); startLocationTracking();" 
+            style="margin-left: 10px; background: #4575B4; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+      Enable
+    </button>
+    <button onclick="this.parentElement.remove();" 
+            style="margin-left: 5px; background: transparent; color: white; border: 1px solid white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+      Skip
+    </button>
+  `;
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 8 seconds
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.remove();
+    }
+  }, 8000);
+}
+
+// Start location tracking
+function startLocationTracking() {
+  if (tracking) return;
+  
+  tracking = true;
+  locateTrackBtn.classList.add("is-tracking");
+  locateTrackBtn.title = "Stop tracking";
+  
+  // Get location immediately
+  getCurrentLocation();
+  
+  // Then get location every X seconds
+  locationInterval = setInterval(getCurrentLocation, UPDATE_INTERVAL);
+  
+  console.log("Location tracking started");
+}
+
+// Stop location tracking
+function stopLocationTracking() {
+  if (!tracking) return;
+  
+  tracking = false;
+  locateTrackBtn.classList.remove("is-tracking");
+  locateTrackBtn.title = "Start location tracking";
+  
+  // Clear interval
+  if (locationInterval) {
+    clearInterval(locationInterval);
+    locationInterval = null;
+  }
+  
+  // Remove location graphic
+  if (locationGraphic) {
+    locationLayer.remove(locationGraphic);
+    locationGraphic = null;
+  }
+  
+  console.log("Location tracking stopped");
+}
+
+// Create the locate/track button
+const locateTrackBtn = document.createElement("button");
+locateTrackBtn.className = "esri-widget esri-widget--button esri-interactive esri-icon-locate";
+locateTrackBtn.title = "Start location tracking";
+locateTrackBtn.setAttribute("aria-label", "Location tracking");
+
+// Button click handler
+locateTrackBtn.addEventListener("click", () => {
+  if (!tracking) {
+    startLocationTracking();
+  } else {
+    stopLocationTracking();
+  }
+});
+
+// Add button to UI
+view.ui.add(locateTrackBtn, { position: "bottom-right", index: 2 });
+
+// 🎯 AUTO-START LOGIC
+view.when(() => {
+  // Small delay to let the map fully load
+  setTimeout(() => {
+    if (isMobileDevice()) {
+      console.log("Mobile device detected - attempting auto-location");
+      getCurrentLocation(); // Try once without starting full tracking
+      
+      // If successful, offer to start tracking
+      setTimeout(() => {
+        if (locationGraphic) {
+          // Location was successful, ask if they want continuous tracking
+          const trackingPrompt = document.createElement('div');
+          trackingPrompt.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4575B4;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 90%;
+            text-align: center;
+          `;
+          trackingPrompt.innerHTML = `
+            ✨ Track your location as you explore?
+            <button onclick="this.parentElement.remove(); startLocationTracking();" 
+                    style="margin-left: 10px; background: white; color: #4575B4; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+              Yes
+            </button>
+            <button onclick="this.parentElement.remove();" 
+                    style="margin-left: 5px; background: transparent; color: white; border: 1px solid white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+              No thanks
+            </button>
+          `;
+          document.body.appendChild(trackingPrompt);
+          
+          setTimeout(() => trackingPrompt.remove(), 6000);
+        }
+      }, 2000);
+    }
+  }, 1000);
+});
+
+// Make functions global so they can be called from inline onclick handlers
+window.startLocationTracking = startLocationTracking;
+
 
 // -------- Popup behavior --------
 // Replace your existing popup configuration with this:

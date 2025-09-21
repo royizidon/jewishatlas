@@ -27,7 +27,7 @@
     /* Hero */
     .hero{text-align:center;padding:34px 12px 10px}
     .hero h1{margin:0 0 10px;font:800 40px/1.3 "Playfair Display",serif;background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-    .hero p{margin:0 auto;max-width:760px;color:var(--gray-600);font-size:18px}
+    .hero p{margin:0 auto;max-width:760px;color:var(--gray-600);font-size:16px}
     .toolbar{margin:18px auto 8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
     .searchBox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--gray-200);border-radius:999px;padding:10px 14px;min-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
     .searchBox input{border:none;outline:none;width:280px;font-size:15px}
@@ -40,7 +40,7 @@
     .brick .kind{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5b5b5b}
     .brick .name{font-weight:800;letter-spacing:.02em;color:var(--brick-ink);font-family:"Playfair Display",serif;font-size:18px;line-height:1.15}
     .brick .hebrew{font-weight:700;color:#2a2a2a;line-height:1.1;direction:rtl}
-    .empty{text-align:center;color:#64748b;padding:30px 12px}
+    .empty{text-align:center;color:#64748b;padding:30px 14px}
 
     /* Modal */
     .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.22);display:none;align-items:flex-start;justify-content:center;overflow:auto;z-index:1100;backdrop-filter:saturate(120%) blur(2px)}
@@ -150,8 +150,76 @@
   cursor: pointer;
 }
 
+    /* Mobile responsive adjustments */
+    @media (max-width:768px){
+      .brickGrid{
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+      }
+      .brick{
+        padding: 3px 4px;
+        min-height: 40px;
+      }
+      .brick .kind{
+        font-size: 9px;
+      }
+      .brick .name{
+        font-size: 12px;
+        line-height: 1.1;
+      }
+      .brick .hebrew{
+        font-size: 11px;
+      }
+    }
 
-    @media (max-width:640px){.hero h1{font-size:32px}#navButtons{gap:12px}.searchBox input{width:200px}}
+    @media (max-width:640px){
+      .hero h1{font-size:32px}
+      #navButtons{gap:12px}
+      .searchBox input{width:200px}
+      
+      .brickGrid{
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        padding: 8px;
+      }
+      .brick{
+        padding: 3px 3px;
+        min-height: 35px;
+      }
+      .brick .kind{
+        font-size: 8px;
+      }
+      .brick .name{
+        font-size: 11px;
+        line-height: 1.1;
+      }
+      .brick .hebrew{
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width:480px){
+      .brickGrid{
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+        padding: 6px;
+      }
+      .brick{
+        padding: 2px 2px;
+        min-height: 32px;
+        border-radius: 5px;
+      }
+      .brick .kind{
+        font-size: 7px;
+      }
+      .brick .name{
+        font-size: 10px;
+        line-height: 1.0;
+      }
+      .brick .hebrew{
+        font-size: 9px;
+      }
+    }
   </style>
 <script src="header.js" defer></script> 
 </head>
@@ -183,7 +251,39 @@
 
   <main class="ja-container">
     <div class="wallWrap">
-      <div id="brickGrid" class="brickGrid" role="list"></div>
+      <div id="brickGrid" class="brickGrid" role="list">
+        <!-- Sample bricks for demonstration -->
+        <button type="button" class="brick" role="listitem">
+          <div class="kind">In Memory Of</div>
+          <div class="name">Aner Shapira</div>
+          <div class="hebrew" dir="rtl">ענר שפירא</div>
+        </button>
+        <button type="button" class="brick" role="listitem">
+          <div class="kind">In Memory Of</div>
+          <div class="name">Asher Zidon</div>
+          <div class="hebrew" dir="rtl">אשר צידון</div>
+        </button>
+        <button type="button" class="brick" role="listitem">
+          <div class="kind">In Memory Of</div>
+          <div class="name">Hanan Drori</div>
+          <div class="hebrew" dir="rtl">חנן דרורי</div>
+        </button>
+        <button type="button" class="brick" role="listitem">
+          <div class="kind">In Memory Of</div>
+          <div class="name">Yuval Shoam</div>
+          <div class="hebrew" dir="rtl">יובל שהם</div>
+        </button>
+        <button type="button" class="brick" role="listitem">
+          <div class="kind">In Memory Of</div>
+          <div class="name">David Cohen</div>
+          <div class="hebrew" dir="rtl">דוד כהן</div>
+        </button>
+        <button type="button" class="brick" role="listitem">
+          <div class="kind">In Memory Of</div>
+          <div class="name">Sarah Levi</div>
+          <div class="hebrew" dir="rtl">שרה לוי</div>
+        </button>
+      </div>
       <div id="emptyState" class="empty" style="display:none">No memorial bricks match your search.</div>
     </div>
   </main>
@@ -209,9 +309,8 @@
 
   <script>
     document.getElementById('backBtn').addEventListener('click',  ()=>location.href='index.html');
-document.getElementById('aboutBtn').addEventListener('click', ()=>location.href='about.html');
-document.getElementById('uploadBtn').addEventListener('click',()=>location.href='upload.html');
-
+    document.getElementById('aboutBtn').addEventListener('click', ()=>location.href='about.html');
+    document.getElementById('uploadBtn').addEventListener('click',()=>location.href='upload.html');
 
     const GRID = document.getElementById('brickGrid');
     const EMPTY = document.getElementById('emptyState');
