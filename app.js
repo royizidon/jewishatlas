@@ -160,7 +160,9 @@ require([
     view.padding = { ...view.padding, top: h };
   });
 
-  // -------- Smart Location Auto-Start for Mobile --------
+
+
+// -------- Optimized Location Tracking with Smart Movement Detection --------
 const locationSymbol = {
   type: "simple-marker",
   style: "circle",
@@ -173,102 +175,192 @@ const locationSymbol = {
 const locationLayer = new GraphicsLayer({ title: "User Location" });
 map.add(locationLayer);
 
+// Location tracking variables
 let locationGraphic = null;
-let locationInterval = null;
 let tracking = false;
-const UPDATE_INTERVAL = 50000; // 50 seconds
+let goToHandle = null;
 
-// Detect if user is on mobile
+// watchPosition variables for smart tracking
+let watchId = null;
+let lastFix = null;
+let lastGoToTs = 0;
+const MIN_MOVE_M = 35;     // ignore GPS jitter under 35 meters
+const MIN_GOTO_MS = 5000;  // don't re-center more than once per 5 seconds
+let userInteractedAt = 0;
+
+// Modern mobile detection
 function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-    || window.innerWidth <= 768;
+  return window.matchMedia("(max-width: 768px)").matches || 
+         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Get current location once
-function getCurrentLocation() {
-  if ("geolocation" in navigator) {
-    console.log("Requesting location...");
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const longitude = position.coords.longitude;
-        const latitude = position.coords.latitude;
-        
-        console.log(`Location updated: ${latitude}, ${longitude}`);
-        
-        // Create point geometry
-        const point = new Point({
-          longitude: longitude,
-          latitude: latitude,
-          spatialReference: { wkid: 4326 }
-        });
-        
-        // Remove existing location graphic
-        if (locationGraphic) {
-          locationLayer.remove(locationGraphic);
-        }
-        
-        // Create new location graphic
-        locationGraphic = new Graphic({
-          geometry: point,
-          symbol: locationSymbol
-        });
-        
-        locationLayer.add(locationGraphic);
-        
-        // Center map on location
-        view.goTo({
-          center: [longitude, latitude],
-          zoom: Math.max(view.zoom, 12) // Don't zoom out if already zoomed in
-        });
-      },
-      (error) => {
-        console.error("Location error:", error);
-        
-        // Show error message to user
-        let errorMessage = "";
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please enable location access in your browser.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out. Please try again.";
-            break;
-          default:
-            errorMessage = "An unknown location error occurred.";
-            break;
-        }
-        
-        // Show error notification
-        showNotification(errorMessage, "error");
-        
-        // On mobile, show location prompt
-        if (isMobileDevice() && error.code === error.PERMISSION_DENIED) {
-          showLocationPrompt();
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 30000 // Accept cached location up to 30 seconds
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-    showNotification("Geolocation is not supported by this browser.", "error");
+// Check permissions status if available
+async function checkLocationPermission() {
+  try {
+    if (navigator.permissions && navigator.permissions.query) {
+      const status = await navigator.permissions.query({ name: "geolocation" });
+      return status.state; // 'granted', 'denied', 'prompt'
+    }
+  } catch (error) {
+    console.log("Permissions API not available");
   }
+  return "unknown";
 }
 
-// Show notification helper
+// Calculate distance between two points in meters
+function distMeters(a, b) {
+  const toRad = (d) => d * Math.PI / 180;
+  const R = 6371000; // Earth's radius in meters
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lon - a.lon);
+  const la1 = toRad(a.lat), la2 = toRad(b.lat);
+  const x = Math.sin(dLat/2)**2 + Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+// Update location marker on map with conflict prevention
+function updateLocationMarker(latitude, longitude) {
+  const point = new Point({
+    longitude: longitude,
+    latitude: latitude,
+    spatialReference: { wkid: 4326 }
+  });
+  
+  // Remove existing location graphic
+  if (locationGraphic) {
+    locationLayer.remove(locationGraphic);
+  }
+  
+  // Create new location graphic
+  locationGraphic = new Graphic({
+    geometry: point,
+    symbol: locationSymbol
+  });
+  
+  locationLayer.add(locationGraphic);
+  
+  // Cancel any in-flight navigation to prevent conflicts
+  if (goToHandle) {
+    try {
+      goToHandle.cancel();
+    } catch (e) {
+      // Ignore cancel errors
+    }
+  }
+  
+  // Center map on location
+  goToHandle = view.goTo({
+    center: [longitude, latitude],
+    zoom: Math.max(view.zoom || 3, 12)
+  }).catch(() => {}); // Ignore navigation errors
+}
+
+// Handle watchPosition updates with movement filtering
+function onPosition(pos) {
+  const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+  const now = Date.now();
+  
+  console.log(`Location update: ${lat}, ${lon} (accuracy: ${accuracy}m)`);
+  
+  // Don't recenter if user recently interacted with map
+  if (now - userInteractedAt < 15000) {
+    console.log("Skipping recenter - user recently interacted");
+    return;
+  }
+  
+  // Movement and time throttling to prevent GPS jitter
+  if (lastFix) {
+    const moved = distMeters(lastFix, { lat, lon });
+    const timeSinceLastGoTo = now - lastGoToTs;
+    
+    if (moved < MIN_MOVE_M && timeSinceLastGoTo < MIN_GOTO_MS) {
+      console.log(`Skipping update - moved only ${moved.toFixed(1)}m, last update ${timeSinceLastGoTo}ms ago`);
+      return;
+    }
+    
+    console.log(`Significant movement detected: ${moved.toFixed(1)}m`);
+  }
+  
+  updateLocationMarker(lat, lon);
+  lastFix = { lat, lon, accuracy };
+  lastGoToTs = now;
+}
+
+// Get current location once (for initial positioning)
+function getCurrentLocation() {
+  if (!("geolocation" in navigator)) {
+    showNotification("Geolocation is not supported by this browser.", "error");
+    return;
+  }
+  
+  console.log("Requesting one-time location...");
+  
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      console.log(`One-time location: ${latitude}, ${longitude}`);
+      updateLocationMarker(latitude, longitude);
+    },
+    (error) => {
+      console.error("Location error:", error);
+      handleLocationError(error);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 30000
+    }
+  );
+}
+
+// Handle location errors with appropriate user feedback
+function handleLocationError(error) {
+  let errorMessage = "";
+  
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      errorMessage = "Location access denied. Please enable location access in your browser settings.";
+      // On mobile, show gentle prompt for permission
+      if (isMobileDevice()) {
+        setTimeout(() => showLocationPrompt(), 1000);
+      }
+      break;
+    case error.POSITION_UNAVAILABLE:
+      errorMessage = "Location information is currently unavailable.";
+      break;
+    case error.TIMEOUT:
+      errorMessage = "Location request timed out. Please try again.";
+      break;
+    default:
+      errorMessage = "An unknown location error occurred.";
+      break;
+  }
+  
+  showNotification(errorMessage, "error");
+}
+
+// Show notification helper with accessibility and duplicate prevention
+let notificationTimeout = null;
 function showNotification(message, type = "info") {
+  // Remove existing notification
+  const existing = document.getElementById("ja-notification");
+  if (existing) existing.remove();
+  
+  // Clear existing timeout
+  if (notificationTimeout) {
+    clearTimeout(notificationTimeout);
+  }
+  
   const notification = document.createElement('div');
+  notification.id = "ja-notification";
+  notification.setAttribute("role", "alert");
+  notification.setAttribute("aria-live", "polite");
+  
   const bgColor = type === "error" ? "#e74c3c" : "#2C3E50";
   
   notification.style.cssText = `
     position: fixed;
-    top: ${document.getElementById('appHeader')?.offsetHeight + 10 || 105}px;
+    top: ${(document.getElementById('appHeader')?.offsetHeight || 95) + 10}px;
     left: 50%;
     transform: translateX(-50%);
     background: ${bgColor};
@@ -281,23 +373,27 @@ function showNotification(message, type = "info") {
     max-width: 90%;
     text-align: center;
   `;
+  
   notification.textContent = message;
   document.body.appendChild(notification);
   
   // Auto-remove after 5 seconds
-  setTimeout(() => {
+  notificationTimeout = setTimeout(() => {
     if (notification.parentElement) {
       notification.remove();
     }
   }, 5000);
 }
 
-// Show a subtle prompt for location access
+// Show location permission prompt (prevent duplicates)
 function showLocationPrompt() {
-  const notification = document.createElement('div');
-  notification.style.cssText = `
+  if (document.getElementById("ja-location-prompt")) return;
+  
+  const prompt = document.createElement('div');
+  prompt.id = "ja-location-prompt";
+  prompt.style.cssText = `
     position: fixed;
-    top: ${document.getElementById('appHeader')?.offsetHeight + 10 || 105}px;
+    top: ${(document.getElementById('appHeader')?.offsetHeight || 95) + 10}px;
     left: 50%;
     transform: translateX(-50%);
     background: #2C3E50;
@@ -310,43 +406,113 @@ function showLocationPrompt() {
     max-width: 90%;
     text-align: center;
   `;
-  notification.innerHTML = `
+  
+  prompt.innerHTML = `
     📍 Enable location to find nearby Jewish landmarks
-    <button onclick="this.parentElement.remove(); startLocationTracking();" 
-            style="margin-left: 10px; background: #4575B4; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+    <button class="ja-enable-btn" style="margin-left: 10px; background: #4575B4; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
       Enable
     </button>
-    <button onclick="this.parentElement.remove();" 
-            style="margin-left: 5px; background: transparent; color: white; border: 1px solid white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+    <button class="ja-skip-btn" style="margin-left: 5px; background: transparent; color: white; border: 1px solid white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
       Skip
     </button>
   `;
-  document.body.appendChild(notification);
+  
+  document.body.appendChild(prompt);
+  
+  // Add event listeners
+  prompt.querySelector('.ja-enable-btn').onclick = () => {
+    prompt.remove();
+    getCurrentLocation();
+  };
+  
+  prompt.querySelector('.ja-skip-btn').onclick = () => {
+    prompt.remove();
+  };
   
   // Auto-remove after 8 seconds
   setTimeout(() => {
-    if (notification.parentElement) {
-      notification.remove();
+    if (prompt.parentElement) {
+      prompt.remove();
     }
   }, 8000);
 }
 
-// Start location tracking
+// Show tracking consent prompt
+function showTrackingPrompt() {
+  if (document.getElementById("ja-tracking-prompt")) return;
+  
+  const prompt = document.createElement('div');
+  prompt.id = "ja-tracking-prompt";
+  prompt.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4575B4;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 90%;
+    text-align: center;
+  `;
+  
+  prompt.innerHTML = `
+    ✨ Track your location as you explore?
+    <button class="ja-track-yes" style="margin-left: 10px; background: white; color: #4575B4; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+      Yes
+    </button>
+    <button class="ja-track-no" style="margin-left: 5px; background: transparent; color: white; border: 1px solid white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+      No thanks
+    </button>
+  `;
+  
+  document.body.appendChild(prompt);
+  
+  prompt.querySelector('.ja-track-yes').onclick = () => {
+    prompt.remove();
+    startLocationTracking();
+  };
+  
+  prompt.querySelector('.ja-track-no').onclick = () => {
+    prompt.remove();
+  };
+  
+  // Auto-remove after 6 seconds
+  setTimeout(() => {
+    if (prompt.parentElement) {
+      prompt.remove();
+    }
+  }, 6000);
+}
+
+// Start location tracking using watchPosition
 function startLocationTracking() {
-  if (tracking) return;
+  if (tracking || !("geolocation" in navigator)) return;
   
   console.log("Starting location tracking...");
   tracking = true;
   locateTrackBtn.classList.add("is-tracking");
-  locateTrackBtn.title = "Stop tracking";
+  locateTrackBtn.setAttribute("aria-pressed", "true");
+  locateTrackBtn.title = "Stop location tracking";
   
-  // Get location immediately
+  // Get immediate location for quick feedback
   getCurrentLocation();
   
-  // Then get location every X seconds
-  locationInterval = setInterval(getCurrentLocation, UPDATE_INTERVAL);
+  // Start continuous tracking with watchPosition
+  watchId = navigator.geolocation.watchPosition(
+    onPosition,
+    handleLocationError,
+    { 
+      enableHighAccuracy: true, 
+      timeout: 15000, 
+      maximumAge: 10000 
+    }
+  );
   
-  console.log("Location tracking started");
+  console.log("Location tracking started with watchPosition");
 }
 
 // Stop location tracking
@@ -356,12 +522,13 @@ function stopLocationTracking() {
   console.log("Stopping location tracking...");
   tracking = false;
   locateTrackBtn.classList.remove("is-tracking");
+  locateTrackBtn.setAttribute("aria-pressed", "false");
   locateTrackBtn.title = "Start location tracking";
   
-  // Clear interval
-  if (locationInterval) {
-    clearInterval(locationInterval);
-    locationInterval = null;
+  // Clear watchPosition
+  if (watchId != null) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
   }
   
   // Remove location graphic
@@ -369,6 +536,10 @@ function stopLocationTracking() {
     locationLayer.remove(locationGraphic);
     locationGraphic = null;
   }
+  
+  // Reset tracking state
+  lastFix = null;
+  lastGoToTs = 0;
   
   console.log("Location tracking stopped");
 }
@@ -378,6 +549,7 @@ const locateTrackBtn = document.createElement("button");
 locateTrackBtn.className = "esri-widget esri-widget--button esri-interactive esri-icon-locate";
 locateTrackBtn.title = "Start location tracking";
 locateTrackBtn.setAttribute("aria-label", "Location tracking");
+locateTrackBtn.setAttribute("aria-pressed", "false");
 
 // Button click handler
 locateTrackBtn.addEventListener("click", () => {
@@ -392,62 +564,77 @@ locateTrackBtn.addEventListener("click", () => {
 // Add button to UI
 view.ui.add(locateTrackBtn, { position: "bottom-right", index: 2 });
 
-// 🎯 AUTO-START LOGIC (Mobile only)
-view.when(() => {
-  // Small delay to let the map fully load
-  setTimeout(() => {
-    if (isMobileDevice()) {
-      console.log("Mobile device detected - attempting auto-location");
-      getCurrentLocation(); // Try once without starting full tracking
+// Track user interactions to prevent auto-centering during manual navigation
+["drag", "mouse-wheel", "pointer-down"].forEach(evt =>
+  view.on(evt, () => { 
+    userInteractedAt = Date.now();
+    console.log("User interaction detected - pausing auto-center");
+  })
+);
+
+// Smart auto-start logic based on permissions and device type
+view.when(async () => {
+  // Wait for map to fully load
+  setTimeout(async () => {
+    const permissionStatus = await checkLocationPermission();
+    
+    if (permissionStatus === "granted") {
+      // Permission already granted - show location and offer tracking
+      console.log("Location permission granted - showing location");
+      getCurrentLocation();
       
-      // If successful, offer to start tracking
-      setTimeout(() => {
-        if (locationGraphic) {
-          // Location was successful, ask if they want continuous tracking
-          const trackingPrompt = document.createElement('div');
-          trackingPrompt.style.cssText = `
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #4575B4;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            max-width: 90%;
-            text-align: center;
-          `;
-          trackingPrompt.innerHTML = `
-            ✨ Track your location as you explore?
-            <button onclick="this.parentElement.remove(); startLocationTracking();" 
-                    style="margin-left: 10px; background: white; color: #4575B4; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-              Yes
-            </button>
-            <button onclick="this.parentElement.remove();" 
-                    style="margin-left: 5px; background: transparent; color: white; border: 1px solid white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-              No thanks
-            </button>
-          `;
-          document.body.appendChild(trackingPrompt);
-          
-          setTimeout(() => {
-            if (trackingPrompt.parentElement) {
-              trackingPrompt.remove();
-            }
-          }, 6000);
-        }
-      }, 2000);
+      // If on mobile, offer continuous tracking after showing location
+      if (isMobileDevice()) {
+        setTimeout(() => {
+          if (locationGraphic) {
+            showTrackingPrompt();
+          }
+        }, 2000);
+      }
+    } else if (permissionStatus === "prompt" && isMobileDevice()) {
+      // Permission can be requested - show gentle prompt on mobile
+      console.log("Mobile device detected - showing location prompt");
+      showLocationPrompt();
+    } else if (permissionStatus === "denied") {
+      // Permission denied - don't prompt again, just log
+      console.log("Location permission previously denied");
     } else {
-      console.log("Desktop device detected - location available via button");
+      // Unknown permission state
+      if (isMobileDevice()) {
+        console.log("Mobile device detected - showing location prompt");
+        showLocationPrompt();
+      } else {
+        console.log("Desktop device detected - location available via button");
+      }
     }
   }, 1000);
 });
 
-// Make functions global so they can be called from inline onclick handlers
+// Handle tab visibility changes for battery optimization
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    console.log("Tab hidden - pausing location tracking");
+    if (watchId != null) { 
+      navigator.geolocation.clearWatch(watchId); 
+      watchId = null; 
+    }
+  } else if (tracking && watchId == null) {
+    console.log("Tab visible - resuming location tracking");
+    watchId = navigator.geolocation.watchPosition(
+      onPosition,
+      handleLocationError,
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+});
+
+// Make functions global for inline event handlers
 window.startLocationTracking = startLocationTracking;
+window.getCurrentLocation = getCurrentLocation;
+
+
+
+
 // -------- Popup behavior --------
 // Replace your existing popup configuration with this:
 view.when(() => {
