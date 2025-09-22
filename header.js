@@ -1,6 +1,27 @@
 // Shared header navigation functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Navigation button handlers
+    // ========= FIX FOR FIXED HEADER OVERLAP =========
+    // Dynamically adjust body padding to account for fixed header height
+    function adjustForFixedHeader() {
+        const header = document.getElementById('appHeader');
+        if (header) {
+            const headerHeight = header.offsetHeight;
+            document.body.style.paddingTop = headerHeight + 'px';
+        }
+    }
+
+    // Set initial padding
+    adjustForFixedHeader();
+
+    // Adjust on window resize
+    window.addEventListener('resize', adjustForFixedHeader);
+    
+    // Also adjust after fonts load (custom fonts can change header height)
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(adjustForFixedHeader);
+    }
+
+    // ========= NAVIGATION BUTTON HANDLERS =========
     const uploadBtn = document.getElementById('uploadBtn');
     const wallBtn = document.getElementById('wallBtn');
     const aboutBtn = document.getElementById('aboutBtn');

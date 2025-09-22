@@ -1,23 +1,5 @@
-  document.getElementById('backBtn').addEventListener('click', () => {
-    window.location.href = 'index.html';
-  });
-
-document.getElementById('aboutBtn')?.addEventListener('click', () => {
-  window.location.href = 'about.html';
-});
-
-document.getElementById('wallBtn')?.addEventListener('click', () => {
-  window.location.href = 'wall.html';
-});
-
-
-
-  // (Optional) wire About / The Wall if you want them to navigate too:
-  // document.getElementById('aboutBtn').addEventListener('click', () => location.href='about.html');
-  // document.getElementById('wallBtn').addEventListener('click',  () => location.href='wall.html');
-
-
 // ========= CONFIG =========
+// REMOVED duplicate navigation handlers since they're already in header.js
 
 const FEATURE_URL =
   "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/JewishAtlas_Submissions_20250902_083008/FeatureServer/0";
@@ -114,7 +96,7 @@ require([
     opacity: 1
   });
 
-const map = new Map({ basemap: "osm" });
+  const map = new Map({ basemap: "osm" });
 
   const view = new MapView({
     container: "viewDiv",
@@ -269,70 +251,71 @@ const map = new Map({ basemap: "osm" });
   $("addForm").addEventListener("submit", onSubmit);
 
   async function onSubmit(e) {
-  e.preventDefault(); 
-  clearStatus();
-  if (!canSubmit()) { 
-    setStatus("err","Please fill required fields and select an address."); 
-    return; 
-  }
-  submitBtn.disabled = true;
-
-  // ADDED: read optional email + keep your comments value
-  const email = (document.getElementById('contactEmail')?.value || '').trim();
-  const baseComments = $("comments").value.trim();
-
-  const attrs = {
-    eng_name: $("siteName").value.trim(),
-    main_category: $("type").value,
-    description: $("desc").value.trim(),
-    preservation_status: $("preservation").value || "",
-    Address: chosen.full || "",
-    city: chosen.city || "",
-    country: chosen.country || "",
-    postal: chosen.postal || "",
-    comments: baseComments,
-    status: "pending"
-  };
-
-  // ADDED: set the ArcGIS field exactly named "Email" only if user provided it
-  if (email) {
-    attrs.Email = email;
-  }
-const sitePhone  = (document.getElementById('sitePhone')?.value  || '').trim();
-let   siteWebsite= (document.getElementById('siteWebsite')?.value|| '').trim();
-const siteEmail  = (document.getElementById('siteEmail')?.value  || '').trim();
-
-if (sitePhone)  attrs.phone = sitePhone;
-
-// normalize website to include protocol if user omitted it
-if (siteWebsite) {
-  if (!/^https?:\/\//i.test(siteWebsite)) siteWebsite = 'https://' + siteWebsite;
-  attrs.website = siteWebsite;
-}
-
-if (siteEmail)  attrs.site_email = siteEmail;
-
-
-attrs.enterdate = Date.now();
-  try {
-    const oid = await addFeature({ lon: chosen.lon, lat: chosen.lat, attrs });
-    const file = $("photoFile").files?.[0] || null;
-    if (file) {
-      const finalFile = file.type.startsWith("image/") ? await maybeDownscale(file) : file;
-      await addAttachment(oid, finalFile);
+    e.preventDefault(); 
+    clearStatus();
+    if (!canSubmit()) { 
+      setStatus("err","Please fill required fields and select an address."); 
+      return; 
     }
-    setStatus("ok", "Thank you! Your submission was received for review.");
-    $("addForm").reset();
-    $("selectedAddress").value = "No address selected yet";
-    chosen = null; 
-    marker.geometry = null;
-  } catch (err) {
-    console.error(err);
-    setStatus("err", "Submission failed. Ensure the layer allows public Add & Add Attachment, or use a server proxy.");
-  } finally {
-    updateSubmit();
+    submitBtn.disabled = true;
+
+    // Read optional email + keep your comments value
+    const email = (document.getElementById('contactEmail')?.value || '').trim();
+    const baseComments = $("comments").value.trim();
+
+    const attrs = {
+      eng_name: $("siteName").value.trim(),
+      main_category: $("type").value,
+      description: $("desc").value.trim(),
+      preservation_status: $("preservation").value || "",
+      Address: chosen.full || "",
+      city: chosen.city || "",
+      country: chosen.country || "",
+      postal: chosen.postal || "",
+      comments: baseComments,
+      status: "pending"
+    };
+
+    // Set the ArcGIS field exactly named "Email" only if user provided it
+    if (email) {
+      attrs.Email = email;
+    }
+    
+    const sitePhone  = (document.getElementById('sitePhone')?.value  || '').trim();
+    let   siteWebsite= (document.getElementById('siteWebsite')?.value|| '').trim();
+    const siteEmail  = (document.getElementById('siteEmail')?.value  || '').trim();
+
+    if (sitePhone)  attrs.phone = sitePhone;
+
+    // normalize website to include protocol if user omitted it
+    if (siteWebsite) {
+      if (!/^https?:\/\//i.test(siteWebsite)) siteWebsite = 'https://' + siteWebsite;
+      attrs.website = siteWebsite;
+    }
+
+    if (siteEmail)  attrs.site_email = siteEmail;
+
+    attrs.enterdate = Date.now();
+    
+    try {
+      const oid = await addFeature({ lon: chosen.lon, lat: chosen.lat, attrs });
+      const file = $("photoFile").files?.[0] || null;
+      if (file) {
+        const finalFile = file.type.startsWith("image/") ? await maybeDownscale(file) : file;
+        await addAttachment(oid, finalFile);
+      }
+      setStatus("ok", "Thank you! Your submission was received for review.");
+      $("addForm").reset();
+      $("selectedAddress").value = "No address selected yet";
+      chosen = null; 
+      marker.geometry = null;
+    } catch (err) {
+      console.error(err);
+      setStatus("err", "Submission failed. Ensure the layer allows public Add & Add Attachment, or use a server proxy.");
+    } finally {
+      updateSubmit();
+    }
   }
-}
 
 });
 
