@@ -42,132 +42,264 @@ require([
 ) {
   console.log("*** REQUIRE BLOCK STARTED ***");
 
-  // -------- Popup Template --------
-  const createPopupTemplate = () => ({
-    title: "{eng_name}",
-    content: [{
-      type: "text",
-      text: `
-        <div style="background:#fff;border-radius:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;">
-          <div style="width:100%;height:200px;background-image:url({expression/has-photo});background-size:cover;background-position:center;display:{expression/has-photo ? 'block' : 'none'};"></div>
-          <div style="padding:20px 20px 15px;">
-            <h2 style="color:#2C3E50;font-size:20px;font-weight:600;margin:0 0 8px;line-height:1.3;">{eng_name}</h2>
-            <div style="display:inline-block;background:#E8F4FD;color:#2980B9;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:15px;">{main_category}</div>
-          </div>
+// -------- Map & View -------- 
+const map = new Map({ basemap: "topo-vector" });
 
-          <div style="display:flex;background:#F8F9FA;border-bottom:1px solid #E9ECEF;margin:0 20px;border-radius:8px 8px 0 0;">
-            <button onclick="showTab(event, 'info-tab')" class="tab-button active" style="flex:1;background:none;border:none;padding:12px 16px;cursor:pointer;font-weight:600;font-size:14px;color:#2C3E50;background:#fff;border-bottom:2px solid #4575B4;">📍 Info</button>
-            <button onclick="showTab(event, 'navigate-tab')" class="tab-button" style="flex:1;background:none;border:none;padding:12px 16px;cursor:pointer;font-weight:600;font-size:14px;color:#6C757D;background:#F8F9FA;">🧭 Navigate</button>
-            <button onclick="showTab(event, 'feedback-tab')" class="tab-button" style="flex:1;background:none;border:none;padding:12px 16px;cursor:pointer;font-weight:600;font-size:14px;color:#6C757D;background:#F8F9FA;border-radius:0 8px 0 0;">💬 Feedback</button>
-          </div>
+const view = new MapView({
+  container: "viewDiv",
+  map,
+  center: [15, 52],
+  zoom: 5.5,
+  ui: { components: [] }
+});
 
-          <div style="padding:20px;background:#fff;">
-            <div id="info-tab" class="tab-content" style="display:block;">
-              <div style="margin-bottom:12px;">
-                <div style="color:#7F8C8D;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">📍 ADDRESS</div>
-                <div style="color:#2C3E50;font-size:14px;line-height:1.4;">{Address}, {city}</div>
-              </div>
-              <div style="margin-bottom:12px;display:{expression/has-description ? 'block' : 'none'};">
-                <div style="color:#7F8C8D;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">ℹ️ ABOUT</div>
-                <div style="color:#2C3E50;font-size:14px;line-height:1.5;">{expression/has-description}</div>
-              </div>
-              <div style="margin-bottom:12px;display:{expression/has-fees-hours ? 'block' : 'none'};">
-                <div style="color:#7F8C8D;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">🕐 HOURS & FEES</div>
-                <div style="color:#2C3E50;font-size:14px;line-height:1.5;">{expression/has-fees-hours}</div>
-              </div>
-              <a href="{expression/google-search-url}" target="_blank" style="display:block;background:#4575B4;color:#fff;text-decoration:none;padding:12px;border-radius:8px;text-align:center;font-weight:bold;font-size:14px;margin-top:15px;">🔍 Search for More Details</a>
-            </div>
+// keep UI clear of header
+const headerH = document.getElementById('appHeader')?.offsetHeight || 95;
+view.padding = { top: headerH };
+window.addEventListener('resize', () => {
+  const h = document.getElementById('appHeader')?.offsetHeight || 95;
+  view.padding = { ...view.padding, top: h };
+});
 
-            <div id="navigate-tab" class="tab-content" style="display:none;">
-              <div style="text-align:center;margin-bottom:20px;"><div style="color:#6C757D;font-size:14px;margin-bottom:15px;">Choose your preferred navigation app:</div></div>
-              <div style="margin-bottom:15px;">
-                <a href="{expression/google-maps-url}" target="_blank" style="display:block;width:100%;background:#34A853;color:#fff;text-decoration:none;padding:15px;border-radius:8px;text-align:center;font-weight:bold;font-size:16px;margin-bottom:12px;box-sizing:border-box;">📍 Open in Google Maps</a>
-                <a href="{expression/waze-url}" target="_blank" style="display:block;width:100%;background:#33CCFF;color:#fff;text-decoration:none;padding:15px;border-radius:8px;text-align:center;font-weight:bold;font-size:16px;box-sizing:border-box;">🚗 Open in Waze</a>
-              </div>
-            </div>
-
-            <div id="feedback-tab" class="tab-content" style="display:none;">
-              <div style="text-align:center;">
-                <div style="color:#6C757D;font-size:16px;margin-bottom:15px;line-height:1.5;">💬 Help us improve!<br>Share your experience or suggest updates to this location.</div>
-                <a href="{expression/feedback-url}" target="_blank" style="display:inline-block;background:#4575B4;color:#fff;text-decoration:none;padding:15px 25px;border-radius:8px;font-weight:bold;font-size:16px;box-shadow:0 2px 8px rgba(69,117,180,.3);">📝 Fill Feedback Form</a>
-              </div>
-            </div>
-          </div>
-
-          <script>
-            function showTab(evt, tabName) {
-              var i, tabcontent, tablinks;
-              tabcontent = document.getElementsByClassName("tab-content");
-              for (i=0; i<tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
-              tablinks = document.getElementsByClassName("tab-button");
-              for (i=0; i<tablinks.length; i++) {
-                tablinks[i].style.backgroundColor = "#F8F9FA";
-                tablinks[i].style.color = "#6C757D";
-                tablinks[i].style.borderBottom = "none";
-              }
-              document.getElementById(tabName).style.display = "block";
-              evt.currentTarget.style.backgroundColor = "white";
-              evt.currentTarget.style.color = "#2C3E50";
-              evt.currentTarget.style.borderBottom = "2px solid #4575B4";
-            }
-          </script>
-        </div>
-      `
-    }],
-    expressionInfos: [
-      { name: "has-photo", returnType: "string", expression: `var u=$feature.photo; return (u && u.trim()!="")?u:"";` },
-      { name: "has-description", returnType: "string", expression: `var d=$feature.description; return (d && d.trim()!="")?d:"";` },
-      { name: "has-fees-hours", returnType: "string", expression: `var h=$feature.fees_opening_hours; return (h && h.trim()!="")?h:"";` },
-      { name: "google-search-url", returnType: "string", expression: `return "https://www.google.com/search?q="+$feature.eng_name+" "+$feature.Address;` },
-      {
-        name: "google-maps-url", returnType: "string",
-        expression: `
-          var g=Geometry($feature); var lat,lon;
-          if (g.spatialReference.wkid==3857){lon=g.x/20037508.34*180; lat=g.y/20037508.34*180; lat=180/PI()*(2*Atan(Exp(lat*PI()/180))-PI()/2);}
-          else if (g.spatialReference.wkid==4326){lat=g.y; lon=g.x;} else {lat=g.y; lon=g.x;}
-          return "https://www.google.com/maps/dir/?api=1&destination="+lat+","+lon;`
-      },
-      {
-        name: "waze-url", returnType: "string",
-        expression: `
-          var g=Geometry($feature); var lat,lon;
-          if (g.spatialReference.wkid==3857){lon=g.x/20037508.34*180; lat=g.y/20037508.34*180; lat=180/PI()*(2*Atan(Exp(lat*PI()/180))-PI()/2);}
-          else if (g.spatialReference.wkid==4326){lat=g.y; lon=g.x;} else {lat=g.y; lon=g.x;}
-          return "https://waze.com/ul?ll="+lat+","+lon+"&navigate=yes";`
-      },
-      { name: "feedback-url", returnType: "string",
-        expression: `return "https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895="+$feature.id;`
+// -------- Popup Template: compact desktop, full mobile, working Google Maps + Waze --------
+const createPopupTemplate = () => ({
+  title: "{eng_name}", // use ArcGIS header title on desktop
+  content: function (feature) {
+    // --- helpers ---
+    function isWebMercatorWkid(wkid) {
+      return wkid === 3857 || wkid === 102100 || wkid === 102113 || wkid === 900913;
+    }
+    function getPointFromGeometry(geom) {
+      if (!geom) return null;
+      if (geom.type === "point") return geom;
+      if (geom.extent?.center) return geom.extent.center;
+      if (geom.centroid) return geom.centroid;
+      return null;
+    }
+    function toLatLon(point) {
+      if (!point) return [null, null];
+      const wkid = point.spatialReference?.wkid;
+      if (wkid === 4326) return [Number(point.y), Number(point.x)];
+      if (isWebMercatorWkid(wkid)) {
+        const lon = point.x * 180 / 20037508.34;
+        const latRad = point.y * Math.PI / 20037508.34;
+        const lat = (180 / Math.PI) * (2 * Math.atan(Math.exp(latRad)) - Math.PI / 2);
+        return [lat, lon];
       }
-    ]
-  });
+      return [Number(point.y), Number(point.x)];
+    }
+    function buildLabel(a) {
+      return [a.eng_name, a.Address, a.city].filter(Boolean).join(", ");
+    }
+    function buildNavLinks(graphic, attrs) {
+  // ----- get destination (lat,lon in WGS84) -----
+  function isWM(wkid){ return wkid===3857 || wkid===102100 || wkid===102113 || wkid===900913; }
+  function getPoint(g){ if (!g) return null; if (g.type==="point") return g; if (g.extent?.center) return g.extent.center; return g.centroid || null; }
+  const pt = getPoint(graphic.geometry);
 
-  // -------- Map & View --------
-  const map = new Map({ basemap: "topo-vector" });
+  let lat=null, lon=null;
+  if (pt) {
+    const wkid = pt.spatialReference?.wkid;
+    if (wkid === 4326) { lat = Number(pt.y); lon = Number(pt.x); }
+    else if (isWM(wkid)) {
+      lon = pt.x * 180 / 20037508.34;
+      const yRad = pt.y * Math.PI / 20037508.34;
+      lat = (180/Math.PI) * (2 * Math.atan(Math.exp(yRad)) - Math.PI/2);
+    } else { lat = Number(pt.y); lon = Number(pt.x); } // best effort
+  }
+  const hasCoords = Number.isFinite(lat) && Number.isFinite(lon);
 
-  const view = new MapView({
-    container: "viewDiv",
-    map,
-    center: [15, 52],
-    zoom: 5.5,
-    ui: { components: [] }
-  });
+  // ----- build a clean label as fallback -----
+  const label = [attrs.eng_name, attrs.Address, attrs.city].filter(Boolean).join(", ") || "Destination";
+  const encLabel = encodeURIComponent(label);
 
-  // keep UI clear of header
-  const headerH = document.getElementById('appHeader')?.offsetHeight || 95;
-  view.padding = { top: headerH };
-  window.addEventListener('resize', () => {
-    const h = document.getElementById('appHeader')?.offsetHeight || 95;
-    view.padding = { ...view.padding, top: h };
-  });
+  // ----- Google Maps (universal) -----
+  const gmaps = hasCoords
+    ? `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${lat.toFixed(6)},${lon.toFixed(6)}&travelmode=driving`
+    : `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${encLabel}&travelmode=driving`;
+
+  // ----- Waze (use HTTPS universal link everywhere) -----
+  // Works on iOS/Android/desktop and avoids the "black screen" from the custom scheme.
+  const waze = hasCoords
+    ? `https://waze.com/ul?ll=${lat.toFixed(6)},${lon.toFixed(6)}&navigate=yes&z=16`
+    : `https://waze.com/ul?q=${encLabel}&navigate=yes&z=16`;
+
+  return { gmaps, waze };
+}
+
+    // Attributes
+    const a = feature.graphic.attributes || {};
+    const name = a.eng_name || "Location";
+    const category = a.main_category || "Place";
+    const address = a.Address || "";
+    const city = a.city || "";
+    const description = a.description || "";
+    const hours = a.fees_opening_hours || "";
+    const photo = a.photo || "";
+    const id = a.id || a.OBJECTID || "";
+
+    // Other links
+    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent([name, category, address].filter(Boolean).join(" "))}`;
+    const feedbackUrl = `https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895=${encodeURIComponent(id)}`;
+
+    // Container
+    const container = document.createElement("div");
+    container.className = "enhanced-popup-container";
+
+    // HTML (desktop compact; mobile full)
+    let html = `
+      <style>
+        /* Remove default action bar to save space */
+        .esri-popup__actions { display: none !important; }
+        /* Trim default padding and avoid horizontal scroll */
+        .esri-popup__content { padding: 0 !important; overflow-x: hidden !important; }
+
+        /* Desktop: show ArcGIS header, hide our large photo/title, compact width, keep tabs visible */
+        @media (min-width: 769px) {
+          .esri-popup__main-container { width: 560px !important; max-width: 560px !important; border-radius: 12px !important; }
+          .show-on-mobile { display: none !important; }
+          .enhanced-popup-container { width: 100%; }
+          .popup-category { padding: 8px 16px 8px; }
+          .category-badge { font-size: 11px; padding: 3px 10px; }
+          .popup-tabs { position: sticky; top: 0; z-index: 1; }
+          .popup-content-wrapper { max-height: 56vh; overflow: auto; -webkit-overflow-scrolling: touch; }
+          .tab-button { font-size: 14px; padding: 10px 12px; }
+          .info-value { font-size: 14px; }
+          /* Clamp long text so user sees some content without scrolling forever */
+          .clamp-4 { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+        }
+
+        /* Mobile: hide ArcGIS header, use our photo/title block full width */
+        @media (max-width: 768px) {
+          .esri-popup__header { display: none !important; }
+          .esri-popup__main-container { width: 100vw !important; max-width: 100vw !important; border-radius: 12px 12px 0 0 !important; }
+          .esri-popup__content { max-height: calc(100vh - 120px) !important; overflow:auto !important; }
+        }
+
+        /* Common UI */
+        .popup-image { width: 100%; height: 190px; background-size: cover; background-position: center; position: relative; }
+        .popup-image-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,.7), transparent); padding: 16px; }
+        .popup-image-title { color: #fff; font-size: 20px; font-weight: 700; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,.4); }
+        .mobile-title { padding: 12px 16px; }
+        .popup-title { color: #2C3E50; font-size: 20px; font-weight: 600; margin: 0; }
+        .popup-category { padding: 0 16px 8px; }
+        .category-badge { display: inline-block; background: #eef5ff; color: #3367d6; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+        .popup-tabs { display: flex; background: #F8F9FA; border-top: 1px solid #E9ECEF; border-bottom: 1px solid #E9ECEF; }
+        .tab-button { flex: 1; background: transparent; border: none; padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 14px; color: #6C757D; border-bottom: 3px solid transparent; transition: .2s; }
+        .tab-button:hover { background: #F2F4F6; }
+        .tab-button.active { background: #fff; color: #2C3E50; border-bottom-color: #4575B4; }
+        .tab-content { display: none; padding: 16px; }
+        .tab-content.active { display: block; }
+        .info-section { margin-bottom: 12px; }
+        .info-label { color: #7F8C8D; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+        .info-value { color: #2C3E50; font-size: 15px; line-height: 1.45; }
+        .primary-button { display: block; background: #4575B4; color: #fff; text-decoration: none; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 15px; margin-top: 12px; box-shadow: 0 2px 8px rgba(69,117,180,.25); }
+        .nav-button { display: block; color: #fff; text-decoration: none; padding: 14px; border-radius: 10px; font-weight: 600; font-size: 16px; text-align: center; margin-bottom: 10px; }
+        .nav-button.google-maps { background: #34A853; box-shadow: 0 3px 10px rgba(52,168,83,.3); }
+        .nav-button.waze { background: #33CCFF; box-shadow: 0 3px 10px rgba(51,204,255,.3); }
+        .nav-info { margin-top: 14px; padding-top: 12px; border-top: 1px solid #E9ECEF; text-align: center; color: #6C757D; font-size: 13px; }
+      </style>
+    `;
+
+    // Mobile-only photo + title (avoid duplicate title on desktop)
+    if (photo && photo.trim()) {
+      html += `
+        <div class="popup-image show-on-mobile" style="background-image:url('${photo.replace(/'/g, "&#39;")}')">
+          <div class="popup-image-overlay"><h2 class="popup-image-title">${name}</h2></div>
+        </div>`;
+    } else {
+      // If no photo, still show a small title on mobile (desktop uses ArcGIS header)
+      html += `<div class="mobile-title show-on-mobile"><h2 class="popup-title">${name}</h2></div>`;
+    }
+
+    // Category + Tabs
+    html += `
+      <div class="popup-category"><span class="category-badge">${category}</span></div>
+      <div class="popup-tabs">
+        <button class="tab-button active" data-tab="info">📍 Info</button>
+        <button class="tab-button" data-tab="navigate">🧭 Navigate</button>
+        <button class="tab-button" data-tab="feedback">💬 Feedback</button>
+      </div>
+
+      <div class="popup-content-wrapper">
+        <div class="tab-content active" data-content="info">
+          <div class="info-section">
+            <div class="info-label">📍 Address</div>
+            <div class="info-value">${address}${city ? ", " + city : ""}</div>
+          </div>
+          ${description?.trim() ? `<div class="info-section"><div class="info-label">ℹ️ About</div><div class="info-value clamp-4">${description}</div></div>` : ""}
+          ${hours?.trim() ? `<div class="info-section"><div class="info-label">🕒 Hours & Fees</div><div class="info-value clamp-4">${hours}</div></div>` : ""}
+          <a href="${googleSearchUrl}" target="_blank" rel="noopener" class="primary-button">🔍 Search for More Details</a>
+        </div>
+
+        <div class="tab-content" data-content="navigate">
+          <div style="text-align:center;margin-bottom:14px;color:#6C757D;font-size:14px;">Get directions from your current location:</div>
+          <a class="nav-button google-maps" target="_blank" rel="noopener">📍 Directions via Google Maps</a>
+          <a class="nav-button waze" target="_blank" rel="noopener">🚗 Directions via Waze</a>
+          <div class="nav-info">Opens your preferred navigation app</div>
+        </div>
+
+        <div class="tab-content" data-content="feedback">
+          <div style="text-align:center;">
+            <div style="font-size:42px;margin-bottom:10px;">💬</div>
+            <h3 style="color:#2C3E50;font-size:18px;font-weight:600;margin:0 0 10px;">Help us improve!</h3>
+            <p style="color:#6C757D;font-size:14px;line-height:1.6;margin:0 0 16px;">Found an issue? Have updates to share?</p>
+            <a href="${feedbackUrl}" target="_blank" rel="noopener" class="primary-button" style="background:linear-gradient(135deg,#667eea,#764ba2);">✏️ Submit Feedback</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Build nav links after DOM exists
+    const { gmaps, waze } = buildNavLinks(feature.graphic, a);
+    container.querySelector(".nav-button.google-maps")?.setAttribute("href", gmaps);
+    container.querySelector(".nav-button.waze")?.setAttribute("href", waze);
+
+    // Tabs
+    const tabButtons = container.querySelectorAll(".tab-button");
+    const tabContents = container.querySelectorAll(".tab-content");
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.tab;
+        tabButtons.forEach(b => b.classList.toggle("active", b === btn));
+        tabContents.forEach(c => c.classList.toggle("active", c.dataset.content === tab));
+      });
+    });
+
+    return container;
+  },
+  outFields: ["*"]
+});
+
+
+// -------- Popup behavior (valid docking; no duplicate title; compact desktop) --------
+view.when(() => {
+  view.popup.collapseEnabled = false;
+
+  function applyPopupLayout() {
+    const mobile = window.innerWidth <= 768;
+    view.popup.dockEnabled = mobile;
+    view.popup.dockOptions = {
+      position: mobile ? "bottom-right" : "top-right",
+      breakpoint: mobile ? false : true,
+      buttonEnabled: false
+    };
+  }
+
+  applyPopupLayout();
+  window.addEventListener("resize", applyPopupLayout);
+
+  // Keep uncollapsed
+  view.popup.watch("collapsed", (c) => { if (c) view.popup.collapsed = false; });
+});
 
 
 
 // -------- Optimized Location Tracking with Smart Movement Detection --------
 
-// location location location
-
-// -------- Simple Location Tracking - 60 Second Updates --------
-// Animated radar style with colorful gradient rings
+// Animated radar style with colorful gradient rings (keep your symbol)
 const locationSymbol = {
   type: "picture-marker",
   url: "data:image/svg+xml;base64," + btoa(`
@@ -184,29 +316,21 @@ const locationSymbol = {
           <stop offset="100%" style="stop-color:#4285F4;stop-opacity:1" />
         </linearGradient>
       </defs>
-      
-      <!-- Outer pulsing ring -->
       <circle cx="40" cy="40" r="25" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.3">
         <animate attributeName="r" from="12" to="35" dur="2.5s" repeatCount="indefinite"/>
         <animate attributeName="opacity" from="0.9" to="0" dur="2.5s" repeatCount="indefinite"/>
         <animate attributeName="stroke-width" from="4" to="1" dur="2.5s" repeatCount="indefinite"/>
       </circle>
-      
-      <!-- Middle pulsing ring -->
       <circle cx="40" cy="40" r="18" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.5">
         <animate attributeName="r" from="12" to="35" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
         <animate attributeName="opacity" from="0.9" to="0" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
         <animate attributeName="stroke-width" from="4" to="1" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
       </circle>
-      
-      <!-- Inner pulsing ring -->
       <circle cx="40" cy="40" r="12" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.7">
         <animate attributeName="r" from="12" to="35" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
         <animate attributeName="opacity" from="0.9" to="0" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
         <animate attributeName="stroke-width" from="4" to="1" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
       </circle>
-      
-      <!-- Center dot with shadow -->
       <filter id="shadow">
         <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
       </filter>
@@ -221,153 +345,137 @@ const locationSymbol = {
 };
 
 // Create graphics layer for location marker
-const locationLayer = new GraphicsLayer({ title: "User Location" });
+const locationLayer = new GraphicsLayer({ title: "User Location", listMode: "hide" });
 map.add(locationLayer);
 
-// Location tracking variables
+// Location tracking state
 let locationGraphic = null;
 let tracking = false;
-let updateInterval = null;
 let lastPosition = null;
-let hasInitiallyCentered = false;  // Track if we've centered once
+let hasInitiallyCentered = false;
+let watchId = null;
+let lastUpdateTs = 0;
+
+// Throttle & distance filter knobs
+const THROTTLE_MS  = 10000;  // ≥ 10s between accepted updates
+const MIN_MOVE_M   = 10;     // ≥ 10 m movement required
+const MAX_STALE_MS = 60000;  // force an update at least every 60s (even if not moving)
 
 // Modern mobile detection
 function isMobileDevice() {
-  return window.matchMedia("(max-width: 768px)").matches || 
+  return window.matchMedia("(max-width: 768px)").matches ||
          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Update location marker (just the dot, no map movement)
-function updateLocationMarker(latitude, longitude) {
-  const point = new Point({
-    longitude: longitude,
-    latitude: latitude,
-    spatialReference: { wkid: 4326 }
-  });
-  
-  // Remove existing location graphic
-  if (locationGraphic) {
-    locationLayer.remove(locationGraphic);
-  }
-  
-  // Create new location graphic
-  locationGraphic = new Graphic({
-    geometry: point,
-    symbol: locationSymbol
-  });
-  
-  locationLayer.add(locationGraphic);
-  
-  // Store position for manual centering
-  lastPosition = { lat: latitude, lon: longitude };
-  console.log(`Location updated: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+// Haversine distance in meters
+function haversineMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-// Get current location (no map movement unless first time)
-function updateLocation(centerOnFirst = false) {
-  if (!("geolocation" in navigator)) {
-    console.error("Geolocation not supported");
-    return;
+// Update location marker (update geometry only; no map movement, no layer refresh)
+function updateLocationMarker(latitude, longitude) {
+  const point = new Point({
+    longitude,
+    latitude,
+    spatialReference: { wkid: 4326 }
+  });
+
+  if (!locationGraphic) {
+    locationGraphic = new Graphic({ geometry: point, symbol: locationSymbol });
+    locationLayer.add(locationGraphic);
+  } else {
+    locationGraphic.geometry = point; // ← only geometry changes
   }
-  
+
+  lastPosition = { lat: latitude, lon: longitude };
+  // console.log(`Location updated: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+}
+
+// One-time fetch (no map movement unless first time)
+function updateLocation(centerOnFirst = false) {
+  if (!("geolocation" in navigator)) return;
+
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const { latitude, longitude } = position.coords;
       updateLocationMarker(latitude, longitude);
-      
+
       // Center map only on first location in mobile
       if (centerOnFirst && !hasInitiallyCentered && isMobileDevice()) {
-        view.goTo({
-          center: [longitude, latitude],
-          zoom: 15
-        }, {
-          duration: 1000,
-          easing: "ease-in-out"
-        }).then(() => {
-          hasInitiallyCentered = true;
-        }).catch(() => {});
-        console.log("First location - centering map");
+        view.goTo({ center: [longitude, latitude], zoom: 15 }, { duration: 800, easing: "ease-in-out" })
+          .then(() => { hasInitiallyCentered = true; })
+          .catch(() => {});
       }
     },
-    (error) => {
-      console.error("Location error:", error);
-      // Silent error handling, no notifications
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 5000
-    }
+    () => {},
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
   );
 }
 
 // Center map on current location (only when user clicks button)
 function centerOnLocation() {
-  if (!lastPosition) {
-    // If no position yet, get it first
-    updateLocation();
-    return;
-  }
-  
+  if (!lastPosition) { updateLocation(); return; }
   view.goTo({
     center: [lastPosition.lon, lastPosition.lat],
     zoom: Math.max(view.zoom || 3, 15)
-  }, {
-    duration: 1000,
-    easing: "ease-in-out"
-  }).catch(() => {}); // Ignore navigation errors
+  }, { duration: 800, easing: "ease-in-out" }).catch(() => {});
 }
 
-// Start location tracking
+// Start location tracking (watchPosition + throttle + distance filter)
+// Marker updates only; map stays put unless user centers.
 function startLocationTracking() {
   if (tracking || !("geolocation" in navigator)) return;
-  
-  console.log("Starting location tracking (60 second updates)...");
+
   tracking = true;
-  
-  // Update button state
   locateBtn.classList.add("is-tracking");
   locateBtn.setAttribute("aria-pressed", "true");
   locateBtn.title = "Click to center / Long press to stop";
-  
-  // Get first location immediately (center on first for mobile)
-  updateLocation(true);  // Pass true to center on first location
-  
-  // Set up 60-second updates (no centering)
-  updateInterval = setInterval(() => {
-    if (tracking) {
-      updateLocation(false);  // Don't center on subsequent updates
-    }
-  }, 60000); // 60 seconds
+
+  // Get first fix immediately (center on first for mobile)
+  updateLocation(true);
+
+  // Continuous updates via watchPosition
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      const now = Date.now();
+
+      const timeOk  = (now - lastUpdateTs) >= THROTTLE_MS;
+      const distOk  = !lastPosition || haversineMeters(lastPosition.lat, lastPosition.lon, latitude, longitude) >= MIN_MOVE_M;
+      const staleOk = (now - lastUpdateTs) >= MAX_STALE_MS;
+
+      if (timeOk && (distOk || staleOk)) {
+        updateLocationMarker(latitude, longitude); // ← only marker moves
+        lastUpdateTs = now;
+      }
+    },
+    (err) => { console.warn("Geolocation error:", err); },
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+  );
 }
 
 // Stop location tracking
 function stopLocationTracking() {
   if (!tracking) return;
-  
-  console.log("Stopping location tracking");
+
   tracking = false;
-  
-  // Update button state
   locateBtn.classList.remove("is-tracking");
   locateBtn.setAttribute("aria-pressed", "false");
   locateBtn.title = "Show my location";
-  
-  // Clear interval
-  if (updateInterval) {
-    clearInterval(updateInterval);
-    updateInterval = null;
-  }
-  
-  // Remove location graphic
-  if (locationGraphic) {
-    locationLayer.remove(locationGraphic);
-    locationGraphic = null;
-  }
-  
-  // Reset state
+
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+
+  // Optional: keep the marker visible after stopping. If you prefer to remove it, uncomment:
+  // if (locationGraphic) { locationLayer.remove(locationGraphic); locationGraphic = null; }
+
   lastPosition = null;
   hasInitiallyCentered = false;
+  lastUpdateTs = 0;
 }
 
 // Create locate button
@@ -395,85 +503,77 @@ document.head.appendChild(style);
 // Button click handler
 locateBtn.addEventListener("click", () => {
   if (!tracking) {
-    // Start tracking
     startLocationTracking();
   } else {
-    // If tracking, center on location
-    centerOnLocation();
+    centerOnLocation(); // user-requested center; map moves only on click
   }
 });
 
-// Long press to stop (mobile friendly)
+// Long press to stop (mobile + desktop)
 let pressTimer;
-
-// Mouse events for desktop
 locateBtn.addEventListener("mousedown", () => {
   if (tracking) {
-    pressTimer = setTimeout(() => {
-      stopLocationTracking();
-    }, 1000); // 1 second long press
+    pressTimer = setTimeout(() => { stopLocationTracking(); }, 1000);
   }
 });
-
-locateBtn.addEventListener("mouseup", () => {
-  clearTimeout(pressTimer);
-});
-
-locateBtn.addEventListener("mouseleave", () => {
-  clearTimeout(pressTimer);
-});
-
-// Touch events for mobile
-locateBtn.addEventListener("touchstart", (e) => {
+locateBtn.addEventListener("mouseup", () => { clearTimeout(pressTimer); });
+locateBtn.addEventListener("mouseleave", () => { clearTimeout(pressTimer); });
+locateBtn.addEventListener("touchstart", () => {
   if (tracking) {
-    pressTimer = setTimeout(() => {
-      stopLocationTracking();
-    }, 1000);
+    pressTimer = setTimeout(() => { stopLocationTracking(); }, 1000);
   }
-});
-
-locateBtn.addEventListener("touchend", (e) => {
-  clearTimeout(pressTimer);
-});
+}, { passive: true });
+locateBtn.addEventListener("touchend", () => { clearTimeout(pressTimer); });
 
 // Add button to UI
 view.ui.add(locateBtn, { position: "bottom-right", index: 2 });
 
-// Auto-start on mobile (silent, no prompts)
-view.when(() => {
-  if (isMobileDevice()) {
-    // Short delay for map to load
-    setTimeout(() => {
-      // Check if geolocation is available
-      if ("geolocation" in navigator) {
-        // Try to check permissions silently
-        if (navigator.permissions && navigator.permissions.query) {
-          navigator.permissions.query({ name: 'geolocation' }).then(result => {
-            if (result.state === 'granted') {
-              // Permission already granted, start tracking
-              console.log("Mobile: Auto-starting location tracking");
-              startLocationTracking();
-            } else if (result.state === 'prompt') {
-              // Permission not yet requested - try to start anyway
-              // This will trigger the browser's permission prompt
-              console.log("Mobile: Attempting to start tracking (will prompt for permission)");
-              startLocationTracking();
-            } else {
-              console.log("Mobile: Location permission denied");
-            }
-          }).catch(() => {
-            // Permissions API not available - try to start anyway
-            console.log("Permissions API not available - attempting to start tracking");
-            startLocationTracking();
-          });
-        } else {
-          // No permissions API - just try to start
-          console.log("No permissions API - attempting to start tracking");
-          startLocationTracking();
+// Pause/resume watch when tab visibility changes (battery saver)
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  } else if (tracking && watchId === null) {
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const now = Date.now();
+        const timeOk  = (now - lastUpdateTs) >= THROTTLE_MS;
+        const distOk  = !lastPosition || haversineMeters(lastPosition.lat, lastPosition.lon, latitude, longitude) >= MIN_MOVE_M;
+        const staleOk = (now - lastUpdateTs) >= MAX_STALE_MS;
+        if (timeOk && (distOk || staleOk)) {
+          updateLocationMarker(latitude, longitude);
+          lastUpdateTs = now;
         }
-      }
-    }, 1500); // Slightly longer delay to ensure map is ready
+      },
+      (err) => { console.warn("Geolocation error:", err); },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+    );
   }
+});
+
+// Auto-start on mobile (respect permissions)
+view.when(() => {
+  if (!isMobileDevice() || !("geolocation" in navigator)) return;
+
+  setTimeout(() => {
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: "geolocation" }).then(result => {
+        if (result.state === "granted") {
+          startLocationTracking();
+        } else if (result.state === "prompt") {
+          // Attempt to start; will prompt the user
+          startLocationTracking();
+        } else {
+          console.log("Mobile: Location permission denied");
+        }
+      }).catch(() => {
+        // Permissions API not available - try to start anyway
+        startLocationTracking();
+      });
+    } else {
+      startLocationTracking();
+    }
+  }, 1500); // slight delay to ensure map ready
 });
 
 // Make functions global if needed
@@ -481,51 +581,7 @@ window.startLocationTracking = startLocationTracking;
 window.updateLocation = updateLocation;
 window.centerOnLocation = centerOnLocation;
 
-////
 
-// -------- Popup behavior --------
-// Replace your existing popup configuration with this:
-view.when(() => {
-  // Enhanced popup configuration for mobile
-  view.popup.dockEnabled = true;
-  view.popup.collapseEnabled = false;
-  
-  // Check if mobile/tablet
-  const isMobile = window.innerWidth <= 768;
-  
-  view.popup.dockOptions = {
-    position: isMobile ? "bottom" : "top-left",
-    breakpoint: false, // Always dock
-    buttonEnabled: false
-  };
-
-  // Force full screen on mobile
-  if (isMobile) {
-    view.popup.set({
-      dockEnabled: true,
-      dockOptions: {
-        position: "bottom",
-        breakpoint: false,
-        buttonEnabled: false
-      }
-    });
-  }
-
-  // If it ever collapses, immediately uncollapse it
-  view.popup.watch("collapsed", (isCollapsed) => {
-    if (isCollapsed) view.popup.collapsed = false;
-  });
-
-  // Handle window resize to adjust popup behavior
-  window.addEventListener('resize', () => {
-    const isMobileNow = window.innerWidth <= 768;
-    view.popup.dockOptions = {
-      position: isMobileNow ? "bottom" : "top-left",
-      breakpoint: false,
-      buttonEnabled: false
-    };
-  });
-});
   // -------- Other UI widgets --------
   view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
   view.ui.add(new Home({ view }), { position: "bottom-right", index: 1 });
