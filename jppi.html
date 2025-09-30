@@ -39,46 +39,85 @@
       left: 0;
     }
 
-    #filterContainer {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      background-color: rgba(255, 255, 255, 0.95);
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
+#filterContainer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
 
-    .filterBtn {
-      margin: 3px;
-      padding: 5px 10px;
-      font-size: 14px;
-      border: 1px solid #aaa;
-      background-color: #f8f8f8;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-    }
+.filterBtn {
+  margin: 3px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #aaa;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
 
-    .filterBtn:hover {
-      background-color: #e8e8e8;
-    }
+.filterBtn:hover {
+  background-color: #e8e8e8;
+}
 
-    .filterBtn.active {
-      background-color: #007BFF;
-      color: white;
-      border-color: #0056b3;
-    }
+.filterBtn.active {
+  background-color: #007BFF;
+  color: white;
+  border-color: #0056b3;
+}
 
-    /* Style the search widget */
-    .esri-search {
-      min-width: 280px;
-    }
-    
-    .esri-search__input {
-      font-family: 'Inter', sans-serif;
-    }
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  #filterContainer {
+    left: 10px;
+    right: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  #filterContainer::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .filterBtn {
+    flex: 0 0 auto;
+    font-size: 12px;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+  
+  .esri-ui-top-right {
+    top: 70px !important;
+    right: 10px !important;
+    left: 10px !important;
+  }
+  
+  .esri-search {
+    min-width: 100%;
+    width: 100%;
+  }
+}
+
+/* Style the search widget */
+.esri-search {
+  min-width: 280px;
+}
+
+.esri-search__input {
+  font-family: 'Inter', sans-serif;
+}
   </style>
 </head>
 

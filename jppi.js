@@ -14,178 +14,157 @@ require([
   console.log("Map inside require:", typeof Map);
   console.log("MapView inside require:", typeof MapView);
 
-  // DEFINE createPopupTemplate FUNCTION WITH GEOMETRY-BASED COORDINATES
-  // DEFINE createPopupTemplate FUNCTION WITH IMPROVED DESIGN
-// DEFINE createPopupTemplate FUNCTION WITH IMPROVED DESIGN
-
-const createPopupTemplate = () => {
-  return {
-    title: "{eng_name}",
-    content: [{
-      type: "text",
-      text: `
-        <div style="
-          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-          border-radius: 20px;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-          padding: 28px;
-          margin: -8px;
-	  width: calc(100% + 16px);
-          box-shadow: 
-            0 20px 60px rgba(0,0,0,0.12),
-            0 8px 25px rgba(0,0,0,0.08),
-            0 0 0 1px rgba(255,255,255,0.9);
-          overflow: hidden;
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-        ">
-          
-          <!-- Category Label -->
+  // DEFINE createPopupTemplate FUNCTION - MOBILE COMPATIBLE
+  const createPopupTemplate = () => {
+    return {
+      title: "{eng_name}",
+      outFields: ["*"],
+      content: (feature) => {
+        const attrs = feature.graphic.attributes;
+        const engName = attrs.eng_name || attrs.ENG_NAME || "Unknown";
+        const address = attrs.Address || attrs.address || attrs.ADDRESS || "";
+        const city = attrs.city || attrs.City || attrs.CITY || "";
+        const country = attrs.country || attrs.Country || attrs.COUNTRY || "";
+        const category = attrs.main_category || attrs.category || attrs.CATEGORY || "";
+        
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(engName + " " + address + " " + city + " " + country)}`;
+        
+        return `
           <div style="
-            text-align: left;
-            margin-bottom: 24px;
-            color: #667eea;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          ">
-            <i class="fas fa-tag" style="font-size: 12px; opacity: 0.8;"></i>
-            {main_category}
-          </div>
-
-          <!-- Location Information -->
-          <div style="
-            margin-bottom: 24px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-          ">
-            <!-- Address -->
-            <div style="
-              display: flex;
-              align-items: flex-start;
-              gap: 16px;
-              margin-bottom: 12px;
-              color: #374151;
-              font-size: 14px;
-              line-height: 1.5;
-            ">
-              <i class="fas fa-map-marker-alt" style="font-size: 14px; color: #667eea; margin-top: 2px; min-width: 16px; margin-right: 4px;"></i>
-              <span style="font-weight: 500;">{Address}</span>
-            </div>
-            
-            <!-- City -->
-            <div style="
-              display: flex;
-              align-items: center;
-              gap: 16px;
-              margin-bottom: 12px;
-              color: #374151;
-              font-size: 14px;
-            ">
-              <i class="fas fa-city" style="font-size: 14px; color: #667eea; min-width: 16px; margin-right: 4px;"></i>
-              <span style="font-weight: 500;">{city}</span>
-            </div>
-            
-            <!-- Country -->
-            <div style="
-              display: flex;
-              align-items: center;
-              gap: 16px;
-              color: #374151;
-              font-size: 14px;
-            ">
-              <i class="fas fa-globe" style="font-size: 14px; color: #667eea; min-width: 16px; margin-right: 4px;"></i>
-              <span style="font-weight: 500;">{country}</span>
-            </div>
-          </div>
-
-          <!-- Google Search Button -->
-          <a href="{expression/google-search-url}" target="_blank" style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
-            color: white;
-            text-decoration: none;
-            padding: 16px 24px;
-            border-radius: 14px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-              0 8px 20px rgba(66, 133, 244, 0.25),
-              0 2px 8px rgba(66, 133, 244, 0.15);
-            border: none;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            padding: 16px;
+            margin: 0;
             width: 100%;
             box-sizing: border-box;
-          " onmouseover="this.style.transform='translateY(-2px) scale(1.02)'; this.style.boxShadow='0 12px 30px rgba(66, 133, 244, 0.35), 0 4px 12px rgba(66, 133, 244, 0.2)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 20px rgba(66, 133, 244, 0.25), 0 2px 8px rgba(66, 133, 244, 0.15)'"
-          >
-            <i class="fas fa-search" style="font-size: 14px; margin-right: 10px;"></i>
-            Search on Google
-          </a>
-        </div>
-      `
-    }],
-    
-    // Expression for Google Search URL
-    expressionInfos: [
-      {
-        name: "google-search-url",
-        title: "Google Search URL",
-        returnType: "string",
-        expression: `
-          return "https://www.google.com/search?q=" + $feature.eng_name + " " + $feature.Address + " " + $feature.city + " " + $feature.country;
-        `
-      }
-    ]
-  };
-};
+          ">
+            
+            <!-- Category Label -->
+            <div style="
+              text-align: left;
+              margin-bottom: 16px;
+              color: #667eea;
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            ">
+              <i class="fas fa-tag" style="font-size: 11px; opacity: 0.8; margin-right: 6px;"></i>
+              ${category}
+            </div>
 
+            <!-- Location Information -->
+            <div style="
+              margin-bottom: 16px;
+              padding: 12px;
+              background: rgba(255, 255, 255, 0.7);
+              border-radius: 8px;
+              border: 1px solid rgba(0, 0, 0, 0.05);
+            ">
+              ${address ? `<div style="
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                margin-bottom: 8px;
+                color: #374151;
+                font-size: 13px;
+                line-height: 1.4;
+              ">
+                <i class="fas fa-map-marker-alt" style="font-size: 13px; color: #667eea; margin-top: 2px;"></i>
+                <span>${address}</span>
+              </div>` : ''}
+              
+              ${city ? `<div style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+                color: #374151;
+                font-size: 13px;
+              ">
+                <i class="fas fa-city" style="font-size: 13px; color: #667eea;"></i>
+                <span>${city}</span>
+              </div>` : ''}
+              
+              ${country ? `<div style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #374151;
+                font-size: 13px;
+              ">
+                <i class="fas fa-globe" style="font-size: 13px; color: #667eea;"></i>
+                <span>${country}</span>
+              </div>` : ''}
+            </div>
+
+            <!-- Google Search Button -->
+            <a href="${googleUrl}" target="_blank" rel="noopener" style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+              color: white;
+              text-decoration: none;
+              padding: 12px 20px;
+              border-radius: 8px;
+              text-align: center;
+              font-weight: 600;
+              font-size: 13px;
+              box-shadow: 0 4px 12px rgba(66, 133, 244, 0.25);
+              width: 100%;
+              box-sizing: border-box;
+            ">
+              <i class="fas fa-search" style="font-size: 13px; margin-right: 8px;"></i>
+              Search on Google
+            </a>
+          </div>
+        `;
+      }
+    };
+  };
 
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
     container: "viewDiv",
     map,
-    center: [16, 50],
-    zoom: 6,
-    ui: { components: [] }
+    center: [25, 45],
+    zoom: 4,
+    ui: { components: [] },
+    popup: {
+      dockEnabled: true,
+      dockOptions: {
+        buttonEnabled: false,
+        breakpoint: false,
+        position: "bottom-center"
+      },
+      collapseEnabled: false
+    }
   });
   
   console.log("*** MAP AND VIEW CREATED ***");
   console.log("View object:", view);
   
   view.ui.add(new Zoom({ view }),   { position: "bottom-right" });
- // view.ui.add(new Locate({ view }), { position: "bottom-right" });
   view.ui.add(new Home({ view }),   { position: "bottom-right" });
 
+  // Create and configure the Search widget
+  const search = new Search({
+    view: view,
+    allPlaceholder: "Search landmarks or places...",
+    includeDefaultSources: true,
+    locationEnabled: false,
+    popupEnabled: true,
+    resultGraphicEnabled: true,
+    sources: []
+  });
 
-
-// Create and configure the Search widget
-const search = new Search({
-  view: view,
-  allPlaceholder: "Search landmarks or places...",
-  includeDefaultSources: true,
-  locationEnabled: false,
-  popupEnabled: true,
-  resultGraphicEnabled: true,
-  sources: []
-});
-
-// Add the search widget to the top-right of the view
-view.ui.add(search, {
-  position: "top-right",
-  index: 0
-});
+  // Add the search widget to the top-right of the view
+  view.ui.add(search, {
+    position: "top-right",
+    index: 0
+  });
 
   const filterDiv = document.getElementById("filterContainer");
   const categories = [
@@ -325,62 +304,61 @@ view.ui.add(search, {
   }
 
   async function createDynamicLayer(features) {
-  if (dynamicLayer) {
-    map.remove(dynamicLayer);
-    dynamicLayer = null;
+    if (dynamicLayer) {
+      map.remove(dynamicLayer);
+      dynamicLayer = null;
+    }
+
+    if (features.length === 0) return;
+
+    console.log("Creating dynamic layer with", features.length, "features");
+
+    dynamicLayer = new GraphicsLayer({
+      title: "Dynamic Landmarks"
+    });
+
+    const graphics = features.map(feature => {
+      const a = feature.attributes || {};
+
+      // Normalize keys (handles different casings/aliases from the proxy)
+      const attrs = {
+        eng_name:      a.eng_name ?? a.ENG_NAME ?? a.name ?? "",
+        Address:       a.Address  ?? a.address  ?? a.ADDRESS ?? "",
+        city:          a.city     ?? a.City     ?? a.CITY    ?? "",
+        country:       a.country  ?? a.Country  ?? a.COUNTRY ?? "",
+        main_category: a.main_category ?? a.category ?? a.CATEGORY ?? ""
+      };
+
+      const point = new Point({
+        x: feature.geometry.x,
+        y: feature.geometry.y,
+        spatialReference: view.spatialReference
+      });
+
+      return new Graphic({
+        geometry: point,
+        attributes: attrs,
+        symbol: getSymbolForCategory(attrs.main_category),
+        popupTemplate: createPopupTemplate()
+      });
+    });
+
+    dynamicLayer.addMany(graphics);
+
+    if (currentFilter) {
+      applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
+    }
+
+    map.add(dynamicLayer);
+    console.log("Dynamic layer added to map with", graphics.length, "graphics");
+    
+    // Log first graphic to verify all attributes are present
+    if (graphics.length > 0) {
+      console.log("First graphic coordinates:", graphics[0].geometry.x, graphics[0].geometry.y);
+      console.log("First graphic category:", graphics[0].attributes.main_category);
+      console.log("First graphic all attributes:", graphics[0].attributes);
+    }
   }
-
-  if (features.length === 0) return;
-
-  console.log("Creating dynamic layer with", features.length, "features");
-
-  dynamicLayer = new GraphicsLayer({
-    title: "Dynamic Landmarks"
-  });
-
-const graphics = features.map(feature => {
-  const a = feature.attributes || {};
-
-  // Normalize keys (handles different casings/aliases from the proxy)
-  const attrs = {
-    eng_name:      a.eng_name ?? a.ENG_NAME ?? a.name ?? "",
-    Address:       a.Address  ?? a.address  ?? a.ADDRESS ?? "",
-    city:          a.city     ?? a.City     ?? a.CITY    ?? "",
-    country:       a.country  ?? a.Country  ?? a.COUNTRY ?? "",
-    main_category: a.main_category ?? a.category ?? a.CATEGORY ?? ""
-  };
-
-  const point = new Point({
-    x: feature.geometry.x,
-    y: feature.geometry.y,
-    spatialReference: view.spatialReference
-  });
-
-  return new Graphic({
-    geometry: point,
-    attributes: attrs, // ← use normalized keys that your popup template references
-    symbol: getSymbolForCategory(attrs.main_category),
-    popupTemplate: createPopupTemplate()
-  });
-});
-
-
-  dynamicLayer.addMany(graphics);
-
-  if (currentFilter) {
-    applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
-  }
-
-  map.add(dynamicLayer);
-  console.log("Dynamic layer added to map with", graphics.length, "graphics");
-  
-  // Log first graphic to verify all attributes are present
-  if (graphics.length > 0) {
-    console.log("First graphic coordinates:", graphics[0].geometry.x, graphics[0].geometry.y);
-    console.log("First graphic category:", graphics[0].attributes.main_category);
-    console.log("First graphic all attributes:", graphics[0].attributes);
-  }
-}
 
   function applyFilterToGraphicsLayer(layer, category) {
     if (!layer || !layer.graphics) return;
@@ -415,29 +393,40 @@ const graphics = features.map(feature => {
     }
   });
 
-  // Click handler for popups
+  // Click/Touch handler for popups - works on both desktop and mobile
   view.on("click", async event => {
     try {
-      const { results } = await view.hitTest(event);
+      // Prevent default behavior
+      event.stopPropagation();
+      
+      const response = await view.hitTest(event, {
+        include: [globalLayer, dynamicLayer].filter(l => l !== null)
+      });
+      
+      if (!response.results.length) {
+        return;
+      }
       
       // Check if dynamicLayer exists before comparing
       if (dynamicLayer) {
-        const hit = results.find(r => r.graphic && r.graphic.layer === dynamicLayer);
+        const hit = response.results.find(r => r.graphic && r.graphic.layer === dynamicLayer);
         if (hit) {
           view.popup.open({
             features: [hit.graphic],
-            location: event.mapPoint
+            location: hit.mapPoint || event.mapPoint,
+            updateLocationEnabled: true
           });
           return; // Exit early to prevent checking other layers
         }
       }
       
       // If no dynamic layer hit, check global layer
-      const globalHit = results.find(r => r.graphic && r.graphic.layer === globalLayer);
+      const globalHit = response.results.find(r => r.graphic && r.graphic.layer === globalLayer);
       if (globalHit) {
         view.popup.open({
           features: [globalHit.graphic],
-          location: event.mapPoint
+          location: globalHit.mapPoint || event.mapPoint,
+          updateLocationEnabled: true
         });
       }
     } catch (error) {
@@ -445,27 +434,27 @@ const graphics = features.map(feature => {
     }
   });
 
-globalLayer.when(() => {
-  view.goTo(globalLayer.fullExtent).catch(console.error);
-  
-  // Add the landmarks layer as a search source
-  const landmarksSource = {
-    layer: globalLayer,
-    searchFields: ["eng_name", "Address", "city"],
-    displayField: "eng_name",
-    exactMatch: false,
-    outFields: ["*"],
-    name: "Jewish Landmarks",
-    placeholder: "e.g., Rabbi Itzhak Huri Synagogue",
-    maxResults: 6,
-    maxSuggestions: 8,
-    suggestionsEnabled: true,
-    minSuggestCharacters: 2
-  };
-  
-  search.sources.unshift(landmarksSource);
-  console.log("Search widget configured with landmarks layer");
-});
+  globalLayer.when(() => {
+    //view.goTo(globalLayer.fullExtent).catch(console.error);
+    
+    // Add the landmarks layer as a search source
+    const landmarksSource = {
+      layer: globalLayer,
+      searchFields: ["eng_name", "Address", "city"],
+      displayField: "eng_name",
+      exactMatch: false,
+      outFields: ["*"],
+      name: "Jewish Landmarks",
+      placeholder: "e.g., Rabbi Itzhak Huri Synagogue",
+      maxResults: 6,
+      maxSuggestions: 8,
+      suggestionsEnabled: true,
+      minSuggestCharacters: 2
+    };
+    
+    search.sources.unshift(landmarksSource);
+    console.log("Search widget configured with landmarks layer");
+  });
 
   filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
     btn.addEventListener("click", () => {
