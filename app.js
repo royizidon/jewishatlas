@@ -151,6 +151,14 @@ const createPopupTemplate = () => ({
     const hours = a.fees_opening_hours || "";
     const photo = a.photo || "";
     const id = a.id || a.OBJECTID || "";
+   // Normalize website URL (supports fields: website / Website / link)
+   function normalizeUrl(u){
+    if (!u) return "";
+    const s = String(u).trim();
+    return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+   }
+   const siteUrl = normalizeUrl(a.website || a.Website || a.link || "");
+
 
     // Other links
   const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent([name, category, fullAddress].filter(Boolean).join(" "))}`;
@@ -244,7 +252,9 @@ const createPopupTemplate = () => ({
           </div>
           ${description?.trim() ? `<div class="info-section"><div class="info-label">ℹ️ About</div><div class="info-value clamp-4">${description}</div></div>` : ""}
           ${hours?.trim() ? `<div class="info-section"><div class="info-label">🕒 Hours & Fees</div><div class="info-value clamp-4">${hours}</div></div>` : ""}
-          <a href="${googleSearchUrl}" target="_blank" rel="noopener" class="primary-button">🔍 Search for More Details</a>
+          <a href="${googleSearchUrl}" 
+class="primary-button">🔍 Search for More Details</a>
+  ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">🌐 Visit website</a>` : ""}
         </div>
 
         <div class="tab-content" data-content="navigate">
@@ -281,7 +291,8 @@ const links = [
   container.querySelector(".nav-button.waze"),
   // include this line if you want the search button too:
    container.querySelector('.primary-button[href*="google.com/search"]'),
-  container.querySelector('.primary-button[href*="docs.google.com/forms"]')
+  container.querySelector('.primary-button[href*="docs.google.com/forms"]'),
+  container.querySelector('.site-link') // ← WEBSITE BUTTON
 ].filter(Boolean);
 
 links.forEach((a) => {
@@ -702,13 +713,13 @@ view.when(() => {
   // -------- Renderer --------
   const globalRenderer = new UniqueValueRenderer({
     field: "main_category",
-    defaultSymbol: { type: "simple-marker", style: "circle", size: 8, color: "#888", outline: { color: "#fff", width: 1 } },
+    defaultSymbol: { type: "simple-marker", style: "circle", size: 7, color: "#888", outline: { color: "#fff", width: 1 } },
     uniqueValueInfos: [
-      { value: "Highlights",        symbol: { type: "simple-marker", style: "circle", size: 8, color: "#f39c12", outline: { color: "#fff", width: 1 } } },
-      { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", size: 8, color: "#5DADE2", outline: { color: "#fff", width: 1 } } },
-      { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", size: 8, color: "#EC7063", outline: { color: "#fff", width: 1 } } },
-      { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", size: 8, color: "#58D68D", outline: { color: "#fff", width: 1 } } },
-      { value: "Community",         symbol: { type: "simple-marker", style: "circle", size: 8, color: "#F5B041", outline: { color: "#fff", width: 1 } } }
+      { value: "Highlights",        symbol: { type: "simple-marker", style: "circle", size: 7, color: "#f39c12", outline: { color: "#fff", width: 1 } } },
+      { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", size: 7, color: "#5DADE2", outline: { color: "#fff", width: 1 } } },
+      { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", size: 7, color: "#EC7063", outline: { color: "#fff", width: 1 } } },
+      { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", size: 7, color: "#58D68D", outline: { color: "#fff", width: 1 } } },
+      { value: "Community",         symbol: { type: "simple-marker", style: "circle", size: 7, color: "#8b5cf6", outline: { color: "#fff", width: 1 } } }
     ]
   });
 
@@ -761,13 +772,13 @@ view.when(() => {
 
   function getSymbolForCategory(category) {
     const symbolMap = {
-      "Featured":          { type: "simple-marker", style: "circle", size: 8, color: "#f39c12", outline: { color: "#fff", width: 1 } },
-      "Synagogue":         { type: "simple-marker", style: "circle", size: 8, color: "#5DADE2", outline: { color: "#fff", width: 1 } },
-      "Heritage":          { type: "simple-marker", style: "circle", size: 8, color: "#EC7063", outline: { color: "#fff", width: 1 } },
-      "Kosher Restaurant": { type: "simple-marker", style: "circle", size: 8, color: "#58D68D", outline: { color: "#fff", width: 1 } },
-      "Community":         { type: "simple-marker", style: "circle", size: 8, color: "#F5B041", outline: { color: "#fff", width: 1 } }
+      "Featured":          { type: "simple-marker", style: "circle", size: 7, color: "#f39c12", outline: { color: "#fff", width: 1 } },
+      "Synagogue":         { type: "simple-marker", style: "circle", size: 7, color: "#5DADE2", outline: { color: "#fff", width: 1 } },
+      "Heritage":          { type: "simple-marker", style: "circle", size: 7, color: "#EC7063", outline: { color: "#fff", width: 1 } },
+      "Kosher Restaurant": { type: "simple-marker", style: "circle", size: 7, color: "#58D68D", outline: { color: "#fff", width: 1 } },
+      "Community":         { type: "simple-marker", style: "circle", size: 7, color: "#8b5cf6", outline: { color: "#fff", width: 1 } }
     };
-    return symbolMap[category] || { type: "simple-marker", style: "circle", size: 8, color: "#888", outline: { color: "#fff", width: 1 } };
+    return symbolMap[category] || { type: "simple-marker", style: "circle", size: 7, color: "#888", outline: { color: "#fff", width: 1 } };
   }
 
   async function createDynamicLayer(features) {

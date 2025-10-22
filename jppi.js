@@ -28,7 +28,16 @@ require([
         const category = attrs.main_category || attrs.category || attrs.CATEGORY || "";
         
         const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(engName + " " + address + " " + city + " " + country)}`;
-        
+        // after: const googleUrl = `https://www.google.com/search?...`
+const normalizeUrl = (u) => {
+  if (!u) return "";
+  const s = String(u).trim();
+  return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+};
+// try common field names
+const rawSite = attrs.website || attrs.Website || attrs.link || attrs.Link || "";
+const siteUrl  = normalizeUrl(rawSite);
+
         return `
           <div style="
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -119,7 +128,30 @@ require([
               <i class="fas fa-search" style="font-size: 13px; margin-right: 8px;"></i>
               Search on Google
             </a>
-          </div>
+  ${siteUrl ? `
+      <!-- Visit Website Button -->
+      <a href="${siteUrl}" target="_blank" rel="noopener" style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 10px;
+      ">
+        <i class="fas fa-globe" style="font-size: 13px; margin-right: 8px;"></i>
+        Visit Website
+      </a>
+    ` : ``}
+       </div>
         `;
       }
     };
@@ -193,8 +225,8 @@ require([
       { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:6, color:"#f39c12", outline:{color:"#fff",width:1} } },
       { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:6, color:"#5DADE2", outline:{color:"#fff",width:1} } },
       { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:6, color:"#EC7063", outline:{color:"#fff",width:1} } },
-      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:8, color:"#58D68D", outline:{color:"#fff",width:1} } },
-      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:6, color:"#F5B041", outline:{color:"#fff",width:1} } }
+      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:6, color:"#58D68D", outline:{color:"#fff",width:1} } },
+      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:6, color:"#8b5cf6", outline:{color:"#fff",width:1} } }
     ]
   });
 
@@ -297,7 +329,7 @@ require([
       "Synagogue": { type:"simple-marker", style:"circle", size:8, color:"#5DADE2", outline:{color:"#fff",width:1} },
       "Heritage": { type:"simple-marker", style:"circle", size:8, color:"#EC7063", outline:{color:"#fff",width:1} },
       "Kosher Restaurant": { type:"simple-marker", style:"circle", size:8, color:"#58D68D", outline:{color:"#fff",width:1} },
-      "Community": { type:"simple-marker", style:"circle", size:8, color:"#F5B041", outline:{color:"#fff",width:1} }
+      "Community": { type:"simple-marker", style:"circle", size:8, color:"#8b5cf6", outline:{color:"#fff",width:1} }
     };
     
     return symbolMap[category] || { type:"simple-marker", style:"circle", size:6, color:"#888", outline:{color:"#fff",width:1} };
