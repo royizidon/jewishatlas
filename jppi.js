@@ -265,7 +265,7 @@ const siteUrl  = normalizeUrl(rawSite);
       const requestBody = new URLSearchParams({
         f: "json",
         where: "1=1",
-        outFields: "eng_name,Address,address,city,country,main_category",
+        outFields: "eng_name,Address,address,city,country,main_category,website,Website,link,Link",
         geometry: JSON.stringify(geometryObj),
         geometryType: "esriGeometryEnvelope",
         spatialRel: "esriSpatialRelIntersects",
@@ -358,7 +358,8 @@ const siteUrl  = normalizeUrl(rawSite);
         Address:       a.Address  ?? a.address  ?? a.ADDRESS ?? "",
         city:          a.city     ?? a.City     ?? a.CITY    ?? "",
         country:       a.country  ?? a.Country  ?? a.COUNTRY ?? "",
-        main_category: a.main_category ?? a.category ?? a.CATEGORY ?? ""
+        main_category: a.main_category ?? a.category ?? a.CATEGORY ?? "",
+        website:       a.website ?? a.Website ?? a.link ?? a.Link ?? ""
       };
 
       const point = new Point({
