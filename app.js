@@ -135,6 +135,7 @@ const createPopupTemplate = () => ({
   return { gmaps, waze };
 }
 
+
     // Attributes
     const a = feature.graphic.attributes || {};
     const name = a.eng_name || "Location";
@@ -270,6 +271,29 @@ const createPopupTemplate = () => ({
     const { gmaps, waze } = buildNavLinks(feature.graphic, a);
     container.querySelector(".nav-button.google-maps")?.setAttribute("href", gmaps);
     container.querySelector(".nav-button.waze")?.setAttribute("href", waze);
+
+
+// === Open same tab on mobile, new tab on desktop ===
+const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+const links = [
+  container.querySelector(".nav-button.google-maps"),
+  container.querySelector(".nav-button.waze"),
+  // include this line if you want the search button too:
+   container.querySelector('.primary-button[href*="google.com/search"]'),
+  container.querySelector('.primary-button[href*="docs.google.com/forms"]')
+].filter(Boolean);
+
+links.forEach((a) => {
+  if (isMobile) {
+    a.setAttribute("target", "_self");     // more reliable than removing
+    a.removeAttribute("rel");
+  } else {
+    a.setAttribute("target", "_blank");
+    a.setAttribute("rel", "noopener");
+  }
+});
+
 
     // Tabs
     const tabButtons = container.querySelectorAll(".tab-button");
