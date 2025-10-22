@@ -25,6 +25,10 @@ require([
   "esri/PopupTemplate",                // ok to keep though not used directly
   "esri/geometry/projection",
   "esri/geometry/SpatialReference",
+  "esri/widgets/BasemapGallery",
+  "esri/widgets/Expand",
+  "esri/widgets/BasemapToggle",
+
 ], function (
   Map,
   MapView,
@@ -38,7 +42,11 @@ require([
   Point,
   PopupTemplate,
   projection,
-  SpatialReference
+  SpatialReference,
+BasemapGallery,
+Expand,
+BasemapToggle
+
 ) {
   console.log("*** REQUIRE BLOCK STARTED ***");
 
@@ -130,16 +138,22 @@ const createPopupTemplate = () => ({
     // Attributes
     const a = feature.graphic.attributes || {};
     const name = a.eng_name || "Location";
-    const category = a.main_category || "Place";
-    const address = a.Address || "";
+    const category = a.category || a.main_category || "Place";
+    const address = a.address || "";
     const city = a.city || "";
+    const fullAddress =
+  (address && city && address.includes(city))
+    ? address                     // address already contains city/country → keep as is
+    : [address, city].filter(Boolean).join(", ") || "Not available";
+
     const description = a.description || "";
     const hours = a.fees_opening_hours || "";
     const photo = a.photo || "";
     const id = a.id || a.OBJECTID || "";
 
     // Other links
-    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent([name, category, address].filter(Boolean).join(" "))}`;
+  const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent([name, category, fullAddress].filter(Boolean).join(" "))}`;
+
     const feedbackUrl = `https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895=${encodeURIComponent(id)}`;
 
     // Container
@@ -225,7 +239,7 @@ const createPopupTemplate = () => ({
         <div class="tab-content active" data-content="info">
           <div class="info-section">
             <div class="info-label">📍 Address</div>
-            <div class="info-value">${address}${city ? ", " + city : ""}</div>
+<div class="info-value">${fullAddress}</div>
           </div>
           ${description?.trim() ? `<div class="info-section"><div class="info-label">ℹ️ About</div><div class="info-value clamp-4">${description}</div></div>` : ""}
           ${hours?.trim() ? `<div class="info-section"><div class="info-label">🕒 Hours & Fees</div><div class="info-value clamp-4">${hours}</div></div>` : ""}
@@ -277,7 +291,7 @@ const createPopupTemplate = () => ({
 // -------- Popup behavior (valid docking; no duplicate title; compact desktop) --------
 view.when(() => {
   view.popup.collapseEnabled = false;
-
+/*
   function applyPopupLayout() {
     const mobile = window.innerWidth <= 768;
     view.popup.dockEnabled = mobile;
@@ -287,6 +301,22 @@ view.when(() => {
       buttonEnabled: false
     };
   }
+*/
+function applyPopupLayout() {
+  const mobile = window.innerWidth <= 768;
+
+  view.popup.dockEnabled = true;  // always dock, mobile and desktop
+  view.popup.dockOptions = {
+    position: mobile ? "bottom-right" : "top-right",
+    breakpoint: false,             // never undock on wide screens
+    buttonEnabled: false           // no toggle button
+  };
+
+  // Optional: shift map center away from popup (only on desktop)
+  if (!mobile) {
+    view.popup.alignment = "top-right"; // ensures better positioning
+  }
+}
 
   applyPopupLayout();
   window.addEventListener("resize", applyPopupLayout);
@@ -585,6 +615,57 @@ window.centerOnLocation = centerOnLocation;
   // -------- Other UI widgets --------
   view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
   view.ui.add(new Home({ view }), { position: "bottom-right", index: 1 });
+
+
+/* === Basemap control: Toggle on mobile, Gallery on desktop === */
+function mountBasemapControl() {
+  const isMobile = window.innerWidth <= 768;
+
+  // remove existing control cleanly
+  if (window.__bmControl) {
+    view.ui.remove(window.__bmControl);
+    // destroy inner content if it was an Expand (desktop)
+    window.__bmControl.content?.destroy?.();
+    window.__bmControl.destroy?.();
+    window.__bmControl = null;
+  }
+
+  if (isMobile) {
+    // Mobile: simple toggle (topo-vector ↔ satellite)
+    const toggle = new BasemapToggle({
+      view,
+      nextBasemap: "satellite"   // change to "hybrid" if you want labels
+    });
+    view.ui.add(toggle, { position: "bottom-left", index: 0 });
+   // mark it as "mobile" so CSS can target it
+   toggle.when(() => toggle.container?.classList.add("bm-toggle--mobile"));
+
+    window.__bmControl = toggle;
+
+  } else {
+    // Desktop: full gallery in an Expand
+    const gallery = new BasemapGallery({ view });
+    const expand = new Expand({
+      view,
+      content: gallery,
+      expandTooltip: "Change basemap",
+      expanded: false
+    });
+    view.ui.add(expand, { position: "bottom-right", index: 3 });
+    window.__bmControl = expand;
+  }
+}
+
+// mount once and also on resize (debounced)
+view.when(() => {
+  mountBasemapControl();
+
+  let _bmTimer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(_bmTimer);
+    _bmTimer = setTimeout(mountBasemapControl, 200);
+  });
+});
 
   // -------- Search --------
   const search = new Search({
