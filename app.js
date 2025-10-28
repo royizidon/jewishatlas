@@ -337,20 +337,27 @@ view.when(() => {
     };
   }
 */
+
 function applyPopupLayout() {
   const mobile = window.innerWidth <= 768;
 
-  view.popup.dockEnabled = true;  // always dock, mobile and desktop
+  view.popup.dockEnabled = true;
   view.popup.dockOptions = {
     position: mobile ? "bottom-right" : "top-right",
-    breakpoint: false,             // never undock on wide screens
-    buttonEnabled: false           // no toggle button
+    breakpoint: false,
+    buttonEnabled: false
   };
 
-  // Optional: shift map center away from popup (only on desktop)
   if (!mobile) {
-    view.popup.alignment = "top-right"; // ensures better positioning
+    view.popup.alignment = "top-right";
   }
+  
+  // *** FIX: Force z-index to be above header ***
+  setTimeout(() => {
+    if (view.popup?.container) {
+      view.popup.container.style.zIndex = "10020";
+    }
+  }, 100);
 }
 
   applyPopupLayout();
@@ -358,9 +365,18 @@ function applyPopupLayout() {
 
   // Keep uncollapsed
   view.popup.watch("collapsed", (c) => { if (c) view.popup.collapsed = false; });
+  
+  // *** FIX: Watch popup visibility and force z-index ***
+  view.popup.watch("visible", (isVisible) => {
+    if (isVisible) {
+      setTimeout(() => {
+        if (view.popup?.container) {
+          view.popup.container.style.zIndex = "10020";
+        }
+      }, 50);
+    }
+  });
 });
-
-
 
 // -------- Optimized Location Tracking with Smart Movement Detection --------
 

@@ -518,3 +518,43 @@ html, body {
     text-overflow: ellipsis;
   }
 }
+
+/* ========================================
+   FIX: Popup covered by header on mobile
+   ======================================== */
+
+/* Ensure popup appears ABOVE header */
+.esri-popup {
+  z-index: 10020 !important;
+}
+
+.esri-popup__main-container {
+  z-index: 10020 !important;
+}
+
+/* Make sure header stays below popup */
+#appHeader {
+  z-index: 1001 !important;
+}
+
+/* Desktop: Position popup below header when docked at top */
+@media (min-width: 769px) {
+  .esri-popup--is-docked-top-right {
+    top: calc(var(--header-h, 115px) + 10px) !important;
+  }
+}
+
+/* Mobile: Center the popup and ensure it's above everything */
+@media (max-width: 768px) {
+  .esri-popup,
+  .esri-popup--is-docked {
+    z-index: 10020 !important;
+  }
+  
+  /* Remove any transform that might conflict with centering */
+  .esri-popup--is-docked-bottom-right,
+  .esri-popup--is-docked-bottom-center,
+  .esri-popup--is-docked-bottom-left {
+    transform: translate(-50%, -50%) !important;
+  }
+}
