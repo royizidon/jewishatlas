@@ -243,84 +243,43 @@ const siteUrl  = normalizeUrl(rawSite);
   
   map.add(globalLayer);
 
-  async function loadDynamicPoints(center) {
-    try {
-      console.log("Fetching from:", window.LANDMARKS_PROXY_URL);
-      console.log("Center:", center.longitude, center.latitude);
-      
-      const extent = view.extent;
-      console.log("Original extent (Web Mercator):", extent);
-      
-      const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
-      console.log("Converted extent (WGS84):", wgs84Extent);
-      
-      const geometryObj = {
-        xmin: wgs84Extent.xmin,
-        ymin: wgs84Extent.ymin,
-        xmax: wgs84Extent.xmax,
-        ymax: wgs84Extent.ymax,
-        spatialReference: { wkid: 4326 }
-      };
-      
-      const requestBody = new URLSearchParams({
-        f: "json",
-        where: "1=1",
-        outFields: "eng_name,Address,address,city,country,main_category,website,Website,link,Link",
-        geometry: JSON.stringify(geometryObj),
-        geometryType: "esriGeometryEnvelope",
-        spatialRel: "esriSpatialRelIntersects",
-        returnGeometry: "true",
-        maxRecordCount: 500
-      });
-      
-      console.log("Geometry object:", geometryObj);
-      
-      const response = await fetch(window.LANDMARKS_PROXY_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: requestBody
-      });
-      
-      console.log("Response status:", response.status);
-      
-      if (!response.ok) {
-        throw new Error("HTTP error! status: " + response.status);
-      }
-      
-      const data = await response.json();
-      console.log("Response data:", data);
-      console.log("Features count:", data.features ? data.features.length : 0);
-      
-      if (data.features && data.features.length > 0) {
-        console.log("First feature:", data.features[0]);
-        
-        // Show coordinates of all features to see where they are
-        console.log("Feature locations:");
-        data.features.slice(0, 5).forEach((feature, i) => {
-          console.log(`Feature ${i+1}: x=${feature.geometry.x}, y=${feature.geometry.y}`);
-        });
-        
-        // Calculate extent of returned features
-        const coords = data.features.map(f => ({ x: f.geometry.x, y: f.geometry.y }));
-        const minX = Math.min(...coords.map(c => c.x));
-        const maxX = Math.max(...coords.map(c => c.x));
-        const minY = Math.min(...coords.map(c => c.y));
-        const maxY = Math.max(...coords.map(c => c.y));
-        
-        console.log("Returned features extent:");
-        console.log(`  X range: ${minX} to ${maxX}`);
-        console.log(`  Y range: ${minY} to ${maxY}`);
-        console.log("Current view extent:", wgs84Extent);
-      }
-      
-      return data.features || [];
-    } catch (error) {
-      console.error("Error loading dynamic points:", error);
-      return [];
-    }
+  async function loadDynamicPoints() {
+  try {
+    const extent = view.extent;
+    const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
+    const geometryObj = {
+      xmin: wgs84Extent.xmin, ymin: wgs84Extent.ymin,
+      xmax: wgs84Extent.xmax, ymax: wgs84Extent.ymax,
+      spatialReference: { wkid: 4326 }
+    };
+
+    const requestBody = new URLSearchParams({
+      f: "json",
+      where: "1=1",
+      outFields: "*",
+      geometry: JSON.stringify(geometryObj),
+      geometryType: "esriGeometryEnvelope",
+      spatialRel: "esriSpatialRelIntersects",
+      returnGeometry: "true",
+      maxRecordCount: 500
+    });
+
+    const response = await fetch(window.LANDMARKS_PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: requestBody
+    });
+
+    if (!response.ok) throw new Error("HTTP " + response.status);
+
+    const data = await response.json();
+    return data.features || [];
+
+  } catch (err) {
+    console.error("Error loading dynamic points:", err);
+    return [];
   }
+}
 
   // Helper function to get symbol based on category (same as global layer)
   function getSymbolForCategory(category) {
