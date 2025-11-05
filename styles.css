@@ -558,3 +558,20 @@ html, body {
     transform: translate(-50%, -50%) !important;
   }
 }
+
+
+/* ========================================
+   OPTIONAL: Improve popup on short screens
+   ======================================== */
+@media (max-height: 500px) and (max-width: 768px) {
+  .esri-popup,
+  .esri-popup--is-docked {
+    height: 90vh !important;
+    max-height: 90vh !important;
+  }
+
+  .esri-popup__content {
+    max-height: calc(90vh - 100px) !important;
+  }
+}
+

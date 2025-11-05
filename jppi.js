@@ -169,7 +169,7 @@ const siteUrl  = normalizeUrl(rawSite);
       dockOptions: {
         buttonEnabled: false,
         breakpoint: false,
-        position: "bottom-center"
+        position: "auto"
       },
       collapseEnabled: false
     }
@@ -218,19 +218,19 @@ const siteUrl  = normalizeUrl(rawSite);
   const globalRenderer = new UniqueValueRenderer({
     field: "main_category",
     defaultSymbol: {
-      type: "simple-marker", style: "circle", size: 6,
+      type: "simple-marker", style: "circle", size: 12,
       color: "#888", outline: { color: "#fff", width: 1 }
     },
     uniqueValueInfos: [
-      { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:6, color:"#f39c12", outline:{color:"#fff",width:1} } },
-      { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:6, color:"#5DADE2", outline:{color:"#fff",width:1} } },
-      { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:6, color:"#EC7063", outline:{color:"#fff",width:1} } },
-      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:6, color:"#58D68D", outline:{color:"#fff",width:1} } },
-      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:6, color:"#8b5cf6", outline:{color:"#fff",width:1} } }
+      { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:12, color:"#f39c12", outline:{color:"#fff",width:1} } },
+      { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:12, color:"#5DADE2", outline:{color:"#fff",width:1} } },
+      { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:12, color:"#EC7063", outline:{color:"#fff",width:1} } },
+      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:12, color:"#58D68D", outline:{color:"#fff",width:1} } },
+      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:12, color:"#8b5cf6", outline:{color:"#fff",width:1} } }
     ]
   });
 
-  const ZOOM_THRESHOLD = 8;
+  const ZOOM_THRESHOLD = 7;
   let dynamicLayer = null;
   let currentFilter = "";
   
@@ -284,14 +284,14 @@ const siteUrl  = normalizeUrl(rawSite);
   // Helper function to get symbol based on category (same as global layer)
   function getSymbolForCategory(category) {
     const symbolMap = {
-      "Highlight": { type:"simple-marker", style:"circle", size:8, color:"#f39c12", outline:{color:"#fff",width:1} },
-      "Synagogue": { type:"simple-marker", style:"circle", size:8, color:"#5DADE2", outline:{color:"#fff",width:1} },
-      "Heritage": { type:"simple-marker", style:"circle", size:8, color:"#EC7063", outline:{color:"#fff",width:1} },
-      "Kosher Restaurant": { type:"simple-marker", style:"circle", size:8, color:"#58D68D", outline:{color:"#fff",width:1} },
-      "Community": { type:"simple-marker", style:"circle", size:8, color:"#8b5cf6", outline:{color:"#fff",width:1} }
+      "Highlight": { type:"simple-marker", style:"circle", size:12, color:"#f39c12", outline:{color:"#fff",width:1} },
+      "Synagogue": { type:"simple-marker", style:"circle", size:12, color:"#5DADE2", outline:{color:"#fff",width:1} },
+      "Heritage": { type:"simple-marker", style:"circle", size:12, color:"#EC7063", outline:{color:"#fff",width:1} },
+      "Kosher Restaurant": { type:"simple-marker", style:"circle", size:12, color:"#58D68D", outline:{color:"#fff",width:1} },
+      "Community": { type:"simple-marker", style:"circle", size:12, color:"#8b5cf6", outline:{color:"#fff",width:1} }
     };
     
-    return symbolMap[category] || { type:"simple-marker", style:"circle", size:6, color:"#888", outline:{color:"#fff",width:1} };
+    return symbolMap[category] || { type:"simple-marker", style:"circle", size:12, color:"#888", outline:{color:"#fff",width:1} };
   }
 
   async function createDynamicLayer(features) {

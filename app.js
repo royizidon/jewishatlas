@@ -343,7 +343,7 @@ function applyPopupLayout() {
 
   view.popup.dockEnabled = true;
   view.popup.dockOptions = {
-    position: mobile ? "bottom-right" : "top-right",
+    position: mobile ? "bottom" : "top-right",
     breakpoint: false,
     buttonEnabled: false
   };
@@ -360,22 +360,44 @@ function applyPopupLayout() {
   }, 100);
 }
 
-  applyPopupLayout();
-  window.addEventListener("resize", applyPopupLayout);
+applyPopupLayout();
 
-  // Keep uncollapsed
-  view.popup.watch("collapsed", (c) => { if (c) view.popup.collapsed = false; });
-  
-  // *** FIX: Watch popup visibility and force z-index ***
-  view.popup.watch("visible", (isVisible) => {
-    if (isVisible) {
-      setTimeout(() => {
-        if (view.popup?.container) {
-          view.popup.container.style.zIndex = "10020";
-        }
-      }, 50);
+// Reapply layout on window resize
+window.addEventListener("resize", () => {
+  applyPopupLayout();
+
+  // Optional: reapply z-index during resize if popup is open
+  if (view.popup?.visible && view.popup?.container) {
+    view.popup.container.style.zIndex = "10020";
+  }
+});
+
+// Force popup to stay uncollapsed
+view.popup.watch("collapsed", (collapsed) => {
+  if (collapsed) view.popup.collapsed = false;
+});
+
+// Watch popup visibility to fix layout and z-index
+view.popup.watch("visible", (visible) => {
+  if (!visible) return;
+
+  // Fix z-index in case header overlaps
+  setTimeout(() => {
+    if (view.popup?.container) {
+      view.popup.container.style.zIndex = "10020";
     }
-  });
+  }, 50);
+
+  // On small screens, shift center upward to reveal popup
+  if (view.widthBreakpoint === "xsmall") {
+    setTimeout(() => {
+      const center = view.center.clone();
+      center.y += 0.15;
+      view.goTo(center, { animate: false }).catch(() => {});
+    }, 250);
+  }
+});
+
 });
 
 // -------- Optimized Location Tracking with Smart Movement Detection --------
