@@ -225,12 +225,13 @@ const createPopupTemplate = () => ({
     `;
 
     // Mobile-only photo + title (avoid duplicate title on desktop)
-    if (photo && photo.trim()) {
-      html += `
-        <div class="popup-image show-on-mobile" style="background-image:url('${photo.replace(/'/g, "&#39;")}')">
-          <div class="popup-image-overlay"><h2 class="popup-image-title">${name}</h2></div>
-        </div>`;
-    } else {
+if (photo && photo.trim()) {
+  html += `
+    <div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')">
+      <div class="popup-image-overlay"><h2 class="popup-image-title">${name}</h2></div>
+    </div>`;
+}
+else {
       // If no photo, still show a small title on mobile (desktop uses ArcGIS header)
       html += `<div class="mobile-title show-on-mobile"><h2 class="popup-title">${name}</h2></div>`;
     }
@@ -343,13 +344,13 @@ function applyPopupLayout() {
 
   view.popup.dockEnabled = true;
   view.popup.dockOptions = {
-    position: mobile ? "bottom" : "top-right",
+    position: mobile ? "bottom" : "top-center",
     breakpoint: false,
     buttonEnabled: false
   };
 
   if (!mobile) {
-    view.popup.alignment = "top-right";
+    view.popup.alignment = "top-centre";
   }
   
   // *** FIX: Force z-index to be above header ***
