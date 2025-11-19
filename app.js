@@ -179,13 +179,13 @@ const createPopupTemplate = () => ({
 
         /* Desktop: show ArcGIS header, hide our large photo/title, compact width, keep tabs visible */
         @media (min-width: 769px) {
-          .esri-popup__main-container { width: 560px !important; max-width: 560px !important; border-radius: 12px !important; }
+          .esri-popup__main-container { width: 100% !important; max-width: 100% !important; border-radius: 12px !important; }
           .show-on-mobile { display: none !important; }
           .enhanced-popup-container { width: 100%; }
           .popup-category { padding: 8px 16px 8px; }
           .category-badge { font-size: 11px; padding: 3px 10px; }
           .popup-tabs { position: sticky; top: 0; z-index: 1; }
-          .popup-content-wrapper { max-height: 56vh; overflow: auto; -webkit-overflow-scrolling: touch; }
+          .popup-content-wrapper { max-height: 90vh; overflow: auto; -webkit-overflow-scrolling: touch; }
           .tab-button { font-size: 14px; padding: 10px 12px; }
           .info-value { font-size: 14px; }
           /* Clamp long text so user sees some content without scrolling forever */
@@ -200,13 +200,48 @@ const createPopupTemplate = () => ({
         }
 
         /* Common UI */
-        .popup-image { width: 100%; height: 190px; background-size: cover; background-position: center; position: relative; }
-        .popup-image-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,.7), transparent); padding: 16px; }
-        .popup-image-title { color: #fff; font-size: 20px; font-weight: 700; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,.4); }
-        .mobile-title { padding: 12px 16px; }
-        .popup-title { color: #2C3E50; font-size: 20px; font-weight: 600; margin: 0; }
-        .popup-category { padding: 0 16px 8px; }
-        .category-badge { display: inline-block; background: #eef5ff; color: #3367d6; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+       
+/* --- Popup Styling (title below image) --- */
+.popup-image {
+  width: 100%;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.popup-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 12px 16px 4px 16px;
+  line-height: 1.3;
+}
+
+.popup-category {
+  padding: 0 16px 8px 16px;
+}
+
+.category-badge {
+  display: inline-block;
+  background: #eef5ff;
+  color: #3367d6;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.esri-popup__main-container {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25) !important;
+}
+
         .popup-tabs { display: flex; background: #F8F9FA; border-top: 1px solid #E9ECEF; border-bottom: 1px solid #E9ECEF; }
         .tab-button { flex: 1; background: transparent; border: none; padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 14px; color: #6C757D; border-bottom: 3px solid transparent; transition: .2s; }
         .tab-button:hover { background: #F2F4F6; }
@@ -227,14 +262,12 @@ const createPopupTemplate = () => ({
     // Mobile-only photo + title (avoid duplicate title on desktop)
 if (photo && photo.trim()) {
   html += `
-    <div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')">
-      <div class="popup-image-overlay"><h2 class="popup-image-title">${name}</h2></div>
-    </div>`;
+    <div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>
+    <h2 class="popup-title">${name}</h2>
+  `;
+} else {
+  html += `<h2 class="popup-title">${name}</h2>`;
 }
-else {
-      // If no photo, still show a small title on mobile (desktop uses ArcGIS header)
-      html += `<div class="mobile-title show-on-mobile"><h2 class="popup-title">${name}</h2></div>`;
-    }
 
     // Category + Tabs
     html += `
@@ -397,9 +430,53 @@ view.popup.watch("visible", (visible) => {
       view.goTo(center, { animate: false }).catch(() => {});
     }, 250);
   }
-});
 
 });
+
+
+view.popup.watch("visible", (visible) => {
+  if (visible) {
+    setTimeout(() => {
+      const popupEl = document.querySelector(".esri-popup__main-container");
+      if (popupEl && !popupEl.querySelector(".custom-close-btn")) {
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "custom-close-btn";
+        closeBtn.innerHTML = "✕";
+        closeBtn.style.cssText = `
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          z-index: 10051;
+          background: #f0f0f0;
+          border: 1px solid #ddd;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          cursor: pointer;
+          font-size: 20px;
+          color: #333;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          font-weight: bold;
+        `;
+        closeBtn.addEventListener("click", () => {
+          view.popup.close();
+        });
+        popupEl.appendChild(closeBtn);
+      }
+    }, 100);
+  }
+});
+
+
+});
+
+
+
+
+
 
 // -------- Optimized Location Tracking with Smart Movement Detection --------
 

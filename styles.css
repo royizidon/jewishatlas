@@ -549,10 +549,10 @@ html, body {
 @media (min-width: 769px) {
   .esri-popup,
   .esri-popup--is-docked {
-    width: 90vw !important;
-    max-width: 900px !important;
-    height: 90vh !important;
-    max-height: 90vh !important;
+    width: 30vw !important;
+    max-width: none !important;
+    height: 120vh !important;
+    max-height: none !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
@@ -568,9 +568,10 @@ html, body {
     flex-direction: column !important;
   }
 
-  .esri-popup__header {
-    flex-shrink: 0;
-  }
+/* Hide ArcGIS default header (title + close) on all devices */
+.esri-popup__header {
+  display: none !important;
+}
 
   .esri-popup__content {
     flex: 1 1 auto !important;
@@ -587,19 +588,25 @@ html, body {
 /* Mobile: Center the popup and ensure it's above everything */
 @media (max-width: 768px) {
   .esri-popup,
-  .esri-popup--is-docked {
-    z-index: 10020 !important;
+  .esri-popup--is-docked,
+  .esri-popup__main-container {
+    z-index: 10050 !important;
   }
 
-  
-  /* Remove any transform that might conflict with centering */
-  .esri-popup--is-docked-bottom-right,
-  .esri-popup--is-docked-bottom-center,
-  .esri-popup--is-docked-bottom-left {
+  #appHeader {
+    z-index: 1000 !important;  /* Keep header lower */
+  }
+
+  /* Make sure popup isn't docked, use fixed positioning */
+  .esri-popup {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    bottom: auto !important;
+    right: auto !important;
   }
 }
-
 
 /* ========================================
    OPTIONAL: Improve popup on short screens

@@ -1,59 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <!-- FAVICONS -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- META -->
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jewish Atlas - Interactive Map of Jewish Heritage Sites & Communities Worldwide</title>
+  <title>Jewish Atlas | אטלס יהודי - Interactive Map of Jewish Heritage Sites & Communities Worldwide</title>
 
-  <!-- 🌍 English SEO Meta Tags -->
-  <meta name="description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide. Interactive map featuring thousands of Jewish landmarks and cultural sites.">
-  <meta name="keywords" content="jewish map, jewish maps, jewish atlas, jewish heritage, jewish communities, synagogue finder, kosher restaurants, jewish landmarks, jewish history, judaism map">
+  <!-- Performance optimization -->
+  <link rel="preconnect" href="https://js.arcgis.com">
+  <link rel="dns-prefetch" href="https://js.arcgis.com">
+
+  <!-- English description -->
+  <meta name="description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, Jewish travel routes, and communities worldwide. Interactive Jewish map with thousands of heritage and cultural locations.">
+
+  <!-- Hebrew SEO -->
+  <meta name="description" lang="he" content="מפות אתרים יהודיים, מסלולי טיולים יהודיים, בתי כנסת, מסעדות כשרות וקהילות יהודיות ברחבי העולם. מפה אינטראקטיבית של אתרי מורשת ותרבות יהודית.">
+
+  <meta name="keywords" content="jewish map, jewish maps, jewish atlas, jewish heritage, jewish communities, synagogue finder, kosher restaurants, jewish travel, jewish tours, jewish landmarks, jewish history, judaism map, jewish heritage travel, jewish travel guide">
+
   <meta name="robots" content="index, follow">
-
-  <!-- 🌍 Hebrew Meta Tags for SEO -->
-  <meta name="description" lang="he" content="מפות אתרים יהודיים, בתי כנסת, מסעדות כשרות וקהילות יהודיות ברחבי העולם. מפה אינטראקטיבית של מורשת ותרבות יהודית.">
-  <meta name="keywords" lang="he" content="מפות אתרים יהודיים, אתרים יהודיים, בתי כנסת בעולם, מסעדות כשרות, מורשת יהודית, קהילות יהודיות, מפה יהודית, מורשת ישראל, אתרי מורשת יהודית">
 
   <!-- Social Media Tags -->
   <meta property="og:title" content="Jewish Atlas - Interactive Map of Jewish Heritage Sites">
-  <meta property="og:description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide.">
+  <meta property="og:description" content="Explore Jewish heritage sites, synagogues, kosher food, and Jewish travel routes around the world.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://jewishatlas.org/">
+<!-- ✔ Add these two lines here -->
+  <meta property="og:image" content="https://jewishatlas.org/social-preview.png">
+  <meta name="twitter:image" content="https://jewishatlas.org/social-preview.png">
+
+
 
   <!-- Twitter Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Jewish Atlas - Interactive Map of Jewish Heritage Sites">
-  <meta name="twitter:description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide.">
+  <meta name="twitter:description" content="Explore Jewish heritage, kosher food, synagogues, and Jewish travel destinations worldwide.">
 
-  <!-- Structured Data -->
+  <!-- STRUCTURED DATA -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Jewish Atlas",
-    "description": "Interactive map of Jewish heritage sites, synagogues, kosher restaurants, and communities worldwide",
+    "description": "Interactive map of Jewish heritage sites, Jewish travel routes, synagogues, kosher restaurants, and communities worldwide.",
     "url": "https://jewishatlas.org",
     "applicationCategory": "MapApplication",
     "operatingSystem": "Web Browser",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
+    "keywords": [
+      "jewish map", "jewish atlas", "jewish heritage",
+      "synagogue finder", "kosher restaurants",
+      "jewish travel", "jewish tours", "jewish heritage travel"
+    ],
     "featureList": [
       "Jewish heritage sites",
       "Synagogue locations",
       "Kosher restaurant finder",
       "Jewish community centers",
+      "Jewish travel routes",
       "Holocaust memorials",
       "Jewish museums",
       "Interactive mapping"
     ],
-    "keywords": "jewish map, jewish atlas, jewish heritage, synagogue finder, kosher restaurants",
-    "author": {
-      "@type": "Organization",
-      "name": "Jewish Atlas"
-    }
+    "author": { "@type": "Organization", "name": "Jewish Atlas" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
 
@@ -74,7 +91,9 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css"/>
+
 </head>
+
 
 <body>
   <header id="appHeader">
