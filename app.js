@@ -870,7 +870,7 @@ view.when(() => {
         geometry: JSON.stringify(geometryObj),
         geometryType: "esriGeometryEnvelope",
         spatialRel: "esriSpatialRelIntersects",
-        returnGeometry: "true", maxRecordCount: 500
+        returnGeometry: "true", maxRecordCount: 100
       });
       const response = await fetch(window.LANDMARKS_PROXY_URL, {
         method: "POST",
