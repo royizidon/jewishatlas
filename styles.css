@@ -1,3 +1,6 @@
+/* ============================================================
+   BASE LAYOUT
+   ============================================================ */
 html, body {
   margin: 0;
   padding: 0;
@@ -6,14 +9,14 @@ html, body {
   font-family: 'Inter', 'Helvetica Neue', sans-serif;
 }
 
-/* ─── HEADER ───────────────────────────────────────────────────────── */
+/* ─── HEADER ───────────────────────────────────────────────── */
 #appHeader {
   position: fixed;
   top: 0; left: 0; right: 0;
   background: #fff;
   border-bottom: 1px solid #e2e8f0;
   z-index: 1000;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 }
 
 #headerRow1 {
@@ -26,7 +29,7 @@ html, body {
 
 #headerRow2 {
   display: flex;
-  justify-content: flex-start; /* KEY FIX: Changed from center to flex-start */
+  justify-content: flex-start;
   padding: 12px 20px 16px;
   border-top: 1px solid #f1f5f9;
   background: #fafbfc;
@@ -75,12 +78,12 @@ html, body {
   border-color: #cbd5e1;
   color: #334155;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.15);
 }
 
 .navBtn:active {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
 }
 
 /* Search Container */
@@ -89,11 +92,11 @@ html, body {
   min-width: 320px;
 }
 
-/* Simple Filter Container - Just Positioning */
+/* ─── FILTERS ──────────────────────────────────────────────── */
 #filterContainer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start; /* Changed from center to flex-start */
+  justify-content: flex-start;
   gap: 8px;
   padding: 12px 16px;
 }
@@ -126,7 +129,7 @@ html, body {
   color: #fff;
   font-weight: 600;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
 }
 
 /* Category Colors */
@@ -157,14 +160,34 @@ html, body {
   color: #fff;
 }
 
-/* ─── MAP ─────────────────────────────────────────────────────────── */
+/* Desktop: slightly tighter chips */
+@media (min-width: 769px) {
+  #filterContainer {
+    gap: 10px;
+    padding: 5px 16px;
+  }
+
+  .filterBtn {
+    min-height: 34px;
+    padding: 3px 12px;
+    font-size: 13px;
+    border-radius: 16px;
+    min-width: 0;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* ─── MAP ─────────────────────────────────────────────────── */
 #viewDiv {
   position: absolute;
   top: 115px;
   left: 0; right: 0; bottom: 0;
 }
 
-/* ─── RESPONSIVE DESIGN ──────────────────────────────────────────────── */
+/* RESPONSIVE HEADER & FILTERS */
 @media (max-width: 1024px) {
   #headerRow1 {
     flex-direction: column;
@@ -172,85 +195,83 @@ html, body {
     gap: 12px;
     padding: 15px 20px;
   }
-  
+
   #headerLeft {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   #navButtons {
     gap: 8px;
   }
-  
+
   .navBtn {
     padding: 8px 14px;
     font-size: 13px;
   }
-  
+
   #searchContainer {
     width: 100%;
     min-width: 200px;
   }
-  
+
   #filterContainer {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
-  
+
   #viewDiv {
     top: 150px;
   }
 }
 
 @media (max-width: 640px) {
-  /* Header adjustments */
   #headerRow1 {
     padding: 12px 16px;
     gap: 8px;
     flex-wrap: wrap;
     row-gap: 8px;
   }
-  
+
   #headerRow2 {
     padding: 8px 16px 12px;
     justify-content: flex-start;
   }
-  
+
   #headerLeft {
     gap: 16px;
   }
-  
+
   #navButtons {
     gap: 6px;
   }
-  
+
   .navBtn {
     padding: 6px 10px;
     font-size: 12px;
   }
-  
+
   #siteTitle {
     font-size: 22px;
   }
-  
-  /* Search widget */
+
   #searchContainer {
     width: 100%;
     min-width: 0;
     order: 2;
     margin-top: 8px;
   }
-  
+
   #searchContainer .esri-search {
     width: 100%;
   }
-  
+
   #searchContainer .esri-search__input {
     font-size: 14px !important;
     padding: 8px 12px !important;
   }
-  
-  /* Filter buttons - horizontal scroll */
+
+  /* Filter buttons - horizontal scroll on mobile */
   #filterContainer {
     display: flex;
     flex-wrap: nowrap;
@@ -263,11 +284,11 @@ html, body {
     -ms-overflow-style: none;
     order: 4;
   }
-  
+
   #filterContainer::-webkit-scrollbar {
     display: none;
   }
-  
+
   .filterBtn {
     flex: 0 0 auto;
     padding: 6px 12px;
@@ -278,349 +299,396 @@ html, body {
     min-width: fit-content;
     touch-action: manipulation;
   }
-  
-  /* Map position */
+
   #viewDiv {
     top: 120px;
   }
-  
-  /* Header z-index */
+
   #appHeader {
     z-index: 1001;
   }
 }
 
-/* Even smaller screens */
 @media (max-width: 480px) {
   #headerRow1 {
     padding: 10px 12px;
   }
-  
+
   #headerRow2 {
     padding: 6px 12px 10px;
   }
-  
+
   #siteTitle {
     font-size: 20px;
   }
-  
+
   .navBtn {
     padding: 5px 8px;
     font-size: 11px;
   }
-  
+
   .filterBtn {
     padding: 5px 10px;
     font-size: 11px;
     min-height: 30px;
   }
-  
+
   #filterContainer {
     gap: 6px;
     padding: 6px;
   }
-  
+
   #viewDiv {
     top: 110px;
   }
 }
 
-/* Mobile popup full-screen styles */
+/* ============================================================
+   BASEMAP TOGGLE (MOBILE) – keep compact
+   ============================================================ */
 @media (max-width: 768px) {
-  /* AGGRESSIVE FIX - Override all existing filter container styles */
-  /* Reset the parent container that holds filters */
-  #headerRow2 {
-    padding: 8px 0 8px 0 !important;
-    margin: 0 !important;
-    display: flex !important;
-    justify-content: flex-start !important;
-  }
-  
-  #filterContainer {
-    display: flex !important;
-    gap: 8px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    margin-left: 8px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    flex-wrap: nowrap !important;
-    -webkit-overflow-scrolling: touch !important;
-    scroll-behavior: smooth !important;
-    width: calc(100vw - 16px) !important;
-    max-width: calc(100vw - 16px) !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    order: 4 !important;
-    flex-shrink: 0 !important;
-  }
-  
-  #filterContainer::-webkit-scrollbar {
-    display: none !important;
-  }
-  
-  .filterBtn {
-    flex: 0 0 auto !important;
-    padding: 4px 12px !important;
-    font-size: 12px !important;
-    min-height: 32px !important;
-    border-radius: 16px !important;
-    white-space: nowrap !important;
-    min-width: fit-content !important;
-    touch-action: manipulation !important;
-    margin: 0 !important;
-  }
-  
-  .filterBtn:first-child {
-    margin-left: 0 !important;
-    padding-left: 12px !important;
-  }
-
-  /* Create a backdrop overlay */
-  .esri-popup::before {
-    content: '' !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-    z-index: 10001 !important;
-  }
-
-  /* COMPLETE shadow removal for ALL popup elements */
-  .esri-popup,
-  .esri-popup--is-docked,
-  .esri-popup__main-container,
-  .esri-popup__header,
-  .esri-popup__content,
-  .esri-popup__footer,
-  .esri-popup__navigation,
-  .esri-view .esri-popup,
-  #viewDiv .esri-popup {
-    box-shadow: none !important;
-    -webkit-box-shadow: none !important;
-    -moz-box-shadow: none !important;
-    filter: none !important;
-    -webkit-filter: none !important;
-    -moz-filter: none !important;
-  }
-
-  /* Make popup a centered modal */
-  .esri-popup,
-  .esri-popup--is-docked {
-    position: fixed !important;
-    width: 85vw !important;
-    height: 50vh !important;
-    max-width: 420px !important;
-    min-width: 280px !important;
-    max-height: 450px !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    right: auto !important;
-    bottom: auto !important;
-    border-radius: 16px !important;
-    z-index: 10010 !important;
-    background: white !important;
-  }
-
-  .esri-popup__main-container {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    z-index: 10011 !important;
-    padding-top: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  .esri-popup__content {
-    max-height: calc(50vh - 100px) !important;
-    overflow-y: auto !important;
-  }
-
-  /* Clean close button */
-  .esri-popup__button--close,
-  .esri-popup__header .esri-popup__button {
-    display: block !important;
-    position: absolute !important;
-    top: 15px !important;
-    right: 15px !important;
-    z-index: 10012 !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    min-height: 44px !important;
-    min-width: 44px !important;
-    font-size: 24px !important;
-    color: #333 !important;
-    font-weight: bold !important;
-  }
-
-  .esri-popup__navigation {
-    padding: 12px !important;
-    z-index: 10011 !important;
-  }
-
-  .esri-popup__button {
-    min-height: 44px !important;
-    min-width: 44px !important;
-  }
-}
-@media (max-width: 768px) {
-  /* make the toggle a compact square like the other buttons */
   .esri-ui .bm-toggle--mobile.esri-basemap-toggle.esri-widget {
     width: 44px !important;
     height: 44px !important;
-    padding: 0 !important;              /* kill the big inner padding */
-    margin: 0 8px 8px 0 !important;     /* align with the stack margins */
+    padding: 0 !important;
+    margin: 0 8px 8px 0 !important;
     background: #fff !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 8px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,.12) !important;
-    overflow: hidden !important;        /* clip the image corners */
+    box-shadow: 0 2px 6px rgba(15,23,42,.15) !important;
+    overflow: hidden !important;
   }
 
-  /* fill the square with the preview image */
   .esri-ui .bm-toggle--mobile .esri-basemap-toggle__image {
     width: 100% !important;
     height: 100% !important;
     display: block !important;
   }
 
-  /* no title strip under the thumbnail */
   .esri-ui .bm-toggle--mobile .esri-basemap-toggle__title {
     display: none !important;
   }
 }
 
+/* ============================================================
+   POPUP: GLASSMORPHIC CENTERED MODAL (B2)
+   ============================================================ */
 
-
-/* ─── Desktop: tighten filter chips ───────────────────────── */
-@media (min-width: 769px) {
-  #filterContainer {
-    gap: 10px;               /* a bit tighter spacing */
-    padding: 5px 16px;
-  }
-
-  .filterBtn {
-    min-height: 34px;        /* down from 44px */
-    padding: 3px 12px;       /* slimmer pill */
-    font-size: 13px;
-    border-radius: 16px;
-
-    /* prevent “extra-wide” pills on long labels */
-    min-width: 0;            /* overrides any fit-content from mobile */
-    max-width: 220px;        /* adjust to taste */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-/* ========================================
-   FIX: Popup covered by header on mobile
-   ======================================== */
-
-/* Ensure popup appears ABOVE header */
-.esri-popup {
+/* Ensure popup above header */
+.esri-popup,
+.esri-popup--is-docked {
   z-index: 10020 !important;
 }
 
-.esri-popup__main-container {
-  z-index: 10020 !important;
-}
-
-/* Make sure header stays below popup */
-#appHeader {
-  z-index: 1001 !important;
-}
-
-/* Desktop: Position popup below header when docked at top */
-@media (min-width: 769px) {
-  .esri-popup--is-docked-top-right {
-    top: calc(var(--header-h, 115px) + 10px) !important;
-  }
-}
-
-/* Replace in your @media (min-width: 769px) section: */
-
-@media (min-width: 769px) {
-  .esri-popup,
-  .esri-popup--is-docked {
-    width: 30vw !important;
-    max-width: none !important;
-    height: 120vh !important;
-    max-height: none !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 10020 !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  .esri-popup__main-container {
-    height: 100% !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-/* Hide ArcGIS default header (title + close) on all devices */
-.esri-popup__header {
+/* Remove pointer & extra shadow */
+.esri-popup__pointer,
+.esri-popup__button--dock {
   display: none !important;
 }
 
-  .esri-popup__content {
-    flex: 1 1 auto !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding-right: 8px !important;
-  }
-  
-  .popup-content-wrapper {
-    overflow: visible !important;
-  }
+/* Center popup but push it down below the fixed header */
+.esri-popup,
+.esri-popup--is-docked {
+  position: fixed !important;
+
+  /* push downward by half header height */
+  top: calc(50% + var(--header-h) /4) !important;
+
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  right: auto !important;
+  bottom: auto !important;
 }
 
-/* Mobile: Center the popup and ensure it's above everything */
+
+/* Glassmorphic card */
+.esri-popup__main-container {
+  background: rgba(255,255,255,0.86) !important;
+  backdrop-filter: blur(18px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255,255,255,0.75) !important;
+  box-shadow: 0 22px 55px rgba(15,23,42,0.45) !important;
+  width: 420px !important;
+  max-width: 92vw !important;
+  max-height: calc(100vh - var(--header-h) - 30px) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+/* Keep header area slim (ArcGIS header with title) */
+.esri-popup__header {
+  padding: 10px 18px 8px 18px !important;
+  border-bottom: 1px solid rgba(148,163,184,0.25) !important;
+}
+
+/* Keep ArcGIS close button hidden – we use our own */
+.esri-popup__button--close {
+  display: none !important;
+}
+
+/* Content area scrolls — FIXED */
+.esri-popup__content {
+  padding: 0 !important;
+  margin: 0 !important;
+
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  -webkit-overflow-scrolling: touch !important; /* smooth mobile scroll */
+
+  /* height available inside centered popup */
+  max-height: calc(100vh - var(--header-h) - 120px) !important;
+}
+
+/* Navigation footer inside popup (1 of 4, arrows) */
+.esri-popup__footer {
+  border-top: 1px solid rgba(148,163,184,0.18) !important;
+  padding: 8px 12px !important;
+}
+
 @media (max-width: 768px) {
-  .esri-popup,
-  .esri-popup--is-docked,
   .esri-popup__main-container {
-    z-index: 10050 !important;
-  }
+    width: 92vw !important;
+    max-width: 92vw !important;
 
-  #appHeader {
-    z-index: 1000 !important;  /* Keep header lower */
-  }
+    /* FIX: keep your dynamic height formula */
+    max-height: calc(100vh - var(--header-h) - 20px) !important;
 
-  /* Make sure popup isn't docked, use fixed positioning */
-  .esri-popup {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    bottom: auto !important;
-    right: auto !important;
+    border-radius: 16px !important;
   }
 }
 
-/* ========================================
-   OPTIONAL: Improve popup on short screens
-   ======================================== */
-@media (max-height: 500px) and (max-width: 768px) {
-  .esri-popup,
-  .esri-popup--is-docked {
-    height: 90vh !important;
+/* Extra-short screens: allow taller popup */
+@media (max-height: 500px) {
+  .esri-popup__main-container {
     max-height: 90vh !important;
   }
-
-  .esri-popup__content {
-    max-height: calc(90vh - 100px) !important;
-  }
 }
 
+/* ============================================================
+   CUSTOM POPUP INNER DESIGN (your HTML template)
+   ============================================================ */
+
+.enhanced-popup-container {
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+/* Top image */
+.popup-image {
+  width: 100%;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px 16px 8px 8px;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Title – we mainly show this on mobile, but styling is neutral */
+.popup-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #111827;
+  margin: 12px 16px 4px 16px;
+  line-height: 1.3;
+}
+
+/* Category badge */
+.popup-category {
+  padding: 0 16px 8px 16px;
+}
+
+.category-badge {
+  display: inline-block;
+  background: rgba(59,130,246,0.1);
+  color: #2563eb;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Tabs */
+.popup-tabs {
+  display: flex;
+  background: rgba(241,245,249,0.9);
+  border-top: 1px solid rgba(148,163,184,0.2);
+  border-bottom: 1px solid rgba(148,163,184,0.2);
+}
+
+.tab-button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: #6b7280;
+  border-bottom: 3px solid transparent;
+  transition: 0.2s;
+}
+
+.tab-button:hover {
+  background: rgba(226,232,240,0.8);
+}
+
+.tab-button.active {
+  background: #f9fafb;
+  color: #1f2937;
+  border-bottom-color: #2563eb;
+}
+
+/* Content panels */
+.popup-content-wrapper {
+  padding-bottom: 12px;
+}
+
+.tab-content {
+  display: none;
+  padding: 16px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Info sections */
+.info-section {
+  margin-bottom: 12px;
+}
+
+.info-label {
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  color: #111827;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+/* Main buttons */
+.primary-button {
+  display: block;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  margin-top: 12px;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+}
+
+.primary-button:hover {
+  filter: brightness(1.05);
+}
+
+/* Navigation tab buttons */
+.nav-button {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.nav-button.google-maps {
+  background: #22c55e;
+  box-shadow: 0 4px 14px rgba(34,197,94,0.35);
+}
+
+.nav-button.waze {
+  background: #06b6d4;
+  box-shadow: 0 4px 14px rgba(6,182,212,0.35);
+}
+
+.nav-info {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(148,163,184,0.35);
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Feedback panel */
+.feedback-emoji {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.feedback-title {
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.feedback-text {
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+/* ============================================================
+   CUSTOM CLOSE BUTTON (for both desktop & mobile)
+   ============================================================ */
+.custom-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10050;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(148,163,184,0.7);
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(15,23,42,0.30);
+}
+
+.custom-close-btn:hover {
+  background: #f9fafb;
+}
+
+/* Remove ArcGIS title + close button */
+.esri-popup__header.esri-popup__header {
+  display: none !important;
+}
+
+.esri-popup__header-content,
+.esri-popup__header-buttons,
+.esri-popup__button--close {
+  display: none !important;
+}
 

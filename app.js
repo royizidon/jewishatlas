@@ -71,8 +71,11 @@ window.addEventListener('resize', () => {
 
 // -------- Popup Template: compact desktop, full mobile, working Google Maps + Waze --------
 const createPopupTemplate = () => ({
-  title: "{eng_name}", // use ArcGIS header title on desktop
+  title: null, // use ArcGIS header title on desktop
   content: function (feature) {
+     // Detect mobile here — must be inside the function
+       const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
     // --- helpers ---
     function isWebMercatorWkid(wkid) {
       return wkid === 3857 || wkid === 102100 || wkid === 102113 || wkid === 900913;
@@ -170,146 +173,94 @@ const createPopupTemplate = () => ({
     container.className = "enhanced-popup-container";
 
     // HTML (desktop compact; mobile full)
-    let html = `
-      <style>
-        /* Remove default action bar to save space */
-        .esri-popup__actions { display: none !important; }
-        /* Trim default padding and avoid horizontal scroll */
-        .esri-popup__content { padding: 0 !important; overflow-x: hidden !important; }
 
-        /* Desktop: show ArcGIS header, hide our large photo/title, compact width, keep tabs visible */
-        @media (min-width: 769px) {
-          .esri-popup__main-container { width: 100% !important; max-width: 100% !important; border-radius: 12px !important; }
-          .show-on-mobile { display: none !important; }
-          .enhanced-popup-container { width: 100%; }
-          .popup-category { padding: 8px 16px 8px; }
-          .category-badge { font-size: 11px; padding: 3px 10px; }
-          .popup-tabs { position: sticky; top: 0; z-index: 1; }
-          .popup-content-wrapper { max-height: 90vh; overflow: auto; -webkit-overflow-scrolling: touch; }
-          .tab-button { font-size: 14px; padding: 10px 12px; }
-          .info-value { font-size: 14px; }
-          /* Clamp long text so user sees some content without scrolling forever */
-          .clamp-4 { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
-        }
+let html = ``;
 
-        /* Mobile: hide ArcGIS header, use our photo/title block full width */
-        @media (max-width: 768px) {
-          .esri-popup__header { display: none !important; }
-          .esri-popup__main-container { width: 100vw !important; max-width: 100vw !important; border-radius: 12px 12px 0 0 !important; }
-          .esri-popup__content { max-height: calc(100vh - 120px) !important; overflow:auto !important; }
-        }
-
-        /* Common UI */
-       
-/* --- Popup Styling (title below image) --- */
-.popup-image {
-  width: 100%;
-  height: 180px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 12px;
-  margin-top: 6px;
-  overflow: hidden;
-}
-
-.popup-title {
-  font-size: 19px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 12px 16px 4px 16px;
-  line-height: 1.3;
-}
-
-.popup-category {
-  padding: 0 16px 8px 16px;
-}
-
-.category-badge {
-  display: inline-block;
-  background: #eef5ff;
-  color: #3367d6;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.esri-popup__main-container {
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25) !important;
-}
-
-        .popup-tabs { display: flex; background: #F8F9FA; border-top: 1px solid #E9ECEF; border-bottom: 1px solid #E9ECEF; }
-        .tab-button { flex: 1; background: transparent; border: none; padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 14px; color: #6C757D; border-bottom: 3px solid transparent; transition: .2s; }
-        .tab-button:hover { background: #F2F4F6; }
-        .tab-button.active { background: #fff; color: #2C3E50; border-bottom-color: #4575B4; }
-        .tab-content { display: none; padding: 16px; }
-        .tab-content.active { display: block; }
-        .info-section { margin-bottom: 12px; }
-        .info-label { color: #7F8C8D; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
-        .info-value { color: #2C3E50; font-size: 15px; line-height: 1.45; }
-        .primary-button { display: block; background: #4575B4; color: #fff; text-decoration: none; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 15px; margin-top: 12px; box-shadow: 0 2px 8px rgba(69,117,180,.25); }
-        .nav-button { display: block; color: #fff; text-decoration: none; padding: 14px; border-radius: 10px; font-weight: 600; font-size: 16px; text-align: center; margin-bottom: 10px; }
-        .nav-button.google-maps { background: #34A853; box-shadow: 0 3px 10px rgba(52,168,83,.3); }
-        .nav-button.waze { background: #33CCFF; box-shadow: 0 3px 10px rgba(51,204,255,.3); }
-        .nav-info { margin-top: 14px; padding-top: 12px; border-top: 1px solid #E9ECEF; text-align: center; color: #6C757D; font-size: 13px; }
-      </style>
-    `;
-
-    // Mobile-only photo + title (avoid duplicate title on desktop)
+// Image first (on all devices)
 if (photo && photo.trim()) {
   html += `
-    <div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>
-    <h2 class="popup-title">${name}</h2>
+    <div class="popup-image"
+      style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>
   `;
-} else {
-  html += `<h2 class="popup-title">${name}</h2>`;
 }
 
-    // Category + Tabs
-    html += `
-      <div class="popup-category"><span class="category-badge">${category}</span></div>
-      <div class="popup-tabs">
-        <button class="tab-button active" data-tab="info">📍 Info</button>
-        <button class="tab-button" data-tab="navigate">🧭 Navigate</button>
-        <button class="tab-button" data-tab="feedback">💬 Feedback</button>
+// Title below image
+html += `<h2 class="popup-title">${name}</h2>`;
+
+
+
+
+// Category + Tabs
+html += `
+  <div class="popup-category">
+    <span class="category-badge">${category}</span>
+  </div>
+
+  <div class="popup-tabs">
+    <button class="tab-button active" data-tab="info">📍 Info</button>
+    <button class="tab-button" data-tab="navigate">🧭 Navigate</button>
+    <button class="tab-button" data-tab="feedback">💬 Feedback</button>
+  </div>
+
+  <div class="popup-content-wrapper">
+    <div class="tab-content active" data-content="info">
+      <div class="info-section">
+        <div class="info-label">📍 Address</div>
+        <div class="info-value">${fullAddress}</div>
       </div>
 
-      <div class="popup-content-wrapper">
-        <div class="tab-content active" data-content="info">
-          <div class="info-section">
-            <div class="info-label">📍 Address</div>
-<div class="info-value">${fullAddress}</div>
-          </div>
-          ${description?.trim() ? `<div class="info-section"><div class="info-label">ℹ️ About</div><div class="info-value clamp-4">${description}</div></div>` : ""}
-          ${hours?.trim() ? `<div class="info-section"><div class="info-label">🕒 Hours & Fees</div><div class="info-value clamp-4">${hours}</div></div>` : ""}
-          <a href="${googleSearchUrl}" 
-class="primary-button">🔍 Search for More Details</a>
-  ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">🌐 Visit website</a>` : ""}
-        </div>
+      ${description?.trim() ? `
+      <div class="info-section">
+        <div class="info-label">ℹ️ About</div>
+        <div class="info-value clamp-4">${description}</div>
+      </div>` : ""}
 
-        <div class="tab-content" data-content="navigate">
-          <div style="text-align:center;margin-bottom:14px;color:#6C757D;font-size:14px;">Get directions from your current location:</div>
-          <a class="nav-button google-maps" target="_blank" rel="noopener">📍 Directions via Google Maps</a>
-          <a class="nav-button waze" target="_blank" rel="noopener">🚗 Directions via Waze</a>
-          <div class="nav-info">Opens your preferred navigation app</div>
-        </div>
+      ${hours?.trim() ? `
+      <div class="info-section">
+        <div class="info-label">🕒 Hours & Fees</div>
+        <div class="info-value clamp-4">${hours}</div>
+      </div>` : ""}
 
-        <div class="tab-content" data-content="feedback">
-          <div style="text-align:center;">
-            <div style="font-size:42px;margin-bottom:10px;">💬</div>
-            <h3 style="color:#2C3E50;font-size:18px;font-weight:600;margin:0 0 10px;">Help us improve!</h3>
-            <p style="color:#6C757D;font-size:14px;line-height:1.6;margin:0 0 16px;">Found an issue? Have updates to share?</p>
-            <a href="${feedbackUrl}" target="_blank" rel="noopener" class="primary-button" style="background:linear-gradient(135deg,#667eea,#764ba2);">✏️ Submit Feedback</a>
-          </div>
-        </div>
+      <a href="${googleSearchUrl}" class="primary-button">
+        🔍 Search for More Details
+      </a>
+
+      ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">🌐 Visit website</a>` : ""}
+    </div>
+
+    <div class="tab-content" data-content="navigate">
+      <div class="nav-info-top">Get directions from your current location:</div>
+      <a class="nav-button google-maps" target="_blank" rel="noopener">
+        📍 Directions via Google Maps
+      </a>
+      <a class="nav-button waze" target="_blank" rel="noopener">
+        🚗 Directions via Waze
+      </a>
+      <div class="nav-info">Opens your preferred navigation app</div>
+    </div>
+
+    <div class="tab-content" data-content="feedback">
+      <div class="feedback-block">
+        <div class="feedback-emoji">💬</div>
+        <h3 class="feedback-title">Help us improve!</h3>
+        <p class="feedback-text">Found an issue? Have updates to share?</p>
+        <a href="${feedbackUrl}" target="_blank" rel="noopener" class="primary-button feedback-submit">
+          ✏️ Submit Feedback
+        </a>
       </div>
-    `;
+    </div>
+  </div>
+`;
+  
 
     container.innerHTML = html;
+// Add static close button
+const closeBtn = document.createElement("button");
+closeBtn.className = "custom-close-btn";
+closeBtn.textContent = "✕";
+closeBtn.addEventListener("click", () => view.popup.close());
+container.appendChild(closeBtn);
+
 
     // Build nav links after DOM exists
     const { gmaps, waze } = buildNavLinks(feature.graphic, a);
@@ -318,7 +269,6 @@ class="primary-button">🔍 Search for More Details</a>
 
 
 // === Open same tab on mobile, new tab on desktop ===
-const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
 const links = [
   container.querySelector(".nav-button.google-maps"),
@@ -360,17 +310,6 @@ links.forEach((a) => {
 // -------- Popup behavior (valid docking; no duplicate title; compact desktop) --------
 view.when(() => {
   view.popup.collapseEnabled = false;
-/*
-  function applyPopupLayout() {
-    const mobile = window.innerWidth <= 768;
-    view.popup.dockEnabled = mobile;
-    view.popup.dockOptions = {
-      position: mobile ? "bottom-right" : "top-right",
-      breakpoint: mobile ? false : true,
-      buttonEnabled: false
-    };
-  }
-*/
 
 function applyPopupLayout() {
   const mobile = window.innerWidth <= 768;
@@ -383,15 +322,9 @@ function applyPopupLayout() {
   };
 
   if (!mobile) {
-    view.popup.alignment = "top-centre";
+    view.popup.alignment = "top-centr";
   }
   
-  // *** FIX: Force z-index to be above header ***
-  setTimeout(() => {
-    if (view.popup?.container) {
-      view.popup.container.style.zIndex = "10020";
-    }
-  }, 100);
 }
 
 applyPopupLayout();
@@ -399,11 +332,6 @@ applyPopupLayout();
 // Reapply layout on window resize
 window.addEventListener("resize", () => {
   applyPopupLayout();
-
-  // Optional: reapply z-index during resize if popup is open
-  if (view.popup?.visible && view.popup?.container) {
-    view.popup.container.style.zIndex = "10020";
-  }
 });
 
 // Force popup to stay uncollapsed
@@ -415,12 +343,6 @@ view.popup.watch("collapsed", (collapsed) => {
 view.popup.watch("visible", (visible) => {
   if (!visible) return;
 
-  // Fix z-index in case header overlaps
-  setTimeout(() => {
-    if (view.popup?.container) {
-      view.popup.container.style.zIndex = "10020";
-    }
-  }, 50);
 
   // On small screens, shift center upward to reveal popup
   if (view.widthBreakpoint === "xsmall") {
@@ -433,7 +355,7 @@ view.popup.watch("visible", (visible) => {
 
 });
 
-
+/*
 view.popup.watch("visible", (visible) => {
   if (visible) {
     setTimeout(() => {
@@ -442,25 +364,7 @@ view.popup.watch("visible", (visible) => {
         const closeBtn = document.createElement("button");
         closeBtn.className = "custom-close-btn";
         closeBtn.innerHTML = "✕";
-        closeBtn.style.cssText = `
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          z-index: 10051;
-          background: #f0f0f0;
-          border: 1px solid #ddd;
-          border-radius: 50%;
-          width: 36px;
-          height: 36px;
-          cursor: pointer;
-          font-size: 20px;
-          color: #333;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0;
-          font-weight: bold;
-        `;
+       
         closeBtn.addEventListener("click", () => {
           view.popup.close();
         });
@@ -469,7 +373,7 @@ view.popup.watch("visible", (visible) => {
     }, 100);
   }
 });
-
+*/
 
 });
 
@@ -666,20 +570,6 @@ locateBtn.title = "Show my location";
 locateBtn.setAttribute("aria-label", "Location tracking");
 locateBtn.setAttribute("aria-pressed", "false");
 
-// Add pulsing animation CSS
-const style = document.createElement('style');
-style.textContent = `
-  .esri-icon-locate.is-tracking {
-    animation: pulse 2s infinite;
-    color: #4285F4;
-  }
-  @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 1; }
-  }
-`;
-document.head.appendChild(style);
 
 // Button click handler
 locateBtn.addEventListener("click", () => {
@@ -855,36 +745,44 @@ view.when(() => {
   // ensure projection is loaded before we project extents
   projection.load().catch(console.error);
 
-  // -------- Dynamic points via proxy --------
-  async function loadDynamicPoints() {
-    try {
-      const extent = view.extent;
-      const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
-      const geometryObj = {
-        xmin: wgs84Extent.xmin, ymin: wgs84Extent.ymin,
-        xmax: wgs84Extent.xmax, ymax: wgs84Extent.ymax,
-        spatialReference: { wkid: 4326 }
-      };
-      const requestBody = new URLSearchParams({
-        f: "json", where: "1=1", outFields: "*",
-        geometry: JSON.stringify(geometryObj),
-        geometryType: "esriGeometryEnvelope",
-        spatialRel: "esriSpatialRelIntersects",
-        returnGeometry: "true", maxRecordCount: 100
-      });
-      const response = await fetch(window.LANDMARKS_PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: requestBody
-      });
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      const data = await response.json();
-      return data.features || [];
-    } catch (err) {
-      console.error("Error loading dynamic points:", err);
-      return [];
-    }
+async function loadDynamicPoints(maxPoints) {
+  try {
+    const extent = view.extent;
+    const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
+    const geometryObj = {
+      xmin: wgs84Extent.xmin, ymin: wgs84Extent.ymin,
+      xmax: wgs84Extent.xmax, ymax: wgs84Extent.ymax,
+      spatialReference: { wkid: 4326 }
+    };
+
+    const requestBody = new URLSearchParams({
+      f: "json",
+      where: "1=1",
+      outFields: "*",
+      geometry: JSON.stringify(geometryObj),
+      geometryType: "esriGeometryEnvelope",
+      spatialRel: "esriSpatialRelIntersects",
+      returnGeometry: "true",
+      resultRecordCount: maxPoints,       // 👈 CONTROL HERE
+      maxRecordCount: maxPoints           // 👈 ALSO HERE TO BE SAFE
+    });
+
+    const response = await fetch(window.LANDMARKS_PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: requestBody
+    });
+
+    if (!response.ok) throw new Error("HTTP " + response.status);
+
+    const data = await response.json();
+    return data.features || [];
+
+  } catch (err) {
+    console.error("Error loading dynamic points:", err);
+    return [];
   }
+}
 
   function getSymbolForCategory(category) {
     const symbolMap = {
@@ -918,17 +816,41 @@ view.when(() => {
     layer.graphics.forEach((g) => { g.visible = !category || g.attributes.main_category === category; });
   }
 
-  let loadingDynamic = false;
-  view.watch("zoom", async (z) => {
-    if (z > ZOOM_THRESHOLD && !loadingDynamic) {
-      loadingDynamic = true;
-      try { await createDynamicLayer(await loadDynamicPoints()); }
-      catch (e) { console.error("Dynamic load error:", e); }
-      finally { loadingDynamic = false; }
-    } else if (z <= ZOOM_THRESHOLD && dynamicLayer) {
-      map.remove(dynamicLayer); dynamicLayer = null;
+let loadingDynamic = false;
+
+view.watch("zoom", async (zoomLevel) => {
+  let maxPoints = 0;
+
+  // Decide how many points to load based on zoom
+  if (zoomLevel >= 13) {
+    maxPoints = 300;
+  } else if (zoomLevel >= 10) {
+    maxPoints = 200;
+  } else if (zoomLevel >= 8) {
+    maxPoints = 100;
+  } else {
+    // Too far out → remove dynamic layer
+    if (dynamicLayer) {
+      map.remove(dynamicLayer);
+      dynamicLayer = null;
     }
-  });
+    return;
+  }
+
+  // Prevent duplicate loads
+  if (loadingDynamic) return;
+  loadingDynamic = true;
+
+  try {
+    const features = await loadDynamicPoints(maxPoints);   // 👈 Use new signature
+    await createDynamicLayer(features);
+  } catch (e) {
+    console.error("Dynamic load error:", e);
+  } finally {
+    loadingDynamic = false;
+  }
+});
+
 
   // clicks: prefer dynamic layer when present
   view.on("click", async (event) => {
