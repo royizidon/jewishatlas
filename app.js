@@ -11,6 +11,260 @@
 // Catch uncaught errors early
 window.addEventListener("error", (e) => console.error("[window.error]", e.message, e.error));
 
+// ========================================
+// PART 1: Shared Geolocation Utilities
+// ========================================
+
+const GeoUtils = {
+  // Web Mercator WKID values (different representations of same projection)
+  WEB_MERCATOR_WKIDS: [3857, 102100, 102113, 900913],
+  
+  /**
+   * Check if a WKID is Web Mercator (used by many map services)
+   */
+  isWebMercatorWkid(wkid) {
+    return this.WEB_MERCATOR_WKIDS.includes(wkid);
+  },
+
+  /**
+   * Extract a Point geometry from various geometry types
+   * Handles: point, polygon (via centroid), envelope (via center)
+   */
+  getPointFromGeometry(geom) {
+    if (!geom) return null;
+    if (geom.type === "point") return geom;
+    if (geom.extent?.center) return geom.extent.center;
+    if (geom.centroid) return geom.centroid;
+    return null;
+  },
+
+  /**
+   * Convert any projected point to WGS84 [latitude, longitude]
+   * Handles Web Mercator & WGS84 natively; attempts best-effort for others
+   * @returns {[number, number]} [lat, lon] or [null, null] if invalid
+   */
+  toLatLon(point) {
+    if (!point) return [null, null];
+
+    const wkid = point.spatialReference?.wkid;
+
+    // Already WGS84
+    if (wkid === 4326) {
+      return [Number(point.y), Number(point.x)];
+    }
+
+    // Web Mercator → WGS84 (Spherical Mercator)
+    if (this.isWebMercatorWkid(wkid)) {
+      const metersPerDegree = 20037508.34;
+      const lon = (point.x * 180) / metersPerDegree;
+      const latRad = (point.y * Math.PI) / metersPerDegree;
+      const lat = (180 / Math.PI) * (2 * Math.atan(Math.exp(latRad)) - Math.PI / 2);
+      return [lat, lon];
+    }
+
+    // Fallback: assume point.y is lat, point.x is lon
+    return [Number(point.y), Number(point.x)];
+  },
+
+  /**
+   * Format coordinates to fixed decimal places
+   * @param {number} value
+   * @param {number} decimals - default 6
+   * @returns {string}
+   */
+  formatCoord(value, decimals = 6) {
+    return Number(value).toFixed(decimals);
+  },
+
+  /**
+   * Build a clean label from address components
+   * Filters out null/empty values and joins with comma
+   */
+  buildLabel(components) {
+    return components.filter(Boolean).join(", ");
+  }
+};
+
+// ========================================
+// PART 2: Cached Mobile Detection
+// ========================================
+
+const DeviceInfo = {
+  // Cache the computed value
+  _isMobile: null,
+  _mediaQuery: null,
+
+  /**
+   * Initialize device detection and listen for changes
+   * Call this once on app startup
+   */
+  init() {
+    this._mediaQuery = window.matchMedia("(max-width: 768px)");
+    this._isMobile = this._mediaQuery.matches;
+
+    // Listen for orientation changes & resize
+    this._mediaQuery.addListener(() => {
+      this._isMobile = this._mediaQuery.matches;
+    });
+
+    return this._isMobile;
+  },
+
+  /**
+   * Get cached mobile status
+   * @returns {boolean}
+   */
+  isMobile() {
+    // If init() wasn't called, do it now (fallback)
+    if (this._isMobile === null) {
+      this.init();
+    }
+    return this._isMobile;
+  },
+
+  /**
+   * Alternative: user-agent check (for cases where matchMedia is unreliable)
+   * More comprehensive than matchMedia alone
+   */
+  isMobileUserAgent() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  },
+
+  /**
+   * Comprehensive check: use both methods
+   */
+  isMobileComprehensive() {
+    return this.isMobile() || this.isMobileUserAgent();
+  }
+};
+
+// ========================================
+// PART 3: Safe Geolocation Watch Manager
+// ========================================
+
+const GeolocationManager = {
+  watchId: null,
+  isWatching: false,
+
+  /**
+   * Safely start watching position
+   * Handles cleanup of previous watch automatically
+   */
+  startWatch(successCallback, errorCallback, options = {}) {
+    if (!("geolocation" in navigator)) {
+      console.warn("Geolocation not available");
+      return null;
+    }
+
+    // Clean up any existing watch
+    this.stopWatch();
+
+    const defaultOptions = {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000,
+      ...options
+    };
+
+    try {
+      this.watchId = navigator.geolocation.watchPosition(
+        successCallback,
+        (error) => {
+          console.warn("Geolocation error:", error.message || error);
+          if (errorCallback) errorCallback(error);
+        },
+        defaultOptions
+      );
+
+      this.isWatching = this.watchId !== null;
+      return this.watchId;
+    } catch (error) {
+      console.error("Failed to start geolocation watch:", error);
+      return null;
+    }
+  },
+
+  /**
+   * Safely stop watching position
+   * Gracefully handles errors and null states
+   */
+  stopWatch() {
+    if (this.watchId === null || this.watchId === undefined) {
+      return;
+    }
+
+    try {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.isWatching = false;
+    } catch (error) {
+      console.warn("Error clearing geolocation watch:", error.message || error);
+    } finally {
+      this.watchId = null;
+    }
+  },
+
+  /**
+   * Get one-time position (no watch)
+   */
+  getCurrentPosition(options = {}) {
+    if (!("geolocation" in navigator)) {
+      return Promise.reject(new Error("Geolocation not available"));
+    }
+
+    const defaultOptions = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 5000,
+      ...options
+    };
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos),
+        (err) => {
+          console.warn("getCurrentPosition error:", err.message || err);
+          reject(err);
+        },
+        defaultOptions
+      );
+    });
+  }
+};
+
+// ========================================
+// PART 4: Usage Examples in Your App
+// ========================================
+
+// On app startup (in your require() block):
+DeviceInfo.init(); // Cache mobile detection once
+
+
+// Starting geolocation tracking:
+GeolocationManager.startWatch(
+  (position) => {
+    const { latitude, longitude } = position.coords;
+    // Handle position update
+    updateLocationMarker(latitude, longitude);
+  },
+  (error) => {
+    console.error("Tracking error:", error);
+  }
+);
+
+// Stopping tracking (safe even if not started):
+GeolocationManager.stopWatch();
+
+// Getting one-time position:
+GeolocationManager.getCurrentPosition()
+  .then(pos => {
+    console.log(pos.coords.latitude, pos.coords.longitude);
+  })
+  .catch(err => {
+    console.error("Could not get position:", err);
+  });
+
 require([
   "esri/Map",
   "esri/views/MapView",
@@ -77,60 +331,33 @@ const createPopupTemplate = () => ({
        const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
     // --- helpers ---
-    function isWebMercatorWkid(wkid) {
-      return wkid === 3857 || wkid === 102100 || wkid === 102113 || wkid === 900913;
-    }
-    function getPointFromGeometry(geom) {
-      if (!geom) return null;
-      if (geom.type === "point") return geom;
-      if (geom.extent?.center) return geom.extent.center;
-      if (geom.centroid) return geom.centroid;
-      return null;
-    }
-    function toLatLon(point) {
-      if (!point) return [null, null];
-      const wkid = point.spatialReference?.wkid;
-      if (wkid === 4326) return [Number(point.y), Number(point.x)];
-      if (isWebMercatorWkid(wkid)) {
-        const lon = point.x * 180 / 20037508.34;
-        const latRad = point.y * Math.PI / 20037508.34;
-        const lat = (180 / Math.PI) * (2 * Math.atan(Math.exp(latRad)) - Math.PI / 2);
-        return [lat, lon];
-      }
-      return [Number(point.y), Number(point.x)];
-    }
-    function buildLabel(a) {
-      return [a.eng_name, a.Address, a.city].filter(Boolean).join(", ");
-    }
-    function buildNavLinks(graphic, attrs) {
-  // ----- get destination (lat,lon in WGS84) -----
-  function isWM(wkid){ return wkid===3857 || wkid===102100 || wkid===102113 || wkid===900913; }
-  function getPoint(g){ if (!g) return null; if (g.type==="point") return g; if (g.extent?.center) return g.extent.center; return g.centroid || null; }
-  const pt = getPoint(graphic.geometry);
 
-  let lat=null, lon=null;
-  if (pt) {
-    const wkid = pt.spatialReference?.wkid;
-    if (wkid === 4326) { lat = Number(pt.y); lon = Number(pt.x); }
-    else if (isWM(wkid)) {
-      lon = pt.x * 180 / 20037508.34;
-      const yRad = pt.y * Math.PI / 20037508.34;
-      lat = (180/Math.PI) * (2 * Math.atan(Math.exp(yRad)) - Math.PI/2);
-    } else { lat = Number(pt.y); lon = Number(pt.x); } // best effort
-  }
+
+
+
+   function buildNavLinks(graphic, attrs) {
+  // Extract point (handles point / polygon / centroid)
+  const pt = GeoUtils.getPointFromGeometry(graphic.geometry);
+
+  // Convert to lat/lon in WGS84
+  const [lat, lon] = GeoUtils.toLatLon(pt);
   const hasCoords = Number.isFinite(lat) && Number.isFinite(lon);
 
-  // ----- build a clean label as fallback -----
-  const label = [attrs.eng_name, attrs.Address, attrs.city].filter(Boolean).join(", ") || "Destination";
+  // Build clean label fallback
+  const label = GeoUtils.buildLabel([
+    attrs.eng_name,
+    attrs.Address || attrs.address,
+    attrs.city
+  ]) || "Destination";
+
   const encLabel = encodeURIComponent(label);
 
-  // ----- Google Maps (universal) -----
+  // Google Maps URL
   const gmaps = hasCoords
     ? `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${lat.toFixed(6)},${lon.toFixed(6)}&travelmode=driving`
     : `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${encLabel}&travelmode=driving`;
 
-  // ----- Waze (use HTTPS universal link everywhere) -----
-  // Works on iOS/Android/desktop and avoids the "black screen" from the custom scheme.
+  // Waze URL
   const waze = hasCoords
     ? `https://waze.com/ul?ll=${lat.toFixed(6)},${lon.toFixed(6)}&navigate=yes&z=16`
     : `https://waze.com/ul?q=${encLabel}&navigate=yes&z=16`;
@@ -322,7 +549,7 @@ function applyPopupLayout() {
   };
 
   if (!mobile) {
-    view.popup.alignment = "top-centr";
+    view.popup.alignment = "top-center";
   }
   
 }
@@ -745,15 +972,36 @@ view.when(() => {
   // ensure projection is loaded before we project extents
   projection.load().catch(console.error);
 
+
+function shrinkExtent(extent, factor = 0.7) {
+  const dx = (extent.xmax - extent.xmin) * (1 - factor) / 2;
+  const dy = (extent.ymax - extent.ymin) * (1 - factor) / 2;
+
+  return {
+    xmin: extent.xmin + dx,
+    ymin: extent.ymin + dy,
+    xmax: extent.xmax - dx,
+    ymax: extent.ymax - dy,
+    spatialReference: extent.spatialReference
+  };
+}
+
 async function loadDynamicPoints(maxPoints) {
   try {
     const extent = view.extent;
     const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
-    const geometryObj = {
-      xmin: wgs84Extent.xmin, ymin: wgs84Extent.ymin,
-      xmax: wgs84Extent.xmax, ymax: wgs84Extent.ymax,
-      spatialReference: { wkid: 4326 }
-    };
+
+// shrink the extent to reduce request size
+const shrunk = shrinkExtent(wgs84Extent, 0.7);  // ← 70% of screen
+
+const geometryObj = {
+  xmin: shrunk.xmin,
+  ymin: shrunk.ymin,
+  xmax: shrunk.xmax,
+  ymax: shrunk.ymax,
+  spatialReference: { wkid: 4326 }
+};
+
 
     const requestBody = new URLSearchParams({
       f: "json",
@@ -810,60 +1058,117 @@ async function loadDynamicPoints(maxPoints) {
     if (currentFilter) applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
     map.add(dynamicLayer);
   }
-
-  function applyFilterToGraphicsLayer(layer, category) {
-    if (!layer || !layer.graphics) return;
-    layer.graphics.forEach((g) => { g.visible = !category || g.attributes.main_category === category; });
-  }
+function applyFilterToGraphicsLayer(layer, category) {
+  if (!layer || !layer.graphics) return;
+  layer.graphics.forEach((g) => {
+    g.visible = !category || g.attributes.main_category === category;
+  });
+}
 
 let loadingDynamic = false;
+let pendingDynamicTimer = null;
 
-view.watch("zoom", async (zoomLevel) => {
+/// Unified dynamic loader
+async function loadDynamicForView() {
+  dynamicReady = false;   // 🚀 block click popups while loading
+
+  const zoomLevel = view.zoom;
   let maxPoints = 0;
 
-  // Decide how many points to load based on zoom
-  if (zoomLevel >= 13) {
-    maxPoints = 300;
-  } else if (zoomLevel >= 10) {
-    maxPoints = 200;
-  } else if (zoomLevel >= 8) {
-    maxPoints = 100;
-  } else {
-    // Too far out → remove dynamic layer
+  if (zoomLevel >= 13) maxPoints = 300;
+  else if (zoomLevel >= 10) maxPoints = 200;
+  else if (zoomLevel >= 8) maxPoints = 100;
+  else {
     if (dynamicLayer) {
       map.remove(dynamicLayer);
       dynamicLayer = null;
     }
+    dynamicReady = true;   // ⭐ re-enable click popups
     return;
   }
 
-  // Prevent duplicate loads
-  if (loadingDynamic) return;
+  if (loadingDynamic) {
+    dynamicReady = true;   // ⭐ must re-enable if skipped
+    return;
+  }
   loadingDynamic = true;
 
   try {
-    const features = await loadDynamicPoints(maxPoints);   // 👈 Use new signature
+    const features = await loadDynamicPoints(maxPoints);
     await createDynamicLayer(features);
+
+    // Re-apply filter AFTER dynamic layer loads
+    if (currentFilter) {
+      applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
+    }
+
   } catch (e) {
     console.error("Dynamic load error:", e);
+
   } finally {
     loadingDynamic = false;
+    dynamicReady = true;   // ⭐ CRITICAL: allow popups again
   }
+}
+
+// --- Smart Dynamic Loader Triggers ---
+
+view.watch("stationary", (isStationary) => {
+  if (!isStationary) return;       // only trigger ONCE when finished
+  if (view.interacting) return;    // skip if user has fingers on the screen
+
+  clearTimeout(pendingDynamicTimer);
+  pendingDynamicTimer = setTimeout(loadDynamicForView, 100);
 });
 
 
-  // clicks: prefer dynamic layer when present
-  view.on("click", async (event) => {
-    try {
-      const { results } = await view.hitTest(event);
-      if (dynamicLayer) {
-        const hit = results.find((r) => r.graphic && r.graphic.layer === dynamicLayer);
-        if (hit) { view.popup.open({ features: [hit.graphic], location: event.mapPoint }); return; }
+// 2) Backup trigger: catches Search widget or abrupt animation end
+view.watch("animating", (animating) => {
+  if (!animating) {
+    clearTimeout(pendingDynamicTimer);
+    pendingDynamicTimer = setTimeout(loadDynamicForView, 100);
+  }
+});
+
+/// === MOBILE-SAFE CLICK HANDLER ===
+view.on("click", async (event) => {
+  try {
+
+    // Do NOT process clicks while dynamic layer is rebuilding
+    if (!dynamicReady) return;
+
+    // Much better for mobile accuracy!
+    const { results } = await view.hitTest(event, { tolerance: 12 });
+
+    // 1. Prefer dynamic layer hits
+    if (dynamicLayer) {
+      const hit = results.find(
+        (r) => r.graphic && r.graphic.layer === dynamicLayer
+      );
+      if (hit) {
+        view.popup.open({
+          features: [hit.graphic],
+          location: event.mapPoint
+        });
+        return;
       }
-      const globalHit = results.find((r) => r.graphic && r.graphic.layer === globalLayer);
-      if (globalHit) view.popup.open({ features: [globalHit.graphic], location: event.mapPoint });
-    } catch (error) { console.error("Error handling click:", error); }
-  });
+    }
+
+    // 2. Fallback to global layer
+    const globalHit = results.find(
+      (r) => r.graphic && r.graphic.layer === globalLayer
+    );
+    if (globalHit) {
+      view.popup.open({
+        features: [globalHit.graphic],
+        location: event.mapPoint
+      });
+    }
+
+  } catch (error) {
+    console.error("Error handling click:", error);
+  }
+});
 
   // -------- Filters UI (render + wire) --------
   const filterDiv = document.getElementById("filterContainer");

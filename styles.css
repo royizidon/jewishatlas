@@ -420,16 +420,13 @@ html, body {
   padding: 0 !important;
 }
 
-/* Keep header area slim (ArcGIS header with title) */
+/* 
+Keep header area slim (ArcGIS header with title)
 .esri-popup__header {
   padding: 10px 18px 8px 18px !important;
   border-bottom: 1px solid rgba(148,163,184,0.25) !important;
 }
-
-/* Keep ArcGIS close button hidden – we use our own */
-.esri-popup__button--close {
-  display: none !important;
-}
+*/
 
 /* Content area scrolls — FIXED */
 .esri-popup__content {
@@ -681,14 +678,27 @@ html, body {
   background: #f9fafb;
 }
 
-/* Remove ArcGIS title + close button */
-.esri-popup__header.esri-popup__header {
+/* Hide ArcGIS close button ONLY for feature popups */
+.esri-popup--feature .esri-popup__button--close {
   display: none !important;
 }
 
-.esri-popup__header-content,
-.esri-popup__header-buttons,
-.esri-popup__button--close {
+
+
+/* Hide header ONLY for your landmark popups */
+.esri-popup--feature .esri-popup__header {
   display: none !important;
 }
+
+/* Keep the pointer & dock button hidden everywhere (fine) */
+.esri-popup__pointer,
+.esri-popup__button--dock {
+  display: none !important;
+}
+
+/* Allow taps to reach map when popup is hidden */
+.esri-popup:not(.esri-popup--visible) {
+  pointer-events: none !important;
+}
+
 
