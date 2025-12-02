@@ -1067,6 +1067,22 @@ function applyFilterToGraphicsLayer(layer, category) {
 
 let loadingDynamic = false;
 let pendingDynamicTimer = null;
+let dynamicReady = true; 
+
+// ===== Extent-key anti-spam system =====
+let lastDynZoom = null;
+let lastDynKey = null;
+let dynTimer = null;
+
+function getExtentKey(extent) {
+  return [
+    Math.round(extent.xmin * 100) / 100,
+    Math.round(extent.ymin * 100) / 100,
+    Math.round(extent.xmax * 100) / 100,
+    Math.round(extent.ymax * 100) / 100
+  ].join(",");
+}
+
 
 /// Unified dynamic loader
 async function loadDynamicForView() {
@@ -1111,23 +1127,50 @@ async function loadDynamicForView() {
   }
 }
 
+
+async function tryDynamicLoad() {
+  const z = view.zoom;
+
+  // Disable dynamic layer below threshold
+  if (z < 8) {
+    if (dynamicLayer) {
+      map.remove(dynamicLayer);
+      dynamicLayer = null;
+    }
+    dynamicReady = true; 
+    return;
+  }
+
+  const key = getExtentKey(view.extent);
+
+  // Skip duplicates
+  if (lastDynZoom === z && lastDynKey === key) {
+    return;
+  }
+
+  lastDynZoom = z;
+  lastDynKey = key;
+
+  await loadDynamicForView();
+}
+
+
+
 // --- Smart Dynamic Loader Triggers ---
+// ===== Improved dynamic layer trigger =====
 
-view.watch("stationary", (isStationary) => {
-  if (!isStationary) return;       // only trigger ONCE when finished
-  if (view.interacting) return;    // skip if user has fingers on the screen
+view.watch("stationary", (still) => {
+  if (!still || view.interacting) return;
 
-  clearTimeout(pendingDynamicTimer);
-  pendingDynamicTimer = setTimeout(loadDynamicForView, 100);
+  clearTimeout(dynTimer);
+  dynTimer = setTimeout(tryDynamicLoad, 350);
 });
 
+view.watch("animating", (anim) => {
+  if (anim) return;
 
-// 2) Backup trigger: catches Search widget or abrupt animation end
-view.watch("animating", (animating) => {
-  if (!animating) {
-    clearTimeout(pendingDynamicTimer);
-    pendingDynamicTimer = setTimeout(loadDynamicForView, 100);
-  }
+  clearTimeout(dynTimer);
+  dynTimer = setTimeout(tryDynamicLoad, 350);
 });
 
 /// === MOBILE-SAFE CLICK HANDLER ===
@@ -1207,6 +1250,9 @@ view.on("click", async (event) => {
           buttons.forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           filterDiv.classList.toggle("filtered", !!cat);
+	  
+	  clearTimeout(dynTimer);
+	  dynTimer = setTimeout(tryDynamicLoad, 100);
         });
       });
     };
