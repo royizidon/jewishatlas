@@ -103,7 +103,7 @@ const DeviceInfo = {
     this._isMobile = this._mediaQuery.matches;
 
     // Listen for orientation changes & resize
-    this._mediaQuery.addListener(() => {
+    this._mediaQuery.addEventListener("change", () => {
       this._isMobile = this._mediaQuery.matches;
     });
 
@@ -328,7 +328,7 @@ const createPopupTemplate = () => ({
   title: null, // use ArcGIS header title on desktop
   content: function (feature) {
      // Detect mobile here — must be inside the function
-       const isMobile = window.matchMedia("(max-width: 768px)").matches;
+       const isMobile = DeviceInfo.isMobile();
 
     // --- helpers ---
 
@@ -539,7 +539,7 @@ view.when(() => {
   view.popup.collapseEnabled = false;
 
 function applyPopupLayout() {
-  const mobile = window.innerWidth <= 768;
+  const mobile = DeviceInfo.isMobile();
 
   view.popup.dockEnabled = true;
   view.popup.dockOptions = {
@@ -603,8 +603,6 @@ view.popup.watch("visible", (visible) => {
 */
 
 });
-
-
 
 
 
@@ -673,12 +671,6 @@ const THROTTLE_MS  = 10000;  // ≥ 10s between accepted updates
 const MIN_MOVE_M   = 10;     // ≥ 10 m movement required
 const MAX_STALE_MS = 60000;  // force an update at least every 60s (even if not moving)
 
-// Modern mobile detection
-function isMobileDevice() {
-  return window.matchMedia("(max-width: 768px)").matches ||
-         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
 // Haversine distance in meters
 function haversineMeters(lat1, lon1, lat2, lon2) {
   const R = 6371000, toRad = d => d * Math.PI / 180;
@@ -718,7 +710,7 @@ function updateLocation(centerOnFirst = false) {
       updateLocationMarker(latitude, longitude);
 
       // Center map only on first location in mobile
-      if (centerOnFirst && !hasInitiallyCentered && isMobileDevice()) {
+      if (centerOnFirst && !hasInitiallyCentered && DeviceInfo.isMobile()) {
         view.goTo({ center: [longitude, latitude], zoom: 15 }, { duration: 800, easing: "ease-in-out" })
           .then(() => { hasInitiallyCentered = true; })
           .catch(() => {});
@@ -851,7 +843,7 @@ document.addEventListener("visibilitychange", () => {
 
 // Auto-start on mobile (respect permissions)
 view.when(() => {
-  if (!isMobileDevice() || !("geolocation" in navigator)) return;
+  if (!DeviceInfo.isMobile() || !("geolocation" in navigator)) return;
 
   setTimeout(() => {
     if (navigator.permissions && navigator.permissions.query) {
@@ -887,7 +879,7 @@ window.centerOnLocation = centerOnLocation;
 
 /* === Basemap control: Toggle on mobile, Gallery on desktop === */
 function mountBasemapControl() {
-  const isMobile = window.innerWidth <= 768;
+  const isMobile = DeviceInfo.isMobile();
 
   // remove existing control cleanly
   if (window.__bmControl) {
@@ -1078,17 +1070,15 @@ view.container.addEventListener("touchend", () => {
   lastTouchEnd = Date.now();
 }, { passive: true });
 
-function isMobileDevice() {
-  return window.matchMedia("(max-width: 768px)").matches ||
-         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-// ===== Extent-key anti-spam system =====
+// ===== IMPROVED: Extent-key anti-spam system =====
 let lastDynZoom = null;
 let lastDynKey = null;
 let dynTimer = null;
+let lastDynLoadTime = 0;           // ← NEW: throttle successive loads
+const MIN_LOAD_INTERVAL = 2000;     // ← NEW: wait 2s between loads
 
 function getExtentKey(extent) {
-  const decimals = isMobileDevice() ? 1 : 2;
+  const decimals = DeviceInfo.isMobile() ? 0 : 2;  // ← CHANGED: 0 decimals for mobile (much coarser)
   const multiplier = Math.pow(10, decimals);
   
   return [
@@ -1133,6 +1123,8 @@ async function loadDynamicForView() {
     if (currentFilter) {
       applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
     }
+    
+    lastDynLoadTime = Date.now();  // ← NEW: record load time
 
   } catch (e) {
     console.error("Dynamic load error:", e);
@@ -1157,6 +1149,12 @@ async function tryDynamicLoad() {
     return;
   }
 
+  // ← NEW: Throttle successive loads (prevent spam during pinch zoom)
+  const timeSinceLastLoad = Date.now() - lastDynLoadTime;
+  if (timeSinceLastLoad < MIN_LOAD_INTERVAL) {
+    return;
+  }
+
   const key = getExtentKey(view.extent);
 
   // Skip duplicates
@@ -1173,25 +1171,33 @@ async function tryDynamicLoad() {
 function shouldTriggerDynamicLoad() {
   if (isTouching) return false;
   if (Date.now() - lastTouchEnd < 600) return false;
-  if (!isMobileDevice() && view.interacting) return false;
+  if (!DeviceInfo.isMobile() && view.interacting) return false;
   return true;
 }
 
 // --- Smart Dynamic Loader Triggers ---
-// ===== Improved dynamic layer trigger =====
+// ===== IMPROVED: Deduplicated watchers =====
+
+let statTimer = null;
+let animTimer = null;
 
 view.watch("stationary", (still) => {
+  clearTimeout(statTimer);
+  clearTimeout(animTimer);  // ← NEW: clear anim timer too
+  
   if (!still) return;
   if (!shouldTriggerDynamicLoad()) return;
-  clearTimeout(dynTimer);
-  dynTimer = setTimeout(tryDynamicLoad, 350);
+  
+  statTimer = setTimeout(tryDynamicLoad, 500);  // ← INCREASED: 500ms
 });
 
 view.watch("animating", (anim) => {
+  clearTimeout(animTimer);
+  
   if (anim) return;
   if (!shouldTriggerDynamicLoad()) return;
-  clearTimeout(dynTimer);
-  dynTimer = setTimeout(tryDynamicLoad, 350);
+  
+  animTimer = setTimeout(tryDynamicLoad, 500);  // ← INCREASED: 500ms
 });
 
 /// === MOBILE-SAFE CLICK HANDLER ===
@@ -1271,18 +1277,9 @@ view.on("click", async (event) => {
           buttons.forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           filterDiv.classList.toggle("filtered", !!cat);
-	  
-clearTimeout(dynTimer);
 
-if (shouldTriggerDynamicLoad()) {
-  dynTimer = setTimeout(tryDynamicLoad, 150);
-} else {
-  dynTimer = setTimeout(() => {
-    if (shouldTriggerDynamicLoad()) {
-      tryDynamicLoad();
-    }
-  }, 700);
-}
+clearTimeout(dynTimer);
+dynTimer = setTimeout(tryDynamicLoad, 600);
 
         });
       });
