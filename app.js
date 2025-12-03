@@ -144,126 +144,16 @@ const DeviceInfo = {
 // PART 3: Safe Geolocation Watch Manager
 // ========================================
 
-const GeolocationManager = {
-  watchId: null,
-  isWatching: false,
-
-  /**
-   * Safely start watching position
-   * Handles cleanup of previous watch automatically
-   */
-  startWatch(successCallback, errorCallback, options = {}) {
-    if (!("geolocation" in navigator)) {
-      console.warn("Geolocation not available");
-      return null;
-    }
-
-    // Clean up any existing watch
-    this.stopWatch();
-
-    const defaultOptions = {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000,
-      ...options
-    };
-
-    try {
-      this.watchId = navigator.geolocation.watchPosition(
-        successCallback,
-        (error) => {
-          console.warn("Geolocation error:", error.message || error);
-          if (errorCallback) errorCallback(error);
-        },
-        defaultOptions
-      );
-
-      this.isWatching = this.watchId !== null;
-      return this.watchId;
-    } catch (error) {
-      console.error("Failed to start geolocation watch:", error);
-      return null;
-    }
-  },
-
-  /**
-   * Safely stop watching position
-   * Gracefully handles errors and null states
-   */
-  stopWatch() {
-    if (this.watchId === null || this.watchId === undefined) {
-      return;
-    }
-
-    try {
-      navigator.geolocation.clearWatch(this.watchId);
-      this.isWatching = false;
-    } catch (error) {
-      console.warn("Error clearing geolocation watch:", error.message || error);
-    } finally {
-      this.watchId = null;
-    }
-  },
-
-  /**
-   * Get one-time position (no watch)
-   */
-  getCurrentPosition(options = {}) {
-    if (!("geolocation" in navigator)) {
-      return Promise.reject(new Error("Geolocation not available"));
-    }
-
-    const defaultOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 5000,
-      ...options
-    };
-
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => resolve(pos),
-        (err) => {
-          console.warn("getCurrentPosition error:", err.message || err);
-          reject(err);
-        },
-        defaultOptions
-      );
-    });
-  }
-};
+// NOTE: This app uses direct navigator.geolocation calls.
+// See startLocationTracking() for the custom location tracking implementation.
 
 // ========================================
 // PART 4: Usage Examples in Your App
 // ========================================
 
-// On app startup (in your require() block):
-DeviceInfo.init(); // Cache mobile detection once
-
-
-// Starting geolocation tracking:
-GeolocationManager.startWatch(
-  (position) => {
-    const { latitude, longitude } = position.coords;
-    // Handle position update
-    updateLocationMarker(latitude, longitude);
-  },
-  (error) => {
-    console.error("Tracking error:", error);
-  }
-);
-
-// Stopping tracking (safe even if not started):
-GeolocationManager.stopWatch();
-
-// Getting one-time position:
-GeolocationManager.getCurrentPosition()
-  .then(pos => {
-    console.log(pos.coords.latitude, pos.coords.longitude);
-  })
-  .catch(err => {
-    console.error("Could not get position:", err);
-  });
+// NOTE: All geolocation is handled inside the require() block below.
+// The custom location tracking system (startLocationTracking, etc.)
+// is the only geolocation system used in this app.
 
 require([
   "esri/Map",
@@ -303,6 +193,9 @@ BasemapToggle
 
 ) {
   console.log("*** REQUIRE BLOCK STARTED ***");
+
+// Initialize device detection (cache mobile status)
+DeviceInfo.init();
 
 // -------- Map & View -------- 
 const map = new Map({ basemap: "topo-vector" });
@@ -733,8 +626,17 @@ function centerOnLocation() {
 // Start location tracking (watchPosition + throttle + distance filter)
 // Marker updates only; map stays put unless user centers.
 function startLocationTracking() {
-  if (tracking || !("geolocation" in navigator)) return;
+  if (tracking) {
+    console.warn("⚠️ Tracking already active");
+    return;
+  }
+  
+  if (!("geolocation" in navigator)) {
+    console.error("❌ Geolocation API not available on this device");
+    return;
+  }
 
+  console.log("✅ Starting location tracking...");
   tracking = true;
   locateBtn.classList.add("is-tracking");
   locateBtn.setAttribute("aria-pressed", "true");
@@ -756,10 +658,21 @@ function startLocationTracking() {
       if (timeOk && (distOk || staleOk)) {
         updateLocationMarker(latitude, longitude); // ← only marker moves
         lastUpdateTs = now;
+        console.log(`✅ Location updated: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
       }
     },
-    (err) => { console.warn("Geolocation error:", err); },
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+    (err) => { 
+      let errorMsg = "Location error";
+      if (err.code === err.PERMISSION_DENIED) {
+        errorMsg = "Permission denied. Enable location in Settings.";
+      } else if (err.code === err.POSITION_UNAVAILABLE) {
+        errorMsg = "GPS signal unavailable. Try outdoors.";
+      } else if (err.code === err.TIMEOUT) {
+        errorMsg = "Location request timed out.";
+      }
+      console.warn("⚠️ " + errorMsg, err.message || err);
+    },
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
   );
 }
 
@@ -846,24 +759,30 @@ view.when(() => {
   if (!DeviceInfo.isMobile() || !("geolocation" in navigator)) return;
 
   setTimeout(() => {
+    console.log("📍 Checking geolocation permissions...");
+    
     if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions.query({ name: "geolocation" }).then(result => {
-        if (result.state === "granted") {
+      navigator.permissions.query({ name: "geolocation" })
+        .then(result => {
+          console.log("Permission state:", result.state);
+          if (result.state === "granted") {
+            startLocationTracking();
+          } else if (result.state === "prompt") {
+            // Will prompt user on next interaction
+            startLocationTracking();
+          } else {
+            console.log("Location permission denied by user");
+          }
+        })
+        .catch(() => {
+          console.log("Permissions API failed, trying direct access...");
           startLocationTracking();
-        } else if (result.state === "prompt") {
-          // Attempt to start; will prompt the user
-          startLocationTracking();
-        } else {
-          console.log("Mobile: Location permission denied");
-        }
-      }).catch(() => {
-        // Permissions API not available - try to start anyway
-        startLocationTracking();
-      });
+        });
     } else {
+      console.log("Permissions API not available, trying direct access...");
       startLocationTracking();
     }
-  }, 1500); // slight delay to ensure map ready
+  }, 2500); // ← INCREASED from 1500
 });
 
 // Make functions global if needed
@@ -1092,26 +1011,35 @@ function getExtentKey(extent) {
 
 /// Unified dynamic loader
 async function loadDynamicForView() {
-  dynamicReady = false;   // 🚀 block click popups while loading
+  // NOTE: Do NOT set dynamicReady=false here
+  // Clicks should work even while layer is loading
+  // loadingDynamic controls the load process only
 
   const zoomLevel = view.zoom;
   let maxPoints = 0;
 
-  if (zoomLevel >= 13) maxPoints = 300;
-  else if (zoomLevel >= 10) maxPoints = 200;
-  else if (zoomLevel >= 8) maxPoints = 100;
-  else {
+  // Mobile gets fewer points for faster hitTest & rendering
+  if (DeviceInfo.isMobile()) {
+    if (zoomLevel >= 13) maxPoints = 150;  // ← Reduced from 300
+    else if (zoomLevel >= 10) maxPoints = 100;  // ← Reduced from 200
+    else if (zoomLevel >= 8) maxPoints = 50;   // ← Reduced from 100
+  } else {
+    // Desktop can handle more features
+    if (zoomLevel >= 13) maxPoints = 300;
+    else if (zoomLevel >= 10) maxPoints = 200;
+    else if (zoomLevel >= 8) maxPoints = 100;
+  }
+
+  if (maxPoints === 0) {
     if (dynamicLayer) {
       map.remove(dynamicLayer);
       dynamicLayer = null;
     }
-    dynamicReady = true;   // ⭐ re-enable click popups
     return;
   }
 
   if (loadingDynamic) {
-    dynamicReady = true;   // ⭐ must re-enable if skipped
-    return;
+    return;  // Already loading, skip
   }
   loadingDynamic = true;
 
@@ -1131,7 +1059,8 @@ async function loadDynamicForView() {
 
   } finally {
     loadingDynamic = false;
-    dynamicReady = true;   // ⭐ CRITICAL: allow popups again
+    // NOTE: dynamicReady is no longer used in click handler
+    // Clicks work regardless of load state
   }
 }
 
@@ -1145,7 +1074,6 @@ async function tryDynamicLoad() {
       map.remove(dynamicLayer);
       dynamicLayer = null;
     }
-    dynamicReady = true; 
     return;
   }
 
@@ -1203,24 +1131,30 @@ view.watch("animating", (anim) => {
 /// === MOBILE-SAFE CLICK HANDLER ===
 view.on("click", async (event) => {
   try {
+    console.log(`📍 Click event at ${event.mapPoint.x.toFixed(4)}, ${event.mapPoint.y.toFixed(4)}`);
 
-    // Do NOT process clicks while dynamic layer is rebuilding
-    if (!dynamicReady) return;
+    // Larger tolerance on mobile (fingers are bigger than cursors!)
+    const tolerance = DeviceInfo.isMobile() ? 22 : 12;
+    console.log(`🎯 hitTest tolerance: ${tolerance}px (mobile: ${DeviceInfo.isMobile()})`);
+    
+    const { results } = await view.hitTest(event, { tolerance });
+    console.log(`📊 hitTest results: ${results.length} hits`);
 
-    // Much better for mobile accuracy!
-    const { results } = await view.hitTest(event, { tolerance: 12 });
-
-    // 1. Prefer dynamic layer hits
+    // 1. Prefer dynamic layer hits (if it exists - ignore dynamicReady)
     if (dynamicLayer) {
       const hit = results.find(
         (r) => r.graphic && r.graphic.layer === dynamicLayer
       );
       if (hit) {
+        console.log("✅ Found dynamic layer graphic:", hit.graphic.attributes);
         view.popup.open({
           features: [hit.graphic],
           location: event.mapPoint
         });
+        console.log("✅ Dynamic layer popup opened");
         return;
+      } else {
+        console.log("ℹ️ No dynamic layer hit, trying global layer...");
       }
     }
 
@@ -1229,14 +1163,18 @@ view.on("click", async (event) => {
       (r) => r.graphic && r.graphic.layer === globalLayer
     );
     if (globalHit) {
+      console.log("✅ Found global layer graphic:", globalHit.graphic.attributes);
       view.popup.open({
         features: [globalHit.graphic],
         location: event.mapPoint
       });
+      console.log("✅ Global layer popup opened");
+    } else {
+      console.log("❌ No hits found (tried both layers)");
     }
 
   } catch (error) {
-    console.error("Error handling click:", error);
+    console.error("❌ Error handling click:", error);
   }
 });
 
