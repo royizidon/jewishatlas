@@ -345,7 +345,7 @@ const createPopupTemplate = () => ({
 
   // Build clean label fallback
   const label = GeoUtils.buildLabel([
-    attrs.eng_name,
+    attrs.name,
     attrs.Address || attrs.address,
     attrs.city
   ]) || "Destination";
@@ -368,7 +368,7 @@ const createPopupTemplate = () => ({
 
     // Attributes
     const a = feature.graphic.attributes || {};
-    const name = a.eng_name || "Location";
+    const name = a.name || "Location";
     const category = a.category || a.main_category || "Place";
     const address = a.address || "";
     const city = a.city || "";
@@ -1006,7 +1006,8 @@ const geometryObj = {
     const requestBody = new URLSearchParams({
       f: "json",
       where: "1=1",
-      outFields: "*",
+      outFields: "name,category,address,city,description,fees_opening_hours,photo,id,ObjectId,website,main_category",
+
       geometry: JSON.stringify(geometryObj),
       geometryType: "esriGeometryEnvelope",
       spatialRel: "esriSpatialRelIntersects",
@@ -1066,20 +1067,35 @@ function applyFilterToGraphicsLayer(layer, category) {
 }
 
 let loadingDynamic = false;
-let pendingDynamicTimer = null;
 let dynamicReady = true; 
 
+let isTouching = false;
+let lastTouchEnd = 0;
+
+view.container.addEventListener("touchstart", () => { isTouching = true; }, { passive: true });
+view.container.addEventListener("touchend", () => { 
+  isTouching = false;
+  lastTouchEnd = Date.now();
+}, { passive: true });
+
+function isMobileDevice() {
+  return window.matchMedia("(max-width: 768px)").matches ||
+         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 // ===== Extent-key anti-spam system =====
 let lastDynZoom = null;
 let lastDynKey = null;
 let dynTimer = null;
 
 function getExtentKey(extent) {
+  const decimals = isMobileDevice() ? 1 : 2;
+  const multiplier = Math.pow(10, decimals);
+  
   return [
-    Math.round(extent.xmin * 100) / 100,
-    Math.round(extent.ymin * 100) / 100,
-    Math.round(extent.xmax * 100) / 100,
-    Math.round(extent.ymax * 100) / 100
+    Math.round(extent.xmin * multiplier) / multiplier,
+    Math.round(extent.ymin * multiplier) / multiplier,
+    Math.round(extent.xmax * multiplier) / multiplier,
+    Math.round(extent.ymax * multiplier) / multiplier
   ].join(",");
 }
 
@@ -1154,21 +1170,26 @@ async function tryDynamicLoad() {
   await loadDynamicForView();
 }
 
-
+function shouldTriggerDynamicLoad() {
+  if (isTouching) return false;
+  if (Date.now() - lastTouchEnd < 600) return false;
+  if (!isMobileDevice() && view.interacting) return false;
+  return true;
+}
 
 // --- Smart Dynamic Loader Triggers ---
 // ===== Improved dynamic layer trigger =====
 
 view.watch("stationary", (still) => {
-  if (!still || view.interacting) return;
-
+  if (!still) return;
+  if (!shouldTriggerDynamicLoad()) return;
   clearTimeout(dynTimer);
   dynTimer = setTimeout(tryDynamicLoad, 350);
 });
 
 view.watch("animating", (anim) => {
   if (anim) return;
-
+  if (!shouldTriggerDynamicLoad()) return;
   clearTimeout(dynTimer);
   dynTimer = setTimeout(tryDynamicLoad, 350);
 });
@@ -1251,8 +1272,18 @@ view.on("click", async (event) => {
           btn.classList.add("active");
           filterDiv.classList.toggle("filtered", !!cat);
 	  
-	  clearTimeout(dynTimer);
-	  dynTimer = setTimeout(tryDynamicLoad, 100);
+clearTimeout(dynTimer);
+
+if (shouldTriggerDynamicLoad()) {
+  dynTimer = setTimeout(tryDynamicLoad, 150);
+} else {
+  dynTimer = setTimeout(() => {
+    if (shouldTriggerDynamicLoad()) {
+      tryDynamicLoad();
+    }
+  }, 700);
+}
+
         });
       });
     };
