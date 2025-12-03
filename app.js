@@ -12,6 +12,74 @@
 window.addEventListener("error", (e) => console.error("[window.error]", e.message, e.error));
 
 // ========================================
+// TOAST NOTIFICATION SYSTEM
+// ========================================
+
+function showToast(message, duration = 3000) {
+  // Remove existing toast
+  const existing = document.querySelector('[data-toast]');
+  if (existing) existing.remove();
+  
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.setAttribute('data-toast', 'true');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    z-index: 10000;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    toast.style.animation = 'slideDown 0.3s ease-in';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// Add CSS animations for toast
+if (!document.querySelector('style[data-toast-css]')) {
+  const style = document.createElement('style');
+  style.setAttribute('data-toast-css', 'true');
+  style.textContent = `
+    @keyframes slideUp {
+      from { 
+        transform: translateX(-50%) translateY(100px); 
+        opacity: 0; 
+      }
+      to { 
+        transform: translateX(-50%) translateY(0); 
+        opacity: 1; 
+      }
+    }
+    @keyframes slideDown {
+      from { 
+        transform: translateX(-50%) translateY(0); 
+        opacity: 1; 
+      }
+      to { 
+        transform: translateX(-50%) translateY(100px); 
+        opacity: 0; 
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// ========================================
 // PART 1: Shared Geolocation Utilities
 // ========================================
 
@@ -609,7 +677,19 @@ function updateLocation(centerOnFirst = false) {
           .catch(() => {});
       }
     },
-    () => {},
+    (err) => {
+      // Handle errors from getCurrentPosition
+      let errorMsg = "Location error";
+      if (err.code === err.PERMISSION_DENIED) {
+        errorMsg = "Location permission denied. Enable in Settings.";
+      } else if (err.code === err.POSITION_UNAVAILABLE) {
+        errorMsg = "GPS signal unavailable. Try outdoors.";
+      } else if (err.code === err.TIMEOUT) {
+        errorMsg = "Location request timed out.";
+      }
+      console.warn("⚠️ " + errorMsg, err.message || err);
+      showToast("⚠️ " + errorMsg);  // ← SHOW TO USER
+    },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
   );
 }
@@ -626,16 +706,21 @@ function centerOnLocation() {
 // Start location tracking (watchPosition + throttle + distance filter)
 // Marker updates only; map stays put unless user centers.
 function startLocationTracking() {
+  console.log("🔍 startLocationTracking() called");
+  
   if (tracking) {
     console.warn("⚠️ Tracking already active");
     return;
   }
   
   if (!("geolocation" in navigator)) {
-    console.error("❌ Geolocation API not available on this device");
+    console.error("❌ CRITICAL: Geolocation API not available in navigator");
+    console.error("   Navigator keys:", Object.keys(navigator).filter(k => k.includes('geo')));
+    showToast("⚠️ Location not supported on this device");
     return;
   }
 
+  console.log("✅ Geolocation API found in navigator");
   console.log("✅ Starting location tracking...");
   tracking = true;
   locateBtn.classList.add("is-tracking");
@@ -643,9 +728,11 @@ function startLocationTracking() {
   locateBtn.title = "Click to center / Long press to stop";
 
   // Get first fix immediately (center on first for mobile)
+  console.log("📍 Calling updateLocation(true) for initial fix...");
   updateLocation(true);
 
   // Continuous updates via watchPosition
+  console.log("👁️ Starting watchPosition...");
   watchId = navigator.geolocation.watchPosition(
     (pos) => {
       const { latitude, longitude } = pos.coords;
@@ -659,21 +746,27 @@ function startLocationTracking() {
         updateLocationMarker(latitude, longitude); // ← only marker moves
         lastUpdateTs = now;
         console.log(`✅ Location updated: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+      } else {
+        console.log(`ℹ️ GPS update ignored: timeOk=${timeOk}, distOk=${distOk}, staleOk=${staleOk}`);
       }
     },
     (err) => { 
+      console.error("❌ watchPosition error, code:", err.code, "message:", err.message);
       let errorMsg = "Location error";
       if (err.code === err.PERMISSION_DENIED) {
-        errorMsg = "Permission denied. Enable location in Settings.";
+        errorMsg = "Location permission denied. Enable in Settings.";
       } else if (err.code === err.POSITION_UNAVAILABLE) {
-        errorMsg = "GPS signal unavailable. Try outdoors.";
+        errorMsg = "GPS signal unavailable. Try outdoors with clear sky.";
       } else if (err.code === err.TIMEOUT) {
         errorMsg = "Location request timed out.";
       }
       console.warn("⚠️ " + errorMsg, err.message || err);
+      showToast("⚠️ " + errorMsg);  // ← SHOW TO USER
     },
     { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
   );
+  
+  console.log("✅ watchPosition started, watchId:", watchId);
 }
 
 // Stop location tracking
@@ -701,35 +794,93 @@ locateBtn.className = "esri-widget esri-widget--button esri-interactive esri-ico
 locateBtn.title = "Show my location";
 locateBtn.setAttribute("aria-label", "Location tracking");
 locateBtn.setAttribute("aria-pressed", "false");
+locateBtn.style.cursor = "pointer";
+locateBtn.style.zIndex = "1000";
 
+// Debug: Log button element
+console.log("🔘 Button created:", locateBtn);
 
-// Button click handler
-locateBtn.addEventListener("click", () => {
+// Button click handler - MAIN EVENT
+locateBtn.addEventListener("click", (event) => {
+  console.log("🔘 CLICK event fired!", event.type, event.target);
+  event.preventDefault();
+  event.stopPropagation();
+  
+  console.log("📍 tracking state:", tracking);
   if (!tracking) {
+    console.log("📍 Starting location tracking from button click...");
     startLocationTracking();
   } else {
-    centerOnLocation(); // user-requested center; map moves only on click
+    console.log("🎯 Centering on current location...");
+    centerOnLocation();
   }
-});
+}, false);
+
+// Touch support for iOS
+locateBtn.addEventListener("touchend", (event) => {
+  console.log("👆 TOUCHEND event fired!", event.type);
+  event.preventDefault();
+  event.stopPropagation();
+  
+  // If not in long-press (stop) mode, treat as click
+  if (!pressTimer) {
+    console.log("📍 Touch recognized as click");
+    console.log("📍 tracking state:", tracking);
+    if (!tracking) {
+      console.log("📍 Starting location tracking from touch...");
+      startLocationTracking();
+    } else {
+      console.log("🎯 Centering on current location from touch...");
+      centerOnLocation();
+    }
+  }
+}, false);
 
 // Long press to stop (mobile + desktop)
-let pressTimer;
-locateBtn.addEventListener("mousedown", () => {
+let pressTimer = null;
+
+locateBtn.addEventListener("mousedown", (event) => {
+  console.log("🖱️ MOUSEDOWN event fired");
   if (tracking) {
-    pressTimer = setTimeout(() => { stopLocationTracking(); }, 1000);
+    pressTimer = setTimeout(() => {
+      console.log("⏱️ Long press timeout - stopping tracking");
+      stopLocationTracking();
+    }, 1000);
   }
 });
-locateBtn.addEventListener("mouseup", () => { clearTimeout(pressTimer); });
-locateBtn.addEventListener("mouseleave", () => { clearTimeout(pressTimer); });
-locateBtn.addEventListener("touchstart", () => {
+
+locateBtn.addEventListener("mouseup", () => {
+  console.log("🖱️ MOUSEUP event fired");
+  clearTimeout(pressTimer);
+  pressTimer = null;
+});
+
+locateBtn.addEventListener("mouseleave", () => {
+  console.log("🖱️ MOUSELEAVE event fired");
+  clearTimeout(pressTimer);
+  pressTimer = null;
+});
+
+locateBtn.addEventListener("touchstart", (event) => {
+  console.log("👆 TOUCHSTART event fired");
   if (tracking) {
-    pressTimer = setTimeout(() => { stopLocationTracking(); }, 1000);
+    pressTimer = setTimeout(() => {
+      console.log("⏱️ Long touch timeout - stopping tracking");
+      stopLocationTracking();
+    }, 1000);
   }
 }, { passive: true });
-locateBtn.addEventListener("touchend", () => { clearTimeout(pressTimer); });
+
+locateBtn.addEventListener("touchend", () => {
+  console.log("👆 TOUCHEND - clearing press timer");
+  clearTimeout(pressTimer);
+  pressTimer = null;
+});
 
 // Add button to UI
+console.log("🔘 Adding button to view.ui...");
 view.ui.add(locateBtn, { position: "bottom-right", index: 2 });
+console.log("🔘 Button added to view.ui");
 
 // Pause/resume watch when tab visibility changes (battery saver)
 document.addEventListener("visibilitychange", () => {
@@ -756,33 +907,41 @@ document.addEventListener("visibilitychange", () => {
 
 // Auto-start on mobile (respect permissions)
 view.when(() => {
-  if (!DeviceInfo.isMobile() || !("geolocation" in navigator)) return;
+  console.log("✅ view.when() fired - checking location permissions");
+  
+  if (!DeviceInfo.isMobile() || !("geolocation" in navigator)) {
+    console.log("⏭️ Skipping auto-start: mobile=" + DeviceInfo.isMobile() + ", geolocation=" + ("geolocation" in navigator));
+    return;
+  }
 
+  console.log("🔍 Mobile device detected, checking permissions in 3.5 seconds...");
+  
   setTimeout(() => {
-    console.log("📍 Checking geolocation permissions...");
+    console.log("📍 Checking geolocation permissions (iOS 14+ compatible)...");
     
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions.query({ name: "geolocation" })
         .then(result => {
-          console.log("Permission state:", result.state);
+          console.log("✅ Permission state query successful:", result.state);
           if (result.state === "granted") {
+            console.log("✅ Permission granted - starting location tracking");
             startLocationTracking();
           } else if (result.state === "prompt") {
-            // Will prompt user on next interaction
-            startLocationTracking();
-          } else {
-            console.log("Location permission denied by user");
+            console.log("🔔 Permission prompt - will prompt user on first location access");
+            // Will prompt user when they tap button
+          } else if (result.state === "denied") {
+            console.log("❌ Location permission denied by user");
+            showToast("⚠️ Location permission denied. Enable in Settings.");
           }
         })
-        .catch(() => {
-          console.log("Permissions API failed, trying direct access...");
-          startLocationTracking();
+        .catch((err) => {
+          console.log("⚠️ Permissions API query failed, falling back to direct access:", err.message);
+          // Fallback - don't auto-start, let user tap button
         });
     } else {
-      console.log("Permissions API not available, trying direct access...");
-      startLocationTracking();
+      console.log("ℹ️ Permissions API not available, will request on user tap");
     }
-  }, 2500); // ← INCREASED from 1500
+  }, 3500);  // ← INCREASED: 2500ms → 3500ms for iOS 14+ compatibility
 });
 
 // Make functions global if needed
@@ -1230,8 +1389,8 @@ dynTimer = setTimeout(tryDynamicLoad, 600);
     view.goTo(globalLayer.fullExtent).catch(console.error);
     search.sources.unshift({
       layer: globalLayer,
-      searchFields: ["eng_name"],
-      displayField: "eng_name",
+      searchFields: ["name"],
+      displayField: "name",
       exactMatch: false,
       outFields: ["*"],
       name: "Jewish Landmarks",
