@@ -276,6 +276,9 @@ const view = new MapView({
   ui: { components: [] }
 });
 
+view.popup.autoOpenEnabled = false;
+
+
 // keep UI clear of header
 const headerH = document.getElementById('appHeader')?.offsetHeight || 95;
 view.padding = { top: headerH };
@@ -442,11 +445,26 @@ html += `
   
 
     container.innerHTML = html;
+// Prevent popup UI clicks from triggering map clicks
+["click", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
+  container.addEventListener(evt, (e) => {
+    e.stopPropagation();
+  }, { passive: false });
+});
+
 // Add static close button
 const closeBtn = document.createElement("button");
 closeBtn.className = "custom-close-btn";
 closeBtn.textContent = "✕";
-closeBtn.addEventListener("click", () => view.popup.close());
+closeBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();  // ← CRITICAL: Stop event from bubbling
+  console.log("✕ Close button clicked");
+  view.popup.close();
+  view.popup.clear();
+  view.popup.visible = false;
+});
+
 container.appendChild(closeBtn);
 
 
@@ -790,6 +808,8 @@ function stopLocationTracking() {
 
 // Create locate button
 const locateBtn = document.createElement("button");
+
+
 locateBtn.className = "esri-widget esri-widget--button esri-interactive esri-icon-locate";
 locateBtn.title = "Show my location";
 locateBtn.setAttribute("aria-label", "Location tracking");
@@ -799,6 +819,11 @@ locateBtn.style.zIndex = "1000";
 
 // Debug: Log button element
 console.log("🔘 Button created:", locateBtn);
+
+// --- Long press state variable (MUST be before any listeners!) ---
+let pressTimer = null;
+
+
 
 // Button click handler - MAIN EVENT
 locateBtn.addEventListener("click", (event) => {
@@ -816,15 +841,25 @@ locateBtn.addEventListener("click", (event) => {
   }
 }, false);
 
-// Touch support for iOS
+// Touch support for iOS - MERGED touchend handler
+// Combines: tap detection + long-press clearing
 locateBtn.addEventListener("touchend", (event) => {
   console.log("👆 TOUCHEND event fired!", event.type);
   event.preventDefault();
   event.stopPropagation();
   
-  // If not in long-press (stop) mode, treat as click
-  if (!pressTimer) {
-    console.log("📍 Touch recognized as click");
+  // Check if this was a long-press
+  const wasLongPress = pressTimer !== null;
+  
+  // Clear the long-press timer
+  clearTimeout(pressTimer);
+  pressTimer = null;
+  
+  console.log("👆 TOUCHEND - wasLongPress:", wasLongPress);
+  
+  // If NOT a long-press, treat as normal tap
+  if (!wasLongPress) {
+    console.log("📍 Touch recognized as regular click (not long-press)");
     console.log("📍 tracking state:", tracking);
     if (!tracking) {
       console.log("📍 Starting location tracking from touch...");
@@ -833,12 +868,14 @@ locateBtn.addEventListener("touchend", (event) => {
       console.log("🎯 Centering on current location from touch...");
       centerOnLocation();
     }
+  } else {
+    console.log("⏱️ Long-press detected - tracking already stopped");
   }
-}, false);
+}, { passive: false });
 
-// Long press to stop (mobile + desktop)
-let pressTimer = null;
 
+
+// MOUSE handlers (desktop)
 locateBtn.addEventListener("mousedown", (event) => {
   console.log("🖱️ MOUSEDOWN event fired");
   if (tracking) {
@@ -861,6 +898,7 @@ locateBtn.addEventListener("mouseleave", () => {
   pressTimer = null;
 });
 
+// TOUCH handlers (iOS long-press detection)
 locateBtn.addEventListener("touchstart", (event) => {
   console.log("👆 TOUCHSTART event fired");
   if (tracking) {
@@ -870,12 +908,6 @@ locateBtn.addEventListener("touchstart", (event) => {
     }, 1000);
   }
 }, { passive: true });
-
-locateBtn.addEventListener("touchend", () => {
-  console.log("👆 TOUCHEND - clearing press timer");
-  clearTimeout(pressTimer);
-  pressTimer = null;
-});
 
 // Add button to UI
 console.log("🔘 Adding button to view.ui...");
@@ -1287,53 +1319,116 @@ view.watch("animating", (anim) => {
   animTimer = setTimeout(tryDynamicLoad, 500);  // ← INCREASED: 500ms
 });
 
+/// === MOBILE-SAFE POPUP OPENING FUNCTION ===
+// ✅ FIX: Add this BEFORE the click handler
+async function openPopupSafely(features, location) {
+  if (!features || !Array.isArray(features) || features.length === 0) {
+    console.warn("⚠️ No features to display");
+    return;
+  }
+
+  // Step 1: Just open directly - duplicate prevention handles the rest
+  console.log("📂 Opening popup with", features.length, "feature(s)");
+  view.popup.open({
+    features,
+    location
+  });
+
+  // Step 2: Force visible (iOS quirk)
+  setTimeout(() => { view.popup.visible = true; }, 20);
+  console.log("✅ Popup opened successfully");
+}
+
 /// === MOBILE-SAFE CLICK HANDLER ===
-view.on("click", async (event) => {
+// ✅ FIX: Changed "click" to "immediate-click"
+// ✅ FIX: Added debounce and hitTest timeout
+
+// Prevent duplicate popups on same feature
+let lastPopupId = null;
+let lastPopupTime = 0;
+
+let lastClickTime = 0;
+let hitTestPending = false;
+
+view.on("immediate-click", async (event) => {
   try {
+    // ✅ FIX #1: Debounce rapid clicks
+    const now = Date.now();
+    if (now - lastClickTime < 300 || hitTestPending) {
+      console.log("⏭️ Click ignored - debounce");
+      return;
+    }
+    lastClickTime = now;
+    hitTestPending = true;
+
     console.log(`📍 Click event at ${event.mapPoint.x.toFixed(4)}, ${event.mapPoint.y.toFixed(4)}`);
 
     // Larger tolerance on mobile (fingers are bigger than cursors!)
     const tolerance = DeviceInfo.isMobile() ? 22 : 12;
     console.log(`🎯 hitTest tolerance: ${tolerance}px (mobile: ${DeviceInfo.isMobile()})`);
     
-    const { results } = await view.hitTest(event, { tolerance });
-    console.log(`📊 hitTest results: ${results.length} hits`);
+    // ✅ FIX #2: Add hitTest timeout
+    const startTime = Date.now();
+    const { results } = await Promise.race([
+      view.hitTest(event, { tolerance }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('hitTest timeout')), 1000)
+      )
+    ]).catch(() => {
+      console.warn("⚠️ hitTest timed out");
+      return { results: [] };
+    });
+    
+    const duration = Date.now() - startTime;
+    console.log(`✅ hitTest completed in ${duration}ms with ${results.length} hits`);
 
-    // 1. Prefer dynamic layer hits (if it exists - ignore dynamicReady)
+    // ✅ FIX #3 & #4: Use safe popup opening function
+    // Try dynamic layer first
     if (dynamicLayer) {
-      const hit = results.find(
-        (r) => r.graphic && r.graphic.layer === dynamicLayer
-      );
-      if (hit) {
-        console.log("✅ Found dynamic layer graphic:", hit.graphic.attributes);
-        view.popup.open({
-          features: [hit.graphic],
-          location: event.mapPoint
-        });
-        console.log("✅ Dynamic layer popup opened");
+      const hit = results.find(r => r.graphic?.layer === dynamicLayer);
+      if (hit?.graphic) {
+        const hitGraphic = hit.graphic;
+        
+        // Prevent double-popup on same feature within 500ms (iOS synthetic clicks at 410-480ms)
+        const now2 = Date.now();
+        if (lastPopupId === hitGraphic.attributes.id && (now2 - lastPopupTime) < 500) {
+          console.log("⏭️ Duplicate popup suppressed (dynamic layer)");
+          return;
+        }
+        lastPopupId = hitGraphic.attributes.id;
+        lastPopupTime = now2;
+        
+        console.log("✅ Found dynamic layer graphic");
+        await openPopupSafely([hitGraphic], event.mapPoint);
         return;
-      } else {
-        console.log("ℹ️ No dynamic layer hit, trying global layer...");
       }
     }
 
-    // 2. Fallback to global layer
-    const globalHit = results.find(
-      (r) => r.graphic && r.graphic.layer === globalLayer
-    );
-    if (globalHit) {
-      console.log("✅ Found global layer graphic:", globalHit.graphic.attributes);
-      view.popup.open({
-        features: [globalHit.graphic],
-        location: event.mapPoint
-      });
-      console.log("✅ Global layer popup opened");
+    // Fallback to global layer
+    const globalHit = results.find(r => r.graphic?.layer === globalLayer);
+    if (globalHit?.graphic) {
+      const hitGraphic = globalHit.graphic;
+      
+      // Prevent double-popup on same feature within 500ms (iOS synthetic clicks at 410-480ms)
+      const now2 = Date.now();
+      if (lastPopupId === hitGraphic.attributes.id && (now2 - lastPopupTime) < 500) {
+        console.log("⏭️ Duplicate popup suppressed (global layer)");
+        return;
+      }
+      lastPopupId = hitGraphic.attributes.id;
+      lastPopupTime = now2;
+      
+      console.log("✅ Found global layer graphic");
+      await openPopupSafely([hitGraphic], event.mapPoint);
     } else {
       console.log("❌ No hits found (tried both layers)");
     }
 
   } catch (error) {
     console.error("❌ Error handling click:", error);
+  } finally {
+    // ✅ FIX #5: Use finally block to ensure hitTestPending resets
+    hitTestPending = false;
   }
 });
 
@@ -1389,8 +1484,8 @@ dynTimer = setTimeout(tryDynamicLoad, 600);
     view.goTo(globalLayer.fullExtent).catch(console.error);
     search.sources.unshift({
       layer: globalLayer,
-      searchFields: ["name"],
-      displayField: "name",
+      searchFields: ["eng_name"],
+      displayField: "eng_name",
       exactMatch: false,
       outFields: ["*"],
       name: "Jewish Landmarks",
