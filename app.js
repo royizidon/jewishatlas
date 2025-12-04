@@ -1179,11 +1179,14 @@ let dynamicReady = true;
 let isTouching = false;
 let lastTouchEnd = 0;
 
-view.container.addEventListener("touchstart", () => { isTouching = true; }, { passive: true });
+view.container.addEventListener("touchstart", () => { 
+  isTouching = true; 
+}, { passive: true });
+
 view.container.addEventListener("touchend", () => { 
   isTouching = false;
-  lastTouchEnd = Date.now();
 }, { passive: true });
+
 
 // ===== IMPROVED: Extent-key anti-spam system =====
 let lastDynZoom = null;
@@ -1293,11 +1296,15 @@ async function tryDynamicLoad() {
 }
 
 function shouldTriggerDynamicLoad() {
-  if (isTouching) return false;
-  if (Date.now() - lastTouchEnd < 600) return false;
-  if (!DeviceInfo.isMobile() && view.interacting) return false;
-  return true;
+  // Allow load when finger is lifted AND interaction is over
+  if (view.interacting) return false;   // still zooming/panning
+
+  // Allow dynamic load immediately when touch ended
+  if (isTouching) return false;         // finger currently on screen
+
+  return true;                          // everything else OK
 }
+
 
 // --- Smart Dynamic Loader Triggers ---
 // ===== IMPROVED: Deduplicated watchers =====
