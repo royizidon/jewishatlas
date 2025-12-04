@@ -458,6 +458,7 @@ Keep header area slim (ArcGIS header with title)
     max-height: calc(100vh - var(--header-h) - 20px) !important;
 
     border-radius: 16px !important;
+
   }
 }
 
@@ -700,5 +701,19 @@ Keep header area slim (ArcGIS header with title)
 .esri-popup:not(.esri-popup--visible) {
   pointer-events: none !important;
 }
+
+.esri-popup__actions {
+  display: none !important;
+}
+
+
+.esri-popup__header {
+     display: none !important;
+   }
+
+
+.esri-popup__button--close {
+     display: none !important;
+   }
 
 

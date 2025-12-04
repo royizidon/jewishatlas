@@ -1044,6 +1044,11 @@ view.when(() => {
     includeDefaultSources: true,
     allPlaceholder: "Find a landmark or address..."
   });
+// Disable popup opening from search results
+search.popupEnabled = false;
+
+search.resultGraphicEnabled = false;
+
 
   // -------- Renderer --------
   const globalRenderer = new UniqueValueRenderer({
