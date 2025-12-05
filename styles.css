@@ -701,11 +701,11 @@ Keep header area slim (ArcGIS header with title)
 .esri-popup:not(.esri-popup--visible) {
   pointer-events: none !important;
 }
-
+/* zoom zoom zoom
 .esri-popup__actions {
   display: none !important;
 }
-
+*/
 
 .esri-popup__header {
      display: none !important;

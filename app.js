@@ -1080,7 +1080,13 @@ search.resultGraphicEnabled = false;
   projection.load().catch(console.error);
 
 
-function shrinkExtent(extent, factor = 0.7) {
+
+function getQueryExtent(extent) {
+  // Do NOT shrink when zoomed in close
+  if (view.zoom >= 13) return extent;
+
+  // Shrink only on medium/large extents
+  const factor = 0.7;
   const dx = (extent.xmax - extent.xmin) * (1 - factor) / 2;
   const dy = (extent.ymax - extent.ymin) * (1 - factor) / 2;
 
@@ -1093,22 +1099,23 @@ function shrinkExtent(extent, factor = 0.7) {
   };
 }
 
+
+
 async function loadDynamicPoints(maxPoints) {
   try {
     const extent = view.extent;
     const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
 
 // shrink the extent to reduce request size
-const shrunk = shrinkExtent(wgs84Extent, 0.7);  // ← 70% of screen
+const queryExtent = getQueryExtent(wgs84Extent);
 
 const geometryObj = {
-  xmin: shrunk.xmin,
-  ymin: shrunk.ymin,
-  xmax: shrunk.xmax,
-  ymax: shrunk.ymax,
+  xmin: queryExtent.xmin,
+  ymin: queryExtent.ymin,
+  xmax: queryExtent.xmax,
+  ymax: queryExtent.ymax,
   spatialReference: { wkid: 4326 }
 };
-
 
     const requestBody = new URLSearchParams({
       f: "json",
@@ -1176,16 +1183,7 @@ function applyFilterToGraphicsLayer(layer, category) {
 let loadingDynamic = false;
 let dynamicReady = true; 
 
-let isTouching = false;
-let lastTouchEnd = 0;
 
-view.container.addEventListener("touchstart", () => { 
-  isTouching = true; 
-}, { passive: true });
-
-view.container.addEventListener("touchend", () => { 
-  isTouching = false;
-}, { passive: true });
 
 
 // ===== IMPROVED: Extent-key anti-spam system =====
@@ -1262,74 +1260,67 @@ async function loadDynamicForView() {
     // Clicks work regardless of load state
   }
 }
+// new code 041225
+// ============================================================
+// MAPBOX-STYLE THROTTLE FOR DYNAMIC LAYER LOADING
+// ============================================================
 
 
-async function tryDynamicLoad() {
-  const z = view.zoom;
 
-  // Disable dynamic layer below threshold
-  if (z < 8) {
-    if (dynamicLayer) {
-      map.remove(dynamicLayer);
-      dynamicLayer = null;
-    }
-    return;
+let lastExtentCenter = null;
+let lastExtentZoom = null;
+let settleTimer = null;
+
+
+
+function needsReload(extent, zoom) {
+  const cx = (extent.xmin + extent.xmax) / 2;
+  const cy = (extent.ymin + extent.ymax) / 2;
+
+  // First time → always reload
+  if (!lastExtentCenter) {
+    lastExtentCenter = { cx, cy };
+    lastExtentZoom = zoom;
+    return true;
   }
 
-  // ← NEW: Throttle successive loads (prevent spam during pinch zoom)
-  const timeSinceLastLoad = Date.now() - lastDynLoadTime;
-  if (timeSinceLastLoad < MIN_LOAD_INTERVAL) {
-    return;
+  // Zoom changed → reload
+  if (zoom !== lastExtentZoom) {
+    lastExtentZoom = zoom;
+    lastExtentCenter = { cx, cy };
+    return true;
   }
 
-  const key = getExtentKey(view.extent);
+  // Movement threshold = 5% of screen width
+  const dx = Math.abs(cx - lastExtentCenter.cx);
+  const dy = Math.abs(cy - lastExtentCenter.cy);
+  const threshold = (extent.xmax - extent.xmin) * 0.01;
 
-  // Skip duplicates
-  if (lastDynZoom === z && lastDynKey === key) {
-    return;
+  if (dx > threshold || dy > threshold) {
+    lastExtentCenter = { cx, cy };
+    return true;
   }
 
-  lastDynZoom = z;
-  lastDynKey = key;
-
-  await loadDynamicForView();
+  return false;
 }
 
-function shouldTriggerDynamicLoad() {
-  // Allow load when finger is lifted AND interaction is over
-  if (view.interacting) return false;   // still zooming/panning
 
-  // Allow dynamic load immediately when touch ended
-  if (isTouching) return false;         // finger currently on screen
+view.watch("extent", () => {
+  clearTimeout(settleTimer);
 
-  return true;                          // everything else OK
-}
+  // Wait for user to finish moving the map
+  settleTimer = setTimeout(() => {
+    // Skip if map is still moving (inertia)
+    if (view.interacting || view.animating) return;
 
+    // Only reload if enough movement or zoom change
+    if (!needsReload(view.extent, view.zoom)) return;
 
-// --- Smart Dynamic Loader Triggers ---
-// ===== IMPROVED: Deduplicated watchers =====
-
-let statTimer = null;
-let animTimer = null;
-
-view.watch("stationary", (still) => {
-  clearTimeout(statTimer);
-  clearTimeout(animTimer);  // ← NEW: clear anim timer too
-  
-  if (!still) return;
-  if (!shouldTriggerDynamicLoad()) return;
-  
-  statTimer = setTimeout(tryDynamicLoad, 500);  // ← INCREASED: 500ms
+    // Load now
+    loadDynamicForView();
+  }, 150);
 });
 
-view.watch("animating", (anim) => {
-  clearTimeout(animTimer);
-  
-  if (anim) return;
-  if (!shouldTriggerDynamicLoad()) return;
-  
-  animTimer = setTimeout(tryDynamicLoad, 500);  // ← INCREASED: 500ms
-});
 
 /// === MOBILE-SAFE POPUP OPENING FUNCTION ===
 // ✅ FIX: Add this BEFORE the click handler
@@ -1483,7 +1474,9 @@ view.on("immediate-click", async (event) => {
           filterDiv.classList.toggle("filtered", !!cat);
 
 clearTimeout(dynTimer);
-dynTimer = setTimeout(tryDynamicLoad, 600);
+dynTimer = setTimeout(() => {
+  loadDynamicForView();
+}, 600);
 
         });
       });
