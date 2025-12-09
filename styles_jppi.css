@@ -1,0 +1,122 @@
+/* ============================================================
+   BASIC RESET FOR JPPI
+   ============================================================ */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   FILTER BUTTONS (SAFE VERSION)
+   ============================================================ */
+
+#filterContainer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filterBtn {
+  padding: 6px 12px;
+  border: 1px solid #ccd1d8;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.filterBtn:hover {
+  background: #f1f5f9;
+}
+
+.filterBtn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+/* Category colors (simple version) */
+.filterBtn[data-cat="Highlights"] { --c: #f59e0b; }
+.filterBtn[data-cat="Synagogue"] { --c: #3b82f6; }
+.filterBtn[data-cat="Heritage"] { --c: #ef4444; }
+.filterBtn[data-cat="Community"] { --c: #8b5cf6; }
+.filterBtn[data-cat="Kosher Restaurant"] { --c: #10b981; }
+
+#filterContainer:not(.filtered) .filterBtn {
+  background: var(--c, #475569);
+  border-color: var(--c, #475569);
+  color: #fff;
+}
+
+#filterContainer.filtered .filterBtn:not(.active) {
+  background: #fff;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+#filterContainer.filtered .filterBtn.active {
+  background: var(--c, #3b82f6);
+  border-color: var(--c, #3b82f6);
+  color: #fff;
+}
+
+/* Mobile scroll behavior */
+@media (max-width: 768px) {
+  #filterContainer {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #filterContainer::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filterBtn {
+    flex: 0 0 auto;
+  }
+
+  .esri-ui-top-right {
+    top: 70px !important;
+    right: 10px !important;
+  }
+}
+/* ============================================================
+   SUPER-ROUNDED POPUP CORNERS (Modern Glassy Style)
+   ============================================================ */
+
+/* Entire popup wrapper */
+.esri-popup {
+  border-radius: 24px !important;
+  overflow: hidden !important; /* ensures inner corners follow shape */
+}
+
+/* Main popup card */
+.esri-popup__main-container {
+  border-radius: 24px !important;
+  background: rgba(255,255,255,0.90) !important;
+  backdrop-filter: blur(18px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.3) !important;
+  box-shadow: 0 22px 55px rgba(15,23,42,0.40) !important;
+}
+
+/* Inner content area follows same rounding */
+.esri-popup__content {
+  border-radius: 22px !important;
+  overflow: hidden !important;
+}

@@ -165,14 +165,11 @@ const siteUrl  = normalizeUrl(rawSite);
     zoom: 4,
     ui: { components: [] },
     popup: {
-      dockEnabled: true,
-      dockOptions: {
-        buttonEnabled: false,
-        breakpoint: false,
-        position: "auto"
-      },
-      collapseEnabled: false
-    }
+  dockEnabled: false,
+  collapseEnabled: false
+}
+
+  
   });
   
   console.log("*** MAP AND VIEW CREATED ***");
@@ -218,15 +215,15 @@ const siteUrl  = normalizeUrl(rawSite);
   const globalRenderer = new UniqueValueRenderer({
     field: "main_category",
     defaultSymbol: {
-      type: "simple-marker", style: "circle", size: 12,
+      type: "simple-marker", style: "circle", size: 10,
       color: "#888", outline: { color: "#fff", width: 1 }
     },
     uniqueValueInfos: [
-      { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:12, color:"#f39c12", outline:{color:"#fff",width:1} } },
-      { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:12, color:"#5DADE2", outline:{color:"#fff",width:1} } },
-      { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:12, color:"#EC7063", outline:{color:"#fff",width:1} } },
-      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:12, color:"#58D68D", outline:{color:"#fff",width:1} } },
-      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:12, color:"#8b5cf6", outline:{color:"#fff",width:1} } }
+      { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:10, color:"#f39c12", outline:{color:"#fff",width:1} } },
+      { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:10, color:"#5DADE2", outline:{color:"#fff",width:1} } },
+      { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:10, color:"#EC7063", outline:{color:"#fff",width:1} } },
+      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:10, color:"#58D68D", outline:{color:"#fff",width:1} } },
+      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:10, color:"#8b5cf6", outline:{color:"#fff",width:1} } }
     ]
   });
 
