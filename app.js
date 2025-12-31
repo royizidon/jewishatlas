@@ -1082,23 +1082,34 @@ search.resultGraphicEnabled = false;
 
 
 function getQueryExtent(extent) {
-  // Do NOT shrink when zoomed in close
-  if (view.zoom >= 13) return extent;
+  const z = view.zoom;
 
-  // Shrink only on medium/large extents
+  // High zoom → no shrink
+  if (z >= 12) return extent;
+
+  // Medium zoom → small shrink
+  if (z >= 9) {
+    const factor = 0.9;
+    return shrink(extent, factor);
+  }
+
+  // Low zoom → larger shrink
   const factor = 0.7;
-  const dx = (extent.xmax - extent.xmin) * (1 - factor) / 2;
-  const dy = (extent.ymax - extent.ymin) * (1 - factor) / 2;
-
-  return {
-    xmin: extent.xmin + dx,
-    ymin: extent.ymin + dy,
-    xmax: extent.xmax - dx,
-    ymax: extent.ymax - dy,
-    spatialReference: extent.spatialReference
-  };
+  return shrink(extent, factor);
 }
 
+function shrink(e, factor) {
+  const dx = (e.xmax - e.xmin) * (1 - factor) / 2;
+  const dy = (e.ymax - e.ymin) * (1 - factor) / 2;
+
+  return {
+    xmin: e.xmin + dx,
+    ymin: e.ymin + dy,
+    xmax: e.xmax - dx,
+    ymax: e.ymax - dy,
+    spatialReference: e.spatialReference
+  };
+}
 
 
 async function loadDynamicPoints(maxPoints) {
@@ -1193,7 +1204,8 @@ let dynTimer = null;
 let lastDynLoadTime = 0;           // ← NEW: throttle successive loads
 const MIN_LOAD_INTERVAL = 2000;     // ← NEW: wait 2s between loads
 
-function getExtentKey(extent) {
+// might be unused
+/*function getExtentKey(extent) {
   const decimals = DeviceInfo.isMobile() ? 0 : 2;  // ← CHANGED: 0 decimals for mobile (much coarser)
   const multiplier = Math.pow(10, decimals);
   
@@ -1203,7 +1215,7 @@ function getExtentKey(extent) {
     Math.round(extent.xmax * multiplier) / multiplier,
     Math.round(extent.ymax * multiplier) / multiplier
   ].join(",");
-}
+}*/
 
 
 /// Unified dynamic loader
