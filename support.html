@@ -237,8 +237,7 @@
       border-radius: 8px;
       padding: 20px;
       text-align: center;
-      margin-top: 4px;
-    }
+      margin: 24px 0 32px;    }
 
     .cta-box h3 {
       font-size: 1.2rem;
@@ -270,11 +269,16 @@
   border-color: #c9a24d;
   color: #0f1838;
 }
+.cta-button:focus-visible {
+  outline: 3px solid rgba(212, 178, 106, 0.55);
+  outline-offset: 3px;
+}
+
 
     footer {
       background: #f9fafb;
       padding: 20px 28px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid rgba(212, 178, 106, 0.45);
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -308,6 +312,26 @@
     .footer-value a:hover {
       text-decoration: underline;
     }
+    .footer-note {
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.8rem;
+      color: #6b7280;
+      line-height: 1.5;
+}
+/* Desktop / Tablet */
+@media (min-width: 700px) {
+  footer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .footer-note {
+    grid-column: span 3;
+  }
+}
 
     /* Responsive */
     @media (max-width: 640px) {
@@ -423,31 +447,43 @@ Jewish Atlas is community-supported and growing. Your contribution directly enab
         </p>
       </div>
 
-      <!-- CALL TO ACTION -->
-      <div class="cta-box">
-        <h3>Ready to Preserve and Connect the Jewish World?</h3>
-        <p>Join us in strengthening Jewish continuity by connecting people, places, and communities worldwide.</p>
-        <a href="mailto:contact@jewishatlas.org?subject=Supporting%20Jewish%20Atlas" class="cta-button">Contact Us to Support</a>
-      </div>
-    </div>
+     <div class="cta-box">
+  <h3>Ready to Preserve and Connect the Jewish World?</h3>
+  <p>Join us in preserving Jewish places while connecting people and communities worldwide.</p>
+  <a href="mailto:contact@jewishatlas.org?subject=Supporting%20Jewish%20Atlas" class="cta-button">
+    Contact Us to Support
+  </a>
+</div>
 
-    <footer>
-      <div class="footer-item">
-        <div class="footer-label">Founder & Director</div>
-        <div class="footer-value"><strong>Royi Zidon, PhD</strong><br>Spatial Ecology & Cultural Preservation</div>
-      </div>
-      <div class="footer-item">
-        <div class="footer-label">Email</div>
-        <div class="footer-value"><a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a></div>
-      </div>
-      <div class="footer-item">
-        <div class="footer-label">Phone</div>
-        <div class="footer-value">+972 58 740 0269</div>
-      </div>
-      <div class="footer-item" style="margin-top: 8px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 0.8rem; color: #6b7280;">
-        Jewish Atlas is an independent, community-built project dedicated to preserving Jewish heritage worldwide.
-      </div>
-    </footer>
+   <footer>
+  <div class="footer-item">
+    <div class="footer-label">Founder &amp; Director</div>
+    <div class="footer-value">
+      <strong>Royi Zidon, PhD</strong><br>
+      Spatial Ecology &amp; Cultural Preservation
+    </div>
+  </div>
+
+  <div class="footer-item">
+    <div class="footer-label">Email</div>
+    <div class="footer-value">
+      <a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a>
+    </div>
+  </div>
+
+  <div class="footer-item">
+    <div class="footer-label">Phone</div>
+    <div class="footer-value">
+<div class="footer-value"><a href="tel:+972587400269">+972 58 740 0269</a></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Jewish Atlas is an independent, community-built project dedicated to preserving Jewish heritage
+    and connecting Jewish communities worldwide.
+  </div>
+</footer>
+
   </div>
 </body>
 </html>
