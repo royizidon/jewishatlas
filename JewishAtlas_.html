@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewish Atlas – Business License Program</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fb;
+      color: #1f2937;
+      padding: 10px;
+      line-height: 1.7;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #ffffff 0%, #f5f7fc 100%);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .accent-line {
+      height: 4px;
+      background: linear-gradient(90deg, #2563eb, #1d4ed8, #2563eb);
+    }
+
+    header {
+      padding: 24px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    header h1 a {
+      text-decoration: none;
+      color: inherit;
+      background: inherit;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: opacity 0.2s ease;
+    }
+
+    header h1 a:hover {
+      opacity: 0.8;
+    }
+
+    header .tagline {
+      font-size: 0.9rem;
+      color: #6b7280;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .content {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      font-size: 1rem;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .section-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-content p {
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(29, 78, 216, 0.08));
+      border-left: 3px solid #2563eb;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .highlight strong {
+      color: #2563eb;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin: 12px 0;
+    }
+
+    .feature-box {
+      background: rgba(37, 99, 235, 0.05);
+      padding: 14px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      border: 1px solid rgba(37, 99, 235, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .feature-box:hover {
+      background: rgba(37, 99, 235, 0.1);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    .feature-box strong {
+      color: #2563eb;
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .impact-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+
+    .impact-item {
+      background: rgba(37, 99, 235, 0.03);
+      border-radius: 4px;
+      border: 1px solid rgba(37, 99, 235, 0.1);
+      color: #4b5563;
+      padding: 10px;
+    }
+
+    .impact-item::before {
+      content: "✓ ";
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    /* Footer */
+footer {
+  background: #f9fafb;
+  padding: 18px 24px;
+  border-top: 1px solid rgba(37, 99, 235, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+.footer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.footer-label {
+  color: #2563eb;
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.footer-value {
+  color: #374151;
+}
+
+.footer-value a {
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer-value a:hover {
+  text-decoration: underline;
+}
+
+    
+
+    /* --- Responsive adjustments --- */
+    @media (min-width: 700px) {
+      .content {
+        font-size: 1.05rem;
+      }
+
+      .features {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .impact-row {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      header h1 {
+        font-size: 2.6rem;
+      }
+      footer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  footer .footer-item:last-child {
+    grid-column: span 3;
+  }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="accent-line"></div>
+
+    <header>
+      <h1><a href="https://jewishatlas.org/" target="_blank" rel="noopener">Jewish Atlas</a></h1>
+      <div class="tagline">Mapping Heritage. Preserving Culture.</div>
+    </header>
+
+    <div class="content">
+      <div class="section">
+        <div class="section-label">Mission</div>
+        <div class="section-content">
+          <p>Build the world's most comprehensive database of Jewish heritage sites,
+providing institutions, municipalities, and organizations with a reliable,
+continuously updated infrastructure for education, tourism, planning, and community engagement.</p>
+        </div>
+      </div>
+
+      <div class="highlight">
+        <strong>Knowledge is Power.</strong> By documenting and mapping Jewish communities and heritage sites, we ensure their preservation and accessibility for generations to come.
+      </div>
+
+      <div class="section">
+        <div class="section-label">Offer</div>
+        <div class="section-content">
+          <div class="features">
+            <div class="feature-box">
+              <strong>Live Database</strong>
+              <span>Continuously growing map of synagogues, cemeteries, community centers, and heritage sites globally.</span>
+            </div>
+            <div class="feature-box">
+              <strong>Advanced Tech</strong>
+              <span>Big data architecture & interactive mapping built by PhD specialist in ecology & spatial science.</span>
+            </div>
+            <div class="feature-box">
+              <strong>White Label</strong>
+              <span>Embed on your site with custom branding, filters, and modifications tailored to your needs.</span>
+            </div>
+            <div class="feature-box">
+              <strong>Always Fresh</strong>
+              <span>New data continuously added to keep communities, sites, and resources current.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<div class="section">
+  <div class="section-label">License & Sponsorship</div>
+  <div class="section-content">
+
+    <p>
+      <strong>Licensing:</strong> Subscription-based access for organizations,
+      municipalities, museums, and institutions. Licenses include live data access,
+      embedding rights, customization options, and continuous updates.
+    </p>
+
+    <p>
+      <strong>Sponsorship:</strong> Companies and mission-aligned partners may support
+      the documentation and preservation of Jewish heritage worldwide. Sponsorship
+      enables open public access while supporting research, data verification,
+      and long-term sustainability.
+    </p>
+
+    <ul style="margin: 8px 0 0 18px; color:#374151; line-height:1.6;">
+      <li>Recognition on the Jewish Atlas website and relevant project pages</li>
+      <li>Association with cultural preservation and education</li>
+      <li>Visibility to global Jewish communities and institutions</li>
+      <li>Optional acknowledgement by region, theme, or initiative</li>
+    </ul>
+
+  </div>
+</div>
+
+
+      <div class="section">
+        <div class="section-label">Impact</div>
+        <div class="impact-row">
+          <div class="impact-item">Tourism & cultural planning</div>
+<div class="impact-item">Education & curricula support</div>
+<div class="impact-item">Community infrastructure mapping</div>
+<div class="impact-item">Preservation & documentation</div>
+
+        </div>
+      </div>
+    </div>
+
+<footer>
+      <div class="footer-item">
+        <div class="footer-label">Founder & Director</div>
+        <div class="footer-value"><strong>Royi Zidon, PhD</strong><br>Spatial Ecology & Cultural Preservation</div>
+      </div>
+      <div class="footer-item">
+        <div class="footer-label">Email</div>
+        <div class="footer-value"><a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a></div>
+      </div>
+      <div class="footer-item">
+        <div class="footer-label">Phone</div>
+        <div class="footer-value">+972 58 740 0269</div>
+      </div>
+      <div class="footer-item" style="margin-top: 8px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 0.8rem; color: #6b7280;">
+        Jewish Atlas is an independent, community-built project dedicated to preserving Jewish heritage worldwide.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
