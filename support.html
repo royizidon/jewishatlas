@@ -3,494 +3,620 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jewish Atlas — Preserving Jewish Heritage Worldwide</title>
+  <title>Jewish Atlas — Major Support</title>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root{
+      --ink:#0f1838;
+      --ink2:#1a2766;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --paper:#ffffff;
+      --bg:#f6f7fb;
+      --gold:#d4b26a;
+      --gold2:#c9a24d;
+      --line:#e5e7eb;
+      --soft:#f0f4f8;
     }
 
-    body {
+    body{
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f6f7fb;
-      color: #1f2937;
+      background: var(--bg);
+      color: var(--text);
       padding: 12px;
       line-height: 1.65;
     }
 
-    .page {
-      max-width: 900px;
+    .page{
+      max-width: 920px;
       margin: 0 auto;
-      background: white;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      border-radius: 10px;
+      background: var(--paper);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.10);
+      border-radius: 12px;
       overflow: hidden;
+      border: 1px solid rgba(212,178,106,0.18);
     }
 
-    .header {
-      background: linear-gradient(135deg, #0f1838 0%, #1a2766 100%);
+    /* Header */
+    .header{
+      background: linear-gradient(135deg, var(--ink) 0%, var(--ink2) 100%);
       color: white;
-      padding: 32px 28px;
+      padding: 34px 28px 26px;
       text-align: center;
+      position: relative;
     }
 
-    .header h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
+    .header::after{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(212,178,106,0.15), rgba(212,178,106,0.95), rgba(212,178,106,0.15));
+    }
+
+    .header h1{
+      font-size: 2.35rem;
+      font-weight: 900;
+      letter-spacing: -0.6px;
       margin-bottom: 6px;
-      letter-spacing: -0.5px;
     }
 
-    .header h1 a {
+    .header h1 a{
       color: white;
       text-decoration: none;
       transition: opacity 0.2s ease;
     }
+    .header h1 a:hover{ opacity: 0.92; }
 
-    .header h1 a:hover {
-      opacity: 0.9;
-    }
-
-    .header .subtitle {
-      font-size: 1.1rem;
-      font-weight: 400;
-      opacity: 0.95;
-      margin-bottom: 2px;
-    }
-
-    .header .tagline {
-      font-size: 0.85rem;
-      opacity: 0.75;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+    .header .subtitle{
+      font-size: 1.05rem;
       font-weight: 500;
-      margin-top: 8px;
+      opacity: 0.95;
+      margin-bottom: 6px;
     }
 
-    .content {
+    .header .tagline{
+      font-size: 0.82rem;
+      opacity: 0.78;
+      text-transform: uppercase;
+      letter-spacing: 1.7px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Replaces the "badge row" with a single discreet line */
+    .header .discreet-line{
+      margin-top: 14px;
+      font-size: 0.92rem;
+      opacity: 0.90;
+      color: rgba(255,255,255,0.92);
+    }
+    .header .discreet-line span{
+      display:inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(212,178,106,0.40);
+      backdrop-filter: blur(6px);
+      font-weight: 600;
+      letter-spacing: -0.1px;
+    }
+
+    .content{
       padding: 28px;
-      display: flex;
+      display:flex;
       flex-direction: column;
       gap: 26px;
     }
 
-    .section {
-      display: flex;
+    .section{
+      display:flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .section h2 {
+    .section h2{
       font-size: 1.35rem;
-      font-weight: 800;
-      color: #0f1838;
-      margin-bottom: 4px;
+      font-weight: 900;
+      color: var(--ink);
       letter-spacing: -0.5px;
       padding-bottom: 10px;
-      border-bottom: 2px solid #d4b26a;
+      border-bottom: 2px solid var(--gold);
+      margin-bottom: 2px;
     }
 
-    .section p {
+    .lead{
+      font-size: 1.05rem;
+      color: #263143;
+      line-height: 1.75;
+    }
+
+    .section p{
       color: #374151;
       font-size: 1rem;
-      line-height: 1.7;
+      line-height: 1.75;
       margin-bottom: 8px;
     }
 
-    .section p:last-child {
-      margin-bottom: 0;
-    }
+    .section p:last-child{ margin-bottom: 0; }
 
-    .problem {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.04));
-      border-left: 4px solid #dc2626;
+    /* Major donor tone blocks */
+    .callout{
+      border-left: 4px solid var(--gold);
+      background: linear-gradient(135deg, rgba(212,178,106,0.10), rgba(15,24,56,0.02));
       padding: 16px;
-      border-radius: 6px;
-      margin: 12px 0;
+      border-radius: 8px;
+      margin: 10px 0;
     }
 
-    .problem strong {
-      color: #dc2626;
+    .callout strong{
+      color: var(--ink);
+      font-weight: 800;
     }
 
-    .solution {
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(22, 163, 74, 0.04));
-      border-left: 4px solid #22c55e;
-      padding: 16px;
-      border-radius: 6px;
-      margin: 12px 0;
+    .divider{
+      height: 1px;
+      background: rgba(212,178,106,0.28);
+      margin: 4px 0 0;
     }
 
-    .solution strong {
-      color: #22c55e;
-    }
-
-    .stats {
-      display: grid;
+    /* Stats */
+    .stats{
+      display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin: 14px 0;
+      margin: 12px 0 6px;
     }
 
-    .stat-box {
-      background: #f0f4f8;
+    .stat-box{
+      background: var(--soft);
       border: 1px solid #d1d5db;
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 14px;
       text-align: center;
     }
 
-    .stat-number {
-      font-size: 1.6rem;
+    .stat-number{
+      font-size: 1.7rem;
       font-weight: 900;
-      color: #0f1838;
+      color: var(--ink);
       line-height: 1;
       margin-bottom: 4px;
     }
 
-    .stat-label {
+    .stat-label{
       font-size: 0.85rem;
-      color: #6b7280;
-      font-weight: 600;
+      color: var(--muted);
+      font-weight: 700;
     }
 
-    .examples {
-      background: #fafafa;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 16px;
-      margin: 12px 0;
-    }
-
-    .examples p {
-      font-size: 0.95rem;
-      margin-bottom: 8px;
-      color: #475569;
-    }
-
-    .examples ul {
-      list-style: none;
-      padding-left: 0;
-      margin: 0;
-    }
-
-    .examples li {
-      padding: 4px 0;
-      padding-left: 20px;
-      position: relative;
-      color: #374151;
-      font-size: 0.95rem;
-    }
-
-    .examples li::before {
-      content: "•";
-      position: absolute;
-      left: 6px;
-      color: #0f1838;
-      font-weight: 900;
-    }
-
-    .why-now {
-      background: linear-gradient(135deg, rgba(249, 115, 22, 0.06), rgba(234, 88, 12, 0.06));
-      border-left: 4px solid #f97316;
-      padding: 16px;
-      border-radius: 6px;
-      margin: 12px 0;
-    }
-
-    .why-now strong {
-      color: #ea580c;
-    }
-
-    .impact-grid {
-      display: grid;
+    /* Pillars / impact */
+    .impact-grid{
+      display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin: 12px 0;
+      margin-top: 8px;
     }
 
-    .impact-item {
+    .impact-item{
       background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+      position: relative;
+      overflow:hidden;
     }
 
-    .impact-item strong {
-      display: block;
-      color: #0f1838;
-      font-size: 0.95rem;
+    .impact-item::before{
+      content:"";
+      position:absolute;
+      top:0; left:0; right:0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(212,178,106,0.25), rgba(212,178,106,0.95), rgba(212,178,106,0.25));
+    }
+
+    .impact-item strong{
+      display:block;
+      color: var(--ink);
+      font-size: 0.98rem;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .impact-item span{
+      display:block;
+      font-size: 0.90rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Discreet partnership options (major donors) */
+    .options{
+      background: #fbfbfd;
+      border: 1px solid rgba(212,178,106,0.32);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 6px;
+    }
+
+    .options .opt{
+      padding: 10px 0;
+      border-top: 1px solid rgba(229,231,235,0.9);
+    }
+
+    .options .opt:first-child{ border-top: 0; padding-top: 0; }
+    .options .opt:last-child{ padding-bottom: 0; }
+
+    .opt-title{
+      font-weight: 900;
+      color: var(--ink);
       margin-bottom: 4px;
+      letter-spacing: -0.2px;
     }
 
-    .impact-item span {
-      display: block;
-      font-size: 0.85rem;
-      color: #6b7280;
-      line-height: 1.5;
-    }
-
-    .cta-box {
-      background: linear-gradient(135deg, #0f1838 0%, #1a2766 100%);
-      color: white;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      margin: 24px 0 32px;
-    }
-
-    .cta-box h3 {
-      font-size: 1.2rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-
-    .cta-box p {
-      color: rgba(255,255,255,0.9);
-      margin-bottom: 12px;
+    .opt-desc{
+      color: #4b5563;
       font-size: 0.95rem;
+      line-height: 1.65;
     }
 
-    .cta-button {
-      display: inline-block;
-      background: #d4b26a;
-      color: #0f1838;
+    /* CTA */
+    .cta-box{
+      background: linear-gradient(135deg, var(--ink) 0%, var(--ink2) 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      margin: 10px 0 8px;
+      border: 1px solid rgba(212,178,106,0.35);
+    }
+
+    .cta-box h3{
+      font-size: 1.22rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .cta-box p{
+      color: rgba(255,255,255,0.90);
+      margin-bottom: 14px;
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    .cta-button{
+      display:inline-block;
+      background: var(--gold);
+      color: var(--ink);
       padding: 12px 24px;
-      border-radius: 6px;
+      border-radius: 8px;
       text-decoration: none;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.95rem;
       transition: all 0.2s ease;
-      border: 2px solid #d4b26a;
+      border: 2px solid var(--gold);
     }
 
-    .cta-button:hover {
-      background: #c9a24d;
-      border-color: #c9a24d;
-      color: #0f1838;
+    .cta-button:hover{
+      background: var(--gold2);
+      border-color: var(--gold2);
+      color: var(--ink);
+      transform: translateY(-1px);
     }
 
-    .cta-button:focus-visible {
-      outline: 3px solid rgba(212, 178, 106, 0.55);
+    .cta-button:focus-visible{
+      outline: 3px solid rgba(212,178,106,0.55);
       outline-offset: 3px;
     }
 
-    footer {
-      background: #f9fafb;
-      padding: 20px 28px;
-      border-top: 1px solid rgba(212, 178, 106, 0.45);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      font-size: 0.9rem;
+    .cta-secondary{
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.82);
     }
 
-    .footer-item {
-      display: flex;
+    .cta-secondary a{
+      color: rgba(255,255,255,0.92);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.35);
+    }
+
+    .cta-secondary a:hover{
+      border-bottom-color: rgba(255,255,255,0.75);
+    }
+
+    /* Footer */
+    footer{
+      background: #f9fafb;
+      padding: 20px 28px;
+      border-top: 1px solid rgba(212,178,106,0.45);
+      display:flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 0.92rem;
+    }
+
+    .footer-item{
+      display:flex;
       flex-direction: column;
       gap: 3px;
     }
 
-    .footer-label {
-      color: #0f1838;
-      font-weight: 700;
+    .footer-label{
+      color: var(--ink);
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       font-size: 0.8rem;
     }
 
-    .footer-value {
+    .footer-value{
       color: #374151;
     }
 
-    .footer-value a {
-      color: #0f1838;
+    .footer-value a{
+      color: var(--ink);
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    .footer-value a:hover {
-      text-decoration: underline;
-    }
+    .footer-value a:hover{ text-decoration: underline; }
 
-    .footer-note {
+    .footer-note{
       margin-top: 8px;
       padding-top: 10px;
-      border-top: 1px solid #e5e7eb;
-      font-size: 0.8rem;
-      color: #6b7280;
-      line-height: 1.5;
+      border-top: 1px solid var(--line);
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
     /* Desktop / Tablet */
-    @media (min-width: 700px) {
-      footer {
-        display: grid;
+    @media (min-width: 700px){
+      footer{
+        display:grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 14px;
       }
-
-      .footer-note {
-        grid-column: span 3;
-      }
+      .footer-note{ grid-column: span 3; }
     }
 
     /* Responsive */
-    @media (max-width: 640px) {
-      .header h1 {
-        font-size: 1.8rem;
-      }
+    @media (max-width: 640px){
+      .header h1{ font-size: 1.85rem; }
+      .stats{ grid-template-columns: 1fr; }
+      .impact-grid{ grid-template-columns: 1fr; }
+    }
 
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .impact-grid {
-        grid-template-columns: 1fr;
-      }
+    /* Print-friendly (optional) */
+    @media print{
+      body{ background: white; padding: 0; }
+      .page{ box-shadow: none; border: none; }
+      .cta-box{ page-break-inside: avoid; }
+      a{ color: inherit; text-decoration: none; }
     }
   </style>
 </head>
 
 <body>
   <div class="page">
+    <!-- HEADER -->
     <div class="header">
       <h1><a href="https://jewishatlas.org" target="_blank" rel="noopener">Jewish Atlas</a></h1>
-      <div class="subtitle">Preserving Our Heritage. Connecting Our Community.</div>
-      <div class="tagline">A Living Map of Jewish Places Worldwide</div>
+      <div class="subtitle">Preserving Jewish Places. Safeguarding Jewish Continuity.</div>
+      <div class="tagline">Major Support • By Invitation • Discreet Conversations</div>
+
+      <!-- Replaced badges with a single discreet line -->
+      <div class="discreet-line">
+        <span>A discreet initiative to preserve Jewish places worldwide — built for permanence and rigor.</span>
+      </div>
     </div>
 
     <div class="content">
-      <!-- THE PROBLEM -->
+      <!-- HERO / OPENING -->
       <div class="section">
-        <h2>Why This Moment Matters</h2>
-        <p>
-          Jewish communities have left physical traces across the world for centuries—synagogues, cemeteries,
-          neighborhoods, schools, memorials. Many of these are now at risk of disappearing.
-          <strong>Beyond documentation, Jewish Atlas functions as connective infrastructure</strong>, linking
-          individuals to communities, services, and institutions in real time.
+        <h2>Major Support</h2>
+        <p class="lead">
+          Jewish history is carried not only in texts, but in places — synagogues, cemeteries, neighborhoods, schools,
+          and communal institutions across the world. Many of these places are disappearing.
         </p>
 
-        <div class="problem">
-          <strong>The Crisis:</strong> As antisemitism and global instability rise, Jewish strength depends on connection. Jewish Atlas connects individuals to Jewish communities worldwide—synagogues, businesses, schools, and networks—creating a living global ecosystem that fosters resilience, continuity, and shared prosperity.
+        <div class="callout">
+          <strong>Jewish Atlas</strong> exists to ensure that Jewish places, memory, and presence remain visible, discoverable,
+          and preserved — with the seriousness, accuracy, and durability this responsibility demands.
         </div>
+      </div>
 
-        <div class="stats">
+      <!-- WHY NOW -->
+      <div class="section">
+        <h2>The Moment We Are In</h2>
+        <p>
+          Across continents, Jewish heritage sites face neglect, conflict, urban development, and demographic change. In parallel,
+          rising antisemitism and global instability have made Jewish continuity increasingly dependent on connection, visibility,
+          and reliable knowledge.
+        </p>
+        <p>
+          When places disappear without record, entire chapters of Jewish life are lost permanently — not only for historians, but for
+          families, communities, and future generations.
+        </p>
+
+        <div class="callout">
+          <strong>This is a long-horizon obligation.</strong> Jewish Atlas is built as permanent cultural infrastructure —
+          a resource designed to endure.
+        </div>
+      </div>
+
+      <!-- WHAT IT IS -->
+      <div class="section">
+        <h2>What Jewish Atlas Provides</h2>
+        <p>
+          Jewish Atlas is a global, living map of Jewish places — past and present — consolidated into a single authoritative platform.
+          It integrates verified records, geographic precision, and structured knowledge to serve preservation, education, and community connection.
+        </p>
+
+        <div class="impact-grid" aria-label="Core pillars">
+          <div class="impact-item">
+            <strong>Documentation &amp; Preservation</strong>
+            <span>Recording sites, institutions, and historical footprints with durability and care.</span>
+          </div>
+          <div class="impact-item">
+            <strong>Verification &amp; Historical Rigor</strong>
+            <span>Cross-referencing community input with archival sources and field validation.</span>
+          </div>
+          <div class="impact-item">
+            <strong>Accessibility &amp; Continuity</strong>
+            <span>Making Jewish places discoverable for families, educators, and communities worldwide.</span>
+          </div>
+          <div class="impact-item">
+            <strong>Long-Term Infrastructure</strong>
+            <span>Building a platform designed for permanence, stewardship, and responsible growth.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW: STEWARDSHIP & INTEGRITY (credibility cues for major donors) -->
+      <div class="section">
+        <h2>Stewardship &amp; Integrity</h2>
+        <p>
+          Jewish Atlas is built with an emphasis on accuracy, provenance, and long-term custodianship. Our approach balances
+          community contributions with research standards appropriate for permanent cultural infrastructure.
+        </p>
+
+        <div class="impact-grid" aria-label="Stewardship elements">
+          <div class="impact-item">
+            <strong>Verification Standards</strong>
+            <span>Triangulating community submissions with archival sources and field validation where feasible.</span>
+          </div>
+          <div class="impact-item">
+            <strong>Data Governance</strong>
+            <span>Structured curation, versioning practices, and documented edits to protect integrity over time.</span>
+          </div>
+          <div class="impact-item">
+            <strong>Preservation &amp; Continuity</strong>
+            <span>Redundancy, backups, and a custodianship plan designed for long-term reliability.</span>
+          </div>
+          <div class="impact-item">
+            <strong>Responsible Growth</strong>
+            <span>Expanding coverage without compromising rigor, clarity, or stewardship obligations.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRESS / CREDIBILITY -->
+      <div class="section">
+        <h2>Progress to Date</h2>
+        <p>
+          Jewish Atlas is already active at global scale, with meaningful coverage and ongoing expansion. The work is built through a combination
+          of research discipline, community contributions, and careful curation.
+        </p>
+
+        <div class="stats" role="group" aria-label="Key metrics">
           <div class="stat-box">
             <div class="stat-number">35,000+</div>
-            <div class="stat-label">Sites Already Mapped</div>
+            <div class="stat-label">Sites Documented</div>
           </div>
           <div class="stat-box">
             <div class="stat-number">121</div>
-            <div class="stat-label">Countries Mapped</div>
+            <div class="stat-label">Countries Represented</div>
           </div>
+        </div>
+
+        <!-- Reworded to sound less "product" -->
+        <div class="callout">
+          <strong>Already in use:</strong> by educators, researchers, families, and community leaders seeking reliable,
+          place-based Jewish knowledge.
         </div>
       </div>
 
-      <!-- THE SOLUTION -->
+      <!-- WHY THIS MATTERS (LEGACY) -->
       <div class="section">
-        <h2>What Jewish Atlas Does</h2>
+        <h2>Why This Work Matters</h2>
         <p>
-          Jewish Atlas is an open, living map that documents Jewish heritage sites worldwide — connecting people to their roots while preserving knowledge for future generations. Our long-term goal is to become the authoritative global reference for Jewish heritage sites — used by communities, researchers, educators, and future generations.
+          Preservation is not only about memory. It is about continuity — ensuring that Jewish presence remains visible, legible, and accessible,
+          even when physical sites are vulnerable.
+        </p>
+        <p>
+          Jewish Atlas transforms fragmented and fragile knowledge into a durable global resource — a foundation for future scholarship,
+          education, and community connection.
         </p>
 
-        <div class="solution">
-          <strong>Our Approach:</strong> We combine field research, community input, and advanced mapping technology to create the most comprehensive record of Jewish places that exists — freely accessible to everyone.
-        </div>
+        <div class="divider" aria-hidden="true"></div>
 
-        <div class="examples">
-          <p><strong>Real places we map:</strong></p>
-          <ul>
-            <li>A small synagogue in Prague that served 3 generations</li>
-            <li>A Jewish cemetery in Kraków with 70,000+ graves</li>
-            <li>A historic neighborhood in Fez that shaped Moroccan Jewish culture</li>
-            <li>Kosher institutions and living communities in every major city</li>
-          </ul>
+        <div class="callout">
+          <strong>Major supporters</strong> do not simply fund activity. They help establish cultural infrastructure that future generations will rely on.
         </div>
       </div>
 
-      <!-- WHY SUPPORT MATTERS -->
+      <!-- MAJOR DONOR OPTIONS (DISCREET) -->
       <div class="section">
-        <h2>Why Your Support Matters</h2>
+        <h2>Paths for Major Support</h2>
         <p>
-          Jewish Atlas is community-supported and growing. Your contribution directly enables the infrastructure that connects Jewish communities worldwide:
+          Jewish Atlas works with a small number of committed supporters aligned with a long-term vision. Support is structured with discretion,
+          clarity, and stewardship.
         </p>
 
-        <div class="impact-grid">
-          <div class="impact-item">
-            <strong>🔍 Field Research</strong>
-            <span>Sending teams to document endangered sites before they're lost</span>
+        <div class="options" aria-label="Support options">
+          <div class="opt">
+            <div class="opt-title">Foundational Support</div>
+            <div class="opt-desc">
+              Establish core capacity and long-term stability — enabling expansion while protecting rigor, accuracy, and durability.
+            </div>
           </div>
-          <div class="impact-item">
-            <strong>📚 Data Collection</strong>
-            <span>Community uploads, archives, and historical verification</span>
+
+          <div class="opt">
+            <div class="opt-title">Named Initiatives</div>
+            <div class="opt-desc">
+              Support a defined geographic region, thematic domain, or preservation priority, with appropriate recognition and reporting.
+            </div>
           </div>
-          <div class="impact-item">
-            <strong>🛠️ Technology</strong>
-            <span>Building the infrastructure to make data accessible globally</span>
+
+          <div class="opt">
+            <div class="opt-title">Legacy Dedication</div>
+            <div class="opt-desc">
+              Create a permanent dedication in honor of a person, family, or community — tied to enduring preservation and visibility.
+            </div>
           </div>
-          <div class="impact-item">
-            <strong>🤝 Community</strong>
-            <span>Partnerships with local organizations and cultural institutions</span>
+
+          <div class="opt">
+            <div class="opt-title">Stewardship Partnerships</div>
+            <div class="opt-desc">
+              For supporters seeking long-term alignment, co-designed around shared priorities and responsible growth.
+            </div>
           </div>
+        </div>
+
+        <div class="callout">
+          <strong>All major support conversations are handled privately</strong> and shaped around alignment, stewardship, and a shared commitment to lasting impact.
         </div>
       </div>
 
-      <!-- YOUR LEGACY -->
-      <div class="section">
-        <h2>Your Legacy</h2>
-        <p>
-          Jewish Atlas is designed to endure. Major supporters don’t just fund activities—they help build
-          permanent infrastructure for Jewish life. A significant partnership creates a lasting legacy:
-          regions mapped for generations, communities made discoverable, and knowledge preserved in a form
-          that cannot be erased.
-        </p>
-        <p>
-          Your contribution becomes part of the global foundation on which future Jewish communities,
-          researchers, educators, and families will rely.
-        </p>
-      </div>
-
-      <!-- PARTNERSHIP OPPORTUNITIES -->
-      <div class="section">
-        <h2>Partnership Opportunities</h2>
-        <p>
-          Jewish Atlas partners with individuals and institutions to build long-term,
-          high-impact initiatives. Each partnership is custom-designed based on shared
-          goals and areas of interest.
-        </p>
-
-        <p>
-          <strong>Legacy Dedication:</strong> Create a permanent dedication in honor of a
-          person, family, or community. Legacy partners help ensure that Jewish places
-          and communities remain visible and accessible for generations to come.
-        </p>
-
-        <p>
-          <strong>Strategic Institutional Partnership:</strong> Institutions partner with
-          Jewish Atlas to embed the platform, access specialized datasets, and co-develop
-          resources that serve their communities and missions.
-        </p>
-
-        <p>
-          <strong>Major Partnership:</strong> Major partners enable the expansion of Jewish
-          Atlas into new regions or thematic domains—supporting field teams, data
-          integration, and long-term sustainability. These partnerships help shape the
-          future direction of the platform.
-        </p>
-      </div>
-
-      <!-- CALL TO ACTION -->
+      <!-- CTA -->
       <div class="cta-box">
-        <h3>Ready to Preserve and Connect the Jewish World?</h3>
-        <p>Join us in building lasting infrastructure for Jewish places, communities, and connections worldwide.</p>
-        <a href="mailto:contact@jewishatlas.org?subject=Partnership%20Conversation%20—%20Jewish%20Atlas" class="cta-button">
-          Start the Conversation
+        <h3>Request a Private Briefing</h3>
+        <p>
+          If you are considering major support for Jewish Atlas, we would welcome a discreet conversation. We can share a concise briefing note
+          and discuss priorities, stewardship, and long-horizon impact.
+        </p>
+
+        <a
+          class="cta-button"
+          href="mailto:contact@jewishatlas.org?subject=Private%20Briefing%20Request%20%E2%80%94%20Jewish%20Atlas"
+        >
+          Request a Private Briefing
         </a>
+
+        <div class="cta-secondary">
+          Prefer a call? Email us and we will coordinate a time, or call
+          <a href="tel:+972587400269">+972 58 740 0269</a>.
+        </div>
       </div>
     </div><!-- end .content -->
 
+    <!-- FOOTER -->
     <footer>
       <div class="footer-item">
         <div class="footer-label">Founder &amp; Director</div>
@@ -508,15 +634,15 @@
       </div>
 
       <div class="footer-item">
-        <div class="footer-label">Phone</div>
+        <div class="footer-label">Website</div>
         <div class="footer-value">
-          <a href="tel:+972587400269">+972 58 740 0269</a>
+          <a href="https://jewishatlas.org" target="_blank" rel="noopener">jewishatlas.org</a>
         </div>
       </div>
 
       <div class="footer-note">
-        Jewish Atlas is an independent, community-built project dedicated to preserving Jewish heritage
-        and connecting Jewish communities worldwide.
+        Jewish Atlas is an independent, community-built initiative dedicated to preserving Jewish places worldwide.
+        Major support conversations are private and by invitation.
       </div>
     </footer>
   </div><!-- end .page -->
