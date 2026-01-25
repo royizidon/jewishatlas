@@ -100,10 +100,10 @@
     }
 
     .content {
-      padding: 18px 24px 22px;
+      padding: 24px 32px 32px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 35px;
       font-size: 1rem;
     }
 
@@ -151,6 +151,7 @@
   padding: 16px;
   border-radius: 8px;
   font-size: 1rem;
+  
 }
 
 .highlight strong { color: var(--navy); }
@@ -206,12 +207,12 @@
   background: linear-gradient(135deg, rgba(15, 24, 56, 0.02), rgba(37, 99, 235, 0.06));
   border: 1px solid rgba(37, 99, 235, 0.18);
   border-left: 4px solid var(--brand);
-  padding: 16px;
+  padding: 24px;
   border-radius: 10px;
 }
 
 
-    .partner-box p { margin-bottom: 10px; }
+    .partner-box p { margin-bottom: 20px; }
 
     .partner-box strong {
       color: var(--navy);
@@ -219,10 +220,20 @@
     }
 
     .partner-box ul {
-      margin: 8px 0 0 18px;
-      color: #374151;
-      line-height: 1.6;
-    }
+  margin: 16px 0 0 24px; /* Increased top margin to separate from paragraph */
+  color: #374151;
+}
+
+.partner-box ul li {
+  margin-bottom: 14px;   /* This is the "magic" for extra space */
+  line-height: 1.5;      /* Improves readability of multi-line bullets */
+  padding-left: 4px;     /* Slight nudge for elegance */
+}
+
+/* Removes margin from the very last bullet so it doesn't mess up bottom padding */
+.partner-box ul li:last-child {
+  margin-bottom: 0;
+}
 
     .impact-row {
       display: grid;
@@ -396,6 +407,65 @@ a:focus-visible{
     grid-template-columns: 1fr;
   }
 }
+.offer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.offer-box {
+  background: #ffffff;
+  border: 1px solid rgba(2, 6, 23, 0.12);
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+}
+
+.offer-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--brand);
+  border-radius: 10px 10px 0 0;
+}
+
+.offer-box-wide {
+  grid-column: span 2;
+}
+
+.offer-box h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--navy);
+}
+
+.offer-box p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.offer-meta {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .offer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .offer-box-wide {
+    grid-column: span 1;
+  }
+}
 
   </style>
 </head>
@@ -453,71 +523,76 @@ a:focus-visible{
   </div>
 </div>
 
-      <div class="section">
-        <div class="section-label">Offer</div>
-        <div class="section-content">
-          <div class="features">
-            <div class="feature-box">
-              <strong>Live Database</strong>
-              <span>Continuously growing map of synagogues, cemeteries, community centers, and heritage sites globally.</span>
-            </div>
-            <div class="feature-box">
-              <strong>Advanced Tech</strong>
-              <span>Big data architecture & interactive mapping built by PhD specialist in ecology & spatial science.</span>
-            </div>
-            <div class="feature-box">
-              <strong>White Label</strong>
-              <span>Embed on your site with custom branding, filters, and modifications tailored to your needs.</span>
-            </div>
-            <div class="feature-box">
-              <strong>Always Fresh</strong>
-              <span>New data continuously added to maintain accuracy and
-                 reflect living communities worldwide.</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="section">
+  <div class="section-label">Offer</div>
 
-      <div class="section">
-        <div class="section-label">License &amp; Sponsorship</div>
-        <div class="section-content">
-          <div class="partner-box">
-            <p>
-              <strong>Licensing:</strong> Subscription-based access for organizations,
-               municipalities, museums, and institutions. Includes live data access,
-               embedding rights, customization options, and continuous updates.
-            </p>
-
-            <p>
-              <strong>Sponsorship:</strong> 
-              Mission-aligned partners play a strategic role in preserving 
-              Jewish heritage worldwide. Sponsorship funding accelerates 
-              documentation efforts, supports research and data verification,
-               and ensures sustained open
-               public access to Jewish Atlas as a shared global resource.
-            </p>
-
-            <ul>
-              <li>Named recognition on Jewish Atlas platform and marketing materials</li>
-              <li>Direct association with global cultural preservation initiatives</li>
-              <li>Visibility to global Jewish communities and institutions</li>
-              <li>Co-branding opportunities tied to specific regions or initiatives</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-label">Impact</div>
-        <div class="impact-row">
-          <div class="impact-item">Tourism &amp; cultural planning</div>
-          <div class="impact-item">Education &amp; curricula support</div>
-          <div class="impact-item">Community infrastructure mapping</div>
-          <div class="impact-item">Preservation &amp; documentation</div>
-        </div>
-      </div>
+  <div class="offer-grid">
+    <!-- Core product (full width) -->
+    <div class="offer-box offer-box-wide">
+      <h3>Data-as-a-Service</h3>
+      <p>
+        A live, verified global dataset of Jewish heritage sites at worldwide scale — 
+        operated as living cultural 
+        infrastructure with continuous updates and institutional-grade reliability.
+      </p>
+      <div class="offer-meta">Updated continuously • Verified • Scalable</div>
     </div>
 
+    <!-- Supporting capability -->
+    <div class="offer-box">
+      <h3>White-Label & Embedding</h3>
+      <p>
+        Seamlessly integrate Jewish Atlas into your platform with custom branding,
+        region-specific filters, and tailored tools.
+      </p>
+    </div>
+
+    <!-- Supporting capability -->
+    <div class="offer-box">
+      <h3>API & Institutional Access</h3>
+      <p>
+        Programmatic access to high-precision geographic data for research,
+        planning, education, and institutional use.
+      </p>
+    </div>
+  </div>
+</div>
+<div class="section">
+  <div class="section-label">License &amp; Sponsorship</div>
+  <div class="section-content">
+    <div class="partner-box">
+      <p>
+        <strong>Licensing:</strong> Institutional access to our full dataset for professional deployment. 
+        Includes dedicated <strong>White-Label</strong> embedding rights, <strong>API</strong> keys for 
+        custom development, and tiered data-access rights.
+      </p>
+
+      <p>
+        <strong>Sponsorship:</strong> 
+        High-visibility partnership opportunities for brands and foundations. 
+        Your presence is integrated into the <strong>Jewish Atlas</strong>, 
+        ensuring your brand is seen wherever Jewish heritage data is accessed.
+      </p>
+
+      <ul>
+        <li><strong>Primary Brand Placement:</strong> "Presented by" recognition on the core global map interface.</li>
+        <li><strong>Network Reach:</strong> Co-branding on all White-Label instances deployed by our partner institutions.</li>
+        <li><strong>Data Credit:</strong> Named sponsorship of specific regional datasets (e.g., "The [Sponsor] Poland Collection").</li>
+        <li><strong>Targeted Visibility:</strong> Direct exposure to a niche audience of global community leaders and researchers.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Impact Verticals</div>
+  <div class="impact-row">
+    <div class="impact-item">Tourism &amp; Cultural Planning</div>
+    <div class="impact-item">Education &amp; Academic Research</div>
+    <div class="impact-item">Urban &amp; Community Infrastructure</div>
+    <div class="impact-item">Digital Preservation &amp; Archiving</div>
+  </div>
+</div>
     <footer>
       <div class="footer-item">
         <div class="footer-label">Founder &amp; Director</div>
