@@ -308,6 +308,79 @@
       /* Make the note span full width */
       footer .footer-note { grid-column: span 3; }
     }
+    /* Progress / credibility section */
+.proof {
+  background: linear-gradient(135deg, rgba(15, 24, 56, 0.02), rgba(212, 178, 106, 0.10));
+  border: 1px solid rgba(212, 178, 106, 0.32);
+  border-left: 4px solid var(--gold);
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.proof p {
+  margin: 0 0 12px 0;
+  color: #374151;
+}
+
+.proof-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.proof-stat {
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 14px 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.proof-stat::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 0 0 6px 6px;
+  opacity: 0.95;
+}
+
+.proof-number {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--navy);
+  letter-spacing: -0.4px;
+  line-height: 1.05;
+  margin-top: 6px;
+}
+
+.proof-label {
+  font-size: 0.86rem;
+  color: var(--muted);
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.proof-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15,24,56,0.10);
+  font-size: 0.92rem;
+  color: #4b5563;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .proof-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
   </style>
 </head>
 
@@ -336,6 +409,32 @@
         Jewish Atlas exists to ensure that Jewish sites, memory, and presence remain visible, discoverable, and connected to communities — through rigorous
          documentation and long-term stewardship.
       </div>
+<div class="section">
+  <div class="section-label">Progress to Date</div>
+  <div class="section-content">
+    <div class="proof">
+      <p>
+        Jewish Atlas is already active at global scale, built through sustained research, community contributions,
+        and careful curation.
+      </p>
+
+      <div class="proof-stats" role="group" aria-label="Key metrics">
+        <div class="proof-stat">
+          <div class="proof-number">121</div>
+          <div class="proof-label">Countries Represented</div>
+        </div>
+        <div class="proof-stat">
+          <div class="proof-number">35,000+</div>
+          <div class="proof-label">Sites Documented</div>
+        </div>
+      </div>
+
+      <div class="proof-note">
+        This existing foundation enables Jewish Atlas to function not as a concept, but as a durable cultural resource.
+      </div>
+    </div>
+  </div>
+</div>
 
       <div class="section">
         <div class="section-label">Offer</div>
