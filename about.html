@@ -1,292 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>About · Jewish Atlas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="header.css">
-  <!-- App config (kept for parity with upload page, safe if unused) -->
-  <script src="config.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About | Jewish Atlas</title>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --header-h: 72px;
-      --hero-a: #0f1838; --hero-b: #202a74; --hero-c: #3b32cc;
-      --ring: rgba(79,70,229,.15);
-      --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e5e7eb; --gray-300:#e2e8f0; --ink:#0f172a;
-      --btn:#4f46e5; --btn-hover:#4338ca;
+    :root {
+      --navy: #0f172a;
+      --slate: #475569;
+      --slate-light: #64748b;
+      --gold: #f4bf4f;
+      --accent: #1e3a8a;
+      --bg: #fcfcfd;
+      --white: #ffffff;
+      --radius: 12px;
     }
 
-    /* Base */
-    html, body { margin:0; height:100%; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body       { background:#f6f7fb; color:var(--ink); overflow:auto; padding-top:var(--header-h); }
-    .ja-container{ max-width:1100px; margin:0 auto; padding:0 16px; }
+    * { box-sizing: border-box; }
 
-   
-    /* Title (hero) */
-    .ja-heroText{ padding:42px 16px 24px; text-align:center; }
-    .ja-heroText .hero-title{
-      font:800 40px/1.2 "Playfair Display", serif;
-      background:linear-gradient(135deg,#2563eb,#7c3aed);
-      -webkit-background-clip:text; background-clip:text;
-      -webkit-text-fill-color:transparent; color:transparent;
-      margin:0 0 10px;
-    }
-    .ja-heroText .hero-subtitle{
-      font-size:18px; line-height:1.6; color:#475569; margin:0 auto; max-width:780px;
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Section cards & layout */
-    .section{ margin:24px 0; }
-    .ja-card { background:#fff; border:1px solid var(--gray-200); border-radius:16px;
-               box-shadow:0 8px 24px rgba(15,23,42,.05); padding:24px; }
-    .ja-grid{ display:grid; gap:16px; grid-template-columns:1fr; }
-    @media (min-width:768px){ .ja-grid{ grid-template-columns:1fr 1fr; } }
-    @media (min-width:1024px){ .ja-grid-3{ grid-template-columns:repeat(3,1fr); } }
-
-    .h3{ font:800 26px/1.3 "Playfair Display", serif; margin:0 0 10px; }
-    .lead{ font-size:16px; color:#475569; line-height:1.7; }
-
-    /* Impact strip */
-    .impact{
-      background:linear-gradient(90deg,#eef2ff,#f5f3ff);
-      border:1px solid var(--gray-200); border-radius:16px; padding:18px;
-      display:grid; gap:12px; grid-template-columns:1fr 1fr; text-align:center;
+    /* Unified Container Width */
+    .container {
+      max-width: 680px; 
+      margin: 0 auto;
+      padding: 0 24px;
     }
-    @media (min-width:768px){ .impact{ grid-template-columns:repeat(4,1fr); } }
-    .impact .num{ font-weight:800; font-size:26px; }
-    .impact .lbl{ color:#475569; font-size:13px; }
 
-    /* Support CTAs */
-    .cta-row{ display:grid; gap:14px; grid-template-columns:1fr; }
-    @media (min-width:768px){ .cta-row{ grid-template-columns:1fr 1fr; } }
-    .cta{
-      border:1px dashed #c7d2fe; background:#fff; border-radius:16px; padding:22px;
+    /* --- HEADER --- */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .cta h4{ margin:0 0 8px; font:800 20px/1.25 Inter, system-ui, sans-serif; }
-    .cta p{ margin:0 0 14px; color:#475569; }
-    .btn-primary{
-      background:var(--btn); color:#fff; border:none; padding:12px 18px; border-radius:12px;
-      font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(79,70,229,.25);
-      transition:background .15s ease, transform .15s ease, box-shadow .15s ease;
-      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .btn-primary:hover{ background:var(--btn-hover); transform:translateY(-1px); box-shadow:0 6px 16px rgba(79,70,229,.32); }
 
-    /* Team */
-    .team-card{ display:flex; gap:16px; align-items:flex-start; }
-    /* Section kicker, not a button */
-.badge{
-  display:block;
-  margin:0 0 6px;
-  padding:0;                 /* no pill padding */
-  background:transparent;    /* no chip background */
-  border:0;                  /* remove border */
-  cursor:default;            /* not clickable */
-
-  color:#4338ca;             /* keep brand color */
-  font-weight:700;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.08em;      /* “eyebrow” feel */
-}
-
-/* small underline accent to separate the label from the title */
-.badge::after{
-  content:"";
-  display:block;
-  width:28px; height:2px;
-  margin-top:6px;
-  background:#c7d2fe;
-  border-radius:1px;
-}
-
-
-    /* Footer note */
-    .tiny{ font-size:12px; color:#64748b; }
-
-    /* Mobile tweaks */
-    @media (max-width:640px){
-      .ja-heroText{ padding:28px 12px 18px; }
-      .ja-heroText .hero-title{ font-size:32px; }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-decoration: none;
     }
-/* extra space at the bottom so the last card doesn't feel cramped */
-main.ja-container { 
-  padding-bottom: 40px;        /* desktop breathing room */
-}
 
-main.ja-container .section:last-of-type {
-  margin-bottom: 24px;         /* space between last section and edge */
-}
+    nav { display: flex; gap: 8px; }
 
-/* mobile: a bit less padding */
-@media (max-width:640px){
-  main.ja-container { padding-bottom: 56px; }
-}
+    .nav-link {
+      text-decoration: none;
+      color: var(--slate);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
 
-/* Hide search/filter row on non-map pages */
-#headerRow2 { 
-  display: none !important; 
-}
+    .nav-link:hover { background: rgba(0,0,0,0.05); }
+    
+
+    /* --- HERO --- */
+    .hero {
+      text-align: center;
+      padding: 50px 0 20px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 2.8rem);
+      margin-bottom: 16px;
+      line-height: 1.1;
+      color: var(--navy);
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--slate);
+      margin: 0 auto;
+    }
+
+    /* --- CONTENT SECTIONS --- */
+    .section-intro, .section {
+      padding: 20px 0;
+    }    
+    
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+
+    p { margin-bottom: 16px; font-size: 1.05rem; color: #334155; }
+
+    .audience-tag {
+      font-size: 0.95rem;
+      color: var(--slate-light);
+      border-top: 1px solid #f1f5f9;
+      padding-top: 12px;
+      margin-top: 20px;
+    }
+
+    .pull-quote {
+      border-left: 4px solid var(--gold);
+      padding: 10px 0 10px 24px;
+      margin: 32px 0;
+      font-style: italic;
+      font-size: 1.15rem;
+      font-weight: 500;
+      background: #fffbeb;
+      color: var(--navy);
+    }
+
+    /* --- IMAGES --- */
+    .featured-image {
+      margin: 30px 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .featured-image img {
+      width: 100%;
+      height: auto;
+      max-height: 450px;
+      object-fit: cover;
+      display: block;
+    }
+
+    figcaption {
+      padding: 12px;
+      background: #f8fafc;
+      font-size: 0.9rem;
+      color: var(--slate-light);
+      text-align: center;
+    }
+
+    /* --- THE BRICK CARD --- */
+    .card-dark {
+      background: var(--navy);
+      color: var(--white);
+      padding: 45px 30px;
+      border-radius: 20px;
+      text-align: center;
+      margin: 35px 0;
+    }
+
+    .card-dark h2 { color: var(--white); margin-top: 0; }
+    .card-dark p { color: #f1f5f9; font-size: 1.05rem; max-width: 500px; margin: 0 auto 20px; }
+
+    .brick-preview {
+      display: inline-block;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: var(--gold);
+      border: 1px dashed rgba(244, 191, 79, 0.4);
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      font-size: 0.95rem;
+    }
+
+    .btn-gold {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--navy);
+      padding: 16px 32px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    .btn-gold:hover { transform: translateY(-2px); }
+
+    /* --- UPLOAD FOOTER BOX --- */
+    .upload-subtle {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .upload-subtle p { margin: 0; font-weight: 600; color: var(--navy); }
+
+    .upload-link {
+      color: var(--navy);
+      text-decoration: none;
+      font-weight: 700;
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 1px;
+      margin-left: 5px;
+      white-space: nowrap;
+    }
+
+    .review-note {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--slate-light);
+      margin-top: 8px;
+      font-weight: 400;
+    }
+
+    /* --- FOOTER --- */
+    .minimal-footer {
+      padding: 40px 0;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    .minimal-footer p { font-size: 0.9rem; color: var(--slate-light); margin: 0; }
+    .minimal-footer a { color: var(--navy); text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 600px) {
+      .header-content { flex-direction: column; gap: 12px; }
+      .container { padding: 0 20px; }
+    }
   </style>
-<script src="header.js"></script>
-
 </head>
 <body>
 
-<header id="appHeader">
-  <div id="headerRow1">
-    <div id="headerLeft">
-      <h1 id="siteTitle">Jewish Atlas</h1>
-      <nav id="navButtons">
-        <button class="navBtn" id="uploadBtn">Upload</button>
-        <button class="navBtn" id="wallBtn">The Wall</button>
-        <button class="navBtn" id="backBtn">Map</button>
+  <header>
+    <div class="container header-content">
+      <a href="index.html" class="logo">Jewish Atlas</a>
+      <nav>
+        <a href="index.html" class="nav-link">Map</a>
+        <a href="wall.html" class="nav-link">The Wall</a>
+        <a href="upload.html" class="nav-link">Upload</a>
       </nav>
     </div>
-<div id="searchContainer"></div>
-  </div>
-  <div id="headerRow2">
-    <div id="filterContainer"></div>
-  
-  </div>
-</header>
+  </header>
 
-  <!-- Hero -->
-  <section class="ja-heroText">
-    <h2 class="hero-title">Mapping Our Shared Jewish Story.</h2>
-    <p class="hero-subtitle">
-      Jewish Atlas connects people to their heritage, helps communities preserve sites,
-      and builds an open, living database for researchers and families around the world.
-    </p>
-  </section>
+  <main class="container">
+    <section class="hero">
+      <h1>Every place tells a story.</h1>
+      <p class="hero-sub">Mapping synagogues, cemeteries, and heritage sites across 121 countries. Many are forgotten. We map them all.</p>
+    </section>
 
-  <main class="ja-container">
-    <!-- Our Aim -->
-    <section class="section">
-      <div class="ja-grid ja-card">
-        <div>
-          <h3 class="h3">What is Jewish Atlas?</h3>
-          <p class="lead">
-            We’re travelers and researchers with a deep love for Jewish history. We listen to people’s memories,
-            mark places that matter, and partner with local communities to keep these stories alive. Jewish Atlas
-            is a bridge between <em>memory</em> and <em>maps</em>—personal, warm, and open to everyone.
-          </p>
-        </div>
-        <div class="ja-grid ja-grid-3" style="gap:12px">
-          <div class="ja-card" style="padding:16px">
-            <div class="badge">Connect</div>
-            <div style="margin-top:8px; font-weight:700">People ↔ Heritage</div>
-            <div class="tiny" style="margin-top:6px">Find and share the places that shaped your family.</div>
-          </div>
-          <div class="ja-card" style="padding:16px">
-            <div class="badge">Preserve</div>
-            <div style="margin-top:8px; font-weight:700">Sites & Memory</div>
-            <div class="tiny" style="margin-top:6px">Organize preservation projects with local communities.</div>
-          </div>
-          <div class="ja-card" style="padding:16px">
-            <div class="badge">Research</div>
-            <div style="margin-top:8px; font-weight:700">Open Database</div>
-            <div class="tiny" style="margin-top:6px">Create a resource for Jewish history and education.</div>
-          </div>
-        </div>
+    <section class="section-intro">
+      <h2>A Living Map</h2>
+      <div class="living-map-text">
+        <p>
+          Jewish Atlas is a global record of heritage—weaving fragments from old archives 
+          and local knowledge into one reliable digital record.
+        </p>
+        <p>
+          <strong>More than a database, this is a bridge.</strong> By making history visible, 
+          we connect people to their roots and help local communities reclaim their stories 
+          to prosper through shared heritage.
+        </p>
+        <p class="audience-tag">
+          Built for travelers, educators, and families seeking to connect.
+        </p>
       </div>
     </section>
 
-    <!-- Impact strip (edit numbers anytime) -->
-    <section class="section">
-      <div class="impact">
-        <div>
-          <div class="num">20000+</div>
-          <div class="lbl">Sites cataloged</div>
-        </div>
-        <div>
-          <div class="num">51</div>
-          <div class="lbl">Countries mapped</div>
-        </div>
-        <div>
-          <div class="num">12+</div>
-          <div class="lbl">Contributors</div>
-        </div>
-        <div>
-          <div class="num">2</div>
-          <div class="lbl">Local projects</div>
-        </div>
-      </div>
-  
-    </section>
+    <figure class="featured-image">
+      <img src="prague-cemetery.jpg" alt="Old Jewish Cemetery, Prague">
+      <figcaption>Old Jewish Cemetery, Prague — one of 35,000+ sites on the atlas</figcaption>
+    </figure>
 
-    <!-- Our Story -->
-<section class="section">
-  <div class="ja-card">
-    <div class="badge">About Us</div>
-    <h3 class="h3" style="margin-top:8px">"Walking where history lives"</h3>
-    <p class="lead">
-      Jewish Atlas began on small side streets and in quiet cemeteries—places where a name on a stone
-      or the outline of a synagogue wall can open an entire world. We met caretakers, teachers, and neighbors
-      who protect memory with simple acts: a cleared path, a mended gate, a story told again.
-    </p>
-    <p class="lead">
-      We walk, listen, photograph, and document—with care and curiosity. Our work is field-first, focused on dignity and accuracy. We spend time with local communities, record stories, and verify every location. This project gathers those acts of memory so they will not fade.
-    </p>
-    <p class="lead">
-      Jewish Atlas is independent and people-powered: our aim is simple—help you connect with your heritage 
-      and make sure the places that tell our story are not forgotten. Every pin on the map is a voice saying: 
-      "We were here—and still are."
-    </p>
-  </div>
-</section>
-
-    <!-- How you can help -->
     <section class="section">
-      <div class="ja-grid">
-        <div class="cta">
-          <h4>Add your heritage site</h4>
-          <p>Know a synagogue, cemetery, mikve, monument, or neighborhood with a story? Share it with the world.</p>
-          <a class="btn-primary" href="upload.html">Upload a Site</a>
-        </div>
-        <div class="cta">
-          <h4>Dedicate a brick on <em>The Wall</em></h4>
-          <p>Your dedication helps fund preservation and research. Honor a person, a family, a community.</p>
-          <a class="btn-primary" href="mailto:jewishatlas.com@gmail.com?subject=Dedicate%20a%20Brick%20—%20Jewish%20Atlas">Email Us to Dedicate</a>
-        </div>
+      <h2>Why This Matters</h2>
+      <p>Preservation is about continuity. By keeping Jewish presence visible and its history accessible, we ensure that these stories remain part of the global landscape, even when physical sites are vulnerable.</p>
+      <div class="pull-quote">
+        "Every point on this map represents a community, a family, and a story made findable and remembered."
       </div>
     </section>
 
-   
+    <section class="card-dark">
+      <h2>Dedicate a Brick</h2>
+      <p>Create a permanent tribute to a person, family, or community. Your support keeps the Atlas free for everyone.</p>
+      
+      <div class="brick-preview">
+        In memory of the Goldstein Family — Warsaw
+      </div>
 
-<!-- Contact -->
-<section class="section">
-  <div class="ja-card" style="display:grid; gap:16px; grid-template-columns:1fr; align-items:flex-start;">
-    <div>
-      <h3 class="h3" style="margin:0 0 8px">Contact</h3>
-      <p class="lead" style="margin:0 0 10px">
-        Questions, corrections, or a story to share? We’d love to hear from you.
+      <div>
+        <a href="mailto:contact@jewishatlas.org?subject=Brick" class="btn-gold">Dedicate a Brick — ₪180</a>
+      </div>
+    </section>
+
+    <section class="upload-subtle">
+      <p>
+        Know a site we missed? 
+        <a href="upload.html" class="upload-link">Upload a Site &rarr;</a>
+        <span class="review-note">Submissions reviewed before publishing</span>
       </p>
-      <ul style="margin:10px 0 16px; padding-left:18px; color:#475569; line-height:1.8">
-        <li>Report an error or add details to a site</li>
-        <li>Ask about preservation projects in your community</li>
-        <li>Media or educational use</li>
-      </ul>
-      <div style="display:flex; gap:12px; flex-wrap:wrap">
-        <a class="btn-primary" href="mailto:jewishatlas.com@gmail.com?subject=Hello%20from%20Jewish%20Atlas">
-          Email Us
-        </a>
-   
-      </div>
-      <p class="tiny" style="margin-top:10px">
-        Prefer writing your own subject? <a href="mailto:jewishatlas.com@gmail.com">jewishatlas.com@gmail.com</a>
-      </p>
-    </div>
-  </div>
-</section>
-    
+    </section>
   </main>
+
+  <footer class="minimal-footer">
+    <div class="container">
+      <p>&copy; 2025 Jewish Atlas &middot; <a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a></p>
+    </div>
+  </footer>
 
 </body>
 </html>
