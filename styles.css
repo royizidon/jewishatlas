@@ -92,6 +92,38 @@ html, body {
   min-width: 320px;
 }
 
+/* Desktop: highlighted search widget */
+  #searchContainer {
+    background: #fff !important;
+    border: 2px solid #2563eb !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 12px rgba(37, 99, 235, 0.15) !important;
+    padding: 2px !important;
+    transition: all 0.2s ease;
+  }
+
+  #searchContainer:hover,
+  #searchContainer:focus-within {
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.25) !important;
+  }
+
+  #searchContainer .esri-search {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  #searchContainer .esri-search__input {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+  }
+
+  #searchContainer .esri-search__input::placeholder {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+
 /* ─── FILTERS ──────────────────────────────────────────────── */
 #filterContainer {
   display: flex;
