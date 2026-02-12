@@ -918,9 +918,222 @@ view.when(() => {
   });
   map.add(globalLayer);
   
-  view.when(() => {
-  if (!DeviceInfo.isMobile()) {
-    showToast(`Explore Jewish Heritage Around the World Use the filters above to view sites by category  — or search by location.`, 6000);
+// ========================================
+// WELCOME POPUP – Bilingual (EN / HE)
+// ========================================
+view.when(() => {
+  if (localStorage.getItem("ja_welcome_dismissed") === "1") return;
+
+  const isMobile = window.matchMedia("(max-width: 640px)").matches;
+
+  // ---------- Language detection ----------
+  const langs = navigator.languages?.length
+    ? navigator.languages
+    : [navigator.language || ""];
+  const isHebrew = langs.some((l) => String(l).toLowerCase().startsWith("he"));
+
+  // ---------- Copy ----------
+  const t = isHebrew
+    ? {
+        dir: "rtl",
+        align: "right",
+        closeSide: "left",
+        title: "ברוכים הבאים לאטלס היהודי",
+        subtitle: "המפה שמחברת עבר, הווה ועתיד — אלפי אתרי מורשת יהודית במקום אחד.",
+        tips: [
+          "הגדילו את המפה כדי לגלות אתרים",
+          "סננו לפי קטגוריה: בתי כנסת · מורשת · אוכל כשר · קהילה",
+          "חפשו עיר או יעד כדי להתחיל לתכנן ביקור",
+        ],
+        cta: "המפה",
+        brick: "הקדישו לבנה",
+        upload: "הוסיפו אתר למפה",
+        hint: "",
+        tagline: "שומרים על הזיכרון. בונים את המפה.",
+        dontShow: "אל תציגו שוב",
+      }
+    : {
+        dir: "ltr",
+        align: "left",
+        closeSide: "right",
+        title: "Welcome to The Jewish Atlas",
+        subtitle:
+          "Explore thousands of Jewish heritage sites around the world — and plan your next visit.",
+        tips: [
+          "🗺️ Zoom in anywhere to discover sites nearby",
+          "🗂️ Filter by category: synagogues · heritage · kosher food · community",
+          "🔍 Search any city to start planning your trip",
+        ],
+        cta: "Start Exploring",
+        brick: "Dedicate a Brick",
+        upload: "Upload a Site",
+        hint: isMobile ? "" : `<span style="color:#999; font-weight:400;"> — help us grow</span>`,
+        tagline: "Preserve memory. Build the map.",
+        dontShow: "Don't show this again",
+      };
+
+  // ---------- Overlay ----------
+  const overlay = document.createElement("div");
+  overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 280ms ease;
+    padding: 16px;
+  `;
+
+  // ---------- Card ----------
+  const card = document.createElement("div");
+  card.style.cssText = `
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: ${isMobile ? "24px 20px 18px" : "36px 40px 28px"};
+    max-width: ${isMobile ? "360px" : "460px"};
+    width: 100%;
+    position: relative;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    direction: ${t.dir};
+    transform: scale(0.96);
+    opacity: 0;
+    transition: transform 280ms ease, opacity 280ms ease;
+    max-height: 85vh;
+    overflow: auto;
+  `;
+
+  // ---------- Build tips HTML ----------
+  const tipPadSide = t.dir === "rtl" ? "right" : "left";
+
+  const tipsHtml = t.tips
+    .map(
+      (tip) =>
+        `<li style="margin-bottom: 8px; padding-${tipPadSide}: 4px;">${tip}</li>`
+    )
+    .join("");
+
+  // ---------- Card content ----------
+  card.innerHTML = `
+    <button id="welcomeClose" style="
+      position: absolute; top: 6px; ${t.closeSide}: 6px;
+      background: none; border: none;
+      min-width: 44px; min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #999; cursor: pointer;
+      border-radius: 10px;
+    " aria-label="Close" type="button">✕</button>
+
+    <h2 style="
+      margin: 0 0 8px;
+      font-size: ${isMobile ? "20px" : "23px"};
+      font-weight: 700;
+      color: #1a1a1a;
+    ">${t.title}</h2>
+
+    <p style="
+      margin: 0 0 18px;
+      font-size: ${isMobile ? "13.5px" : "14.5px"};
+      color: #555;
+      line-height: 1.55;
+    ">${t.subtitle}</p>
+
+    <ul style="
+      list-style: none;
+      padding: 0;
+      margin: 0 0 22px;
+      text-align: ${t.align};
+      font-size: ${isMobile ? "13px" : "14px"};
+      color: #444;
+      line-height: 1.65;
+    ">${tipsHtml}</ul>
+
+    <button id="welcomeExplore" style="
+      display: block;
+      width: 100%;
+      padding: ${isMobile ? "15px 0" : "13px 0"};
+      min-height: 44px;
+      background: #3b5998;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: background 200ms ease;
+    " type="button">${t.cta}</button>
+
+    <div style="
+      font-size: 13px;
+      margin-bottom: 14px;
+      color: #3b5998;
+      line-height: 1.5;
+    ">
+      <a href="/wall.html" style="color:#3b5998; text-decoration:none; font-weight:600;">${t.brick}</a>
+      <span style="color:#ccc; margin: 0 8px;">·</span>
+      <a href="/upload.html" style="color:#3b5998; text-decoration:none; font-weight:600;">${t.upload}</a>
+      ${t.hint}
+    </div>
+
+    <p style="
+      margin: 0 0 14px;
+      font-size: 12.5px;
+      color: #888;
+      font-style: italic;
+      letter-spacing: 0.2px;
+    ">${t.tagline}</p>
+
+    <label style="
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      color: #999;
+      cursor: pointer;
+      padding: 8px 0;
+      user-select: none;
+    ">
+      <input type="checkbox" id="welcomeDontShow"
+        style="width: 18px; height: 18px; accent-color: #3b5998; cursor: pointer;">
+      ${t.dontShow}
+    </label>
+  `;
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  // ---------- Animate in ----------
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      overlay.style.opacity = "1";
+      card.style.transform = "scale(1)";
+      card.style.opacity = "1";
+    });
+  });
+
+  // ---------- Close logic ----------
+  function closeWelcome() {
+    if (card.querySelector("#welcomeDontShow")?.checked) {
+      localStorage.setItem("ja_welcome_dismissed", "1");
+    }
+    overlay.style.opacity = "0";
+    card.style.transform = "scale(0.96)";
+    card.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 280);
+  }
+
+  card.querySelector("#welcomeClose").addEventListener("click", closeWelcome);
+  card.querySelector("#welcomeExplore").addEventListener("click", closeWelcome);
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeWelcome();
+  });
+
+  // Hover effect only on hover-capable devices
+  if (window.matchMedia("(hover: hover)").matches) {
+    const btn = card.querySelector("#welcomeExplore");
+    btn.addEventListener("mouseenter", () => (btn.style.background = "#2d4373"));
+    btn.addEventListener("mouseleave", () => (btn.style.background = "#3b5998"));
   }
 });
 
