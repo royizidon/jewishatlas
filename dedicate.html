@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dedicate a Brick</title>
+
+<link rel="stylesheet" href="dedicate.css" />
+<script src="dedicate.js" defer></script>
+</head>
+
+<body>
+
+<div class="dedicate-wrapper">
+
+  <a href="wall.html" class="back-link">← Back to Wall</a>
+
+  <h1 class="page-title">Dedicate a Brick</h1>
+
+  <div class="tier-select">
+    <label>
+      <input type="radio" name="tier" value="brick" checked>
+      Brick
+    </label>
+
+    <label>
+      <input type="radio" name="tier" value="page">
+      Brick + Memorial Page
+    </label>
+  </div>
+
+  <form id="dedicateForm" class="dedicate-form" enctype="multipart/form-data">
+
+    <div class="form-group">
+      <label>Hebrew Name</label>
+      <input type="text" name="he_name">
+    </div>
+
+    <div class="form-group">
+      <label>English Name</label>
+      <input type="text" name="eng_name">
+    </div>
+
+    <div class="form-group">
+      <label>Hebrew Dates</label>
+      <input type="text" name="born_str" placeholder="א ניסן תש״פ – א אלול תשע״ד">
+    </div>
+
+    <div class="form-group">
+      <label>Gregorian Dates</label>
+      <input type="text" name="death_str" placeholder="1.1.1940 – 1.1.2000">
+    </div>
+
+    <div class="form-group">
+      <label>Origin (City / Country)</label>
+      <input type="text" name="origin">
+    </div>
+
+    <div class="form-group">
+      <label>Your Email</label>
+      <input type="email" name="dedicator_email" required>
+    </div>
+
+    <!-- PAGE ONLY FIELDS -->
+    <div id="pageFields" class="page-extra" style="display:none;">
+
+      <div class="form-group">
+        <label>Full Biography</label>
+        <textarea name="full_bio" rows="6"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Image (max 1MB)</label>
+        <input type="file" name="image" accept="image/*">
+      </div>
+
+    </div>
+
+    <button type="submit" class="submit-btn">
+      Continue
+    </button>
+
+  </form>
+
+</div>
+
+</body>
+</html>

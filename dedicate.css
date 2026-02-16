@@ -1,0 +1,102 @@
+body {
+  margin: 0;
+  font-family: "Georgia", serif;
+  background: #ffffff;
+  color: #222;
+}
+
+.dedicate-wrapper {
+  max-width: 720px;
+  margin: 60px auto;
+  padding: 0 20px 60px;
+}
+
+.back-link {
+  text-decoration: none;
+  font-size: 14px;
+  color: #888;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 42px;
+  font-weight: 500;
+  margin: 40px 0;
+  letter-spacing: -0.5px;
+}
+
+.tier-select {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  font-size: 18px;
+}
+
+.tier-select input {
+  margin-right: 8px;
+}
+
+.dedicate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+input, textarea {
+  border: none;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 4px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  border-bottom: 1px solid #000;
+}
+
+.submit-btn {
+  margin-top: 30px;
+  padding: 14px;
+  background: #111;
+  color: white;
+  border: none;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: #333;
+}
+
+.page-extra.hidden {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .form-group-row {
+    flex-direction: column;
+  }
+
+  .page-title {
+    font-size: 32px;
+  }
+}
