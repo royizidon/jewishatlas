@@ -1,102 +1,491 @@
+/* =========================================
+   BASE
+========================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: "Georgia", serif;
-  background: #ffffff;
-  color: #222;
+  font-family: "DM Sans", system-ui, sans-serif;
+  background: #fff;
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* =========================================
+   LAYOUT
+========================================= */
 
 .dedicate-wrapper {
-  max-width: 720px;
-  margin: 60px auto;
-  padding: 0 20px 60px;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 120px;
 }
+
+/* =========================================
+   BACK LINK
+========================================= */
 
 .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   text-decoration: none;
-  font-size: 14px;
-  color: #888;
+  font-size: 15px;
+  font-weight: 500;
+  color: #666;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
 }
+
+.back-link:hover {
+  color: #111;
+}
+
+/* =========================================
+   HEADER
+========================================= */
 
 .page-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 400;
+  font-size: 44px;
   text-align: center;
-  font-size: 42px;
-  font-weight: 500;
-  margin: 40px 0;
-  letter-spacing: -0.5px;
+  margin: 56px 0 16px;
+  letter-spacing: -0.3px;
+  color: #111;
+  line-height: 1.25;
 }
 
-.tier-select {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-bottom: 40px;
-  font-size: 18px;
+.support-note {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  margin: 0 0 40px;
 }
 
-.tier-select input {
-  margin-right: 8px;
-}
+/* =========================================
+   FORM
+========================================= */
 
 .dedicate-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0;
 }
 
-.form-group {
+/* =========================================
+   TIER BUTTONS
+========================================= */
+
+.tier-buttons {
   display: flex;
-  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 52px;
 }
 
-.form-group-row {
-  display: flex;
-  gap: 20px;
+.tier-btn {
+  flex: 1;
+  padding: 12px 16px 14px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-.form-group label {
+.tier-btn:hover {
+  border-color: #aaa;
+}
+
+.tier-btn.active {
+  border-color: #2f2f2f;
+  background: #2f2f2f;
+  color: #fff;
+}
+
+.tier-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+.tier-desc {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+  opacity: 0.5;
+  font-weight: 400;
+}
+
+.tier-btn.active .tier-desc {
+  opacity: 0.65;
+}
+
+.tier-price {
+  display: block;
+  margin-top: 6px;
+  font-family: "DM Sans", sans-serif;
   font-size: 14px;
-  margin-bottom: 6px;
-  color: #555;
+  font-weight: 600;
+  color: #111;
 }
 
-input, textarea {
+.tier-btn.active .tier-price {
+  color: #fff;
+}
+
+/* =========================================
+   FLOATING LABEL FIELDS
+========================================= */
+
+.field {
+  position: relative;
+  margin-bottom: 36px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
   border: none;
   border-bottom: 1px solid #ddd;
-  padding: 10px 4px;
-  font-size: 16px;
+  padding: 24px 0 10px;
+  font-size: 18px;
   font-family: inherit;
+  font-weight: 400;
+  background: transparent;
+  color: #222;
+  transition: border-color 0.25s;
   outline: none;
 }
 
-input:focus, textarea:focus {
-  border-bottom: 1px solid #000;
+.field input:focus,
+.field textarea:focus {
+  border-bottom-color: #111;
 }
 
-.submit-btn {
-  margin-top: 30px;
-  padding: 14px;
-  background: #111;
-  color: white;
-  border: none;
-  font-size: 16px;
-  letter-spacing: 0.5px;
+.field label {
+  position: absolute;
+  left: 0;
+  top: 24px;
+  font-size: 17px;
+  color: #999;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  font-weight: 400;
+}
+
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label {
+  top: 4px;
+  font-size: 12px;
+  color: #777;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+/* RTL label floats right */
+.field input[dir="rtl"] + label {
+  left: auto;
+  right: 0;
+  text-align: right;
+}
+
+.field input[dir="rtl"]:focus + label,
+.field input[dir="rtl"]:not(:placeholder-shown) + label {
+  right: 0;
+  left: auto;
+}
+
+/* Textarea */
+.field textarea {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 18px 16px;
+  min-height: 140px;
+  resize: vertical;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.field textarea::placeholder {
+  color: #aaa;
+}
+
+.field textarea:focus {
+  border-color: #111;
+  border-bottom-color: #111;
+}
+
+.field .textarea-label {
+  position: static;
+  display: block;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #666;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+.field input[dir="rtl"] {
+  text-align: right;
+  font-size: 19px;
+}
+
+/* Date inputs — label always floated up */
+.field input[type="date"] + label {
+  top: 4px;
+  font-size: 12px;
+  color: #777;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+.field input[type="date"] {
+  color: #555;
+  font-size: 17px;
+  padding-top: 28px;
+}
+
+/* =========================================
+   FIELD PAIR (side by side)
+========================================= */
+
+.field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 36px;
+}
+
+/* =========================================
+   UPLOAD ZONE
+========================================= */
+
+.upload-zone {
+  position: relative;
+  margin-bottom: 36px;
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
+  z-index: 2;
+}
+
+.upload-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 24px;
+  border: 1.5px dashed #d8d8d8;
+  border-radius: 12px;
+  background: #fafafa;
+  transition: all 0.25s ease;
+}
+
+.upload-idle svg {
+  stroke: #bbb;
+}
+
+.upload-idle span {
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.upload-idle small {
+  font-size: 13px;
+  color: #aaa;
+  font-weight: 400;
+}
+
+.upload-zone:hover .upload-idle {
+  border-color: #bbb;
+  background: #f3f3f3;
+  transform: translateY(-2px);
+}
+
+/* Preview */
+.upload-preview {
+  display: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  position: relative;
+}
+
+.upload-preview.active {
+  display: block;
+}
+
+.upload-preview img {
+  display: block;
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  padding: 8px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 3;
+}
+
+.remove-btn:hover {
+  background: rgba(160, 30, 30, 0.8);
+}
+
+/* =========================================
+   SUBMIT
+========================================= */
+
+.submit-btn {
+  margin-top: 48px;
+  padding: 18px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 17px;
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.25s;
 }
 
 .submit-btn:hover {
-  background: #333;
+  background: #2a2a2a;
 }
 
-.page-extra.hidden {
-  display: none;
+.submit-btn:active {
+  transform: scale(0.995);
 }
+
+.submit-btn:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.btn-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot-pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* =========================================
+   NOTE
+========================================= */
+
+.note {
+  text-align: center;
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 18px;
+  font-weight: 400;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
 
 @media (max-width: 600px) {
-  .form-group-row {
-    flex-direction: column;
+
+  .dedicate-wrapper {
+    padding: 32px 18px 100px;
   }
 
   .page-title {
-    font-size: 32px;
+    font-size: 34px;
+    margin: 48px 0 12px;
+  }
+
+  .support-note {
+    margin-bottom: 32px;
+    font-size: 13px;
+  }
+
+  .tier-buttons {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+
+  .tier-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    padding: 14px 18px;
+  }
+
+  .tier-desc {
+    margin-top: 0;
+    margin-left: 2px;
+  }
+
+  .field-pair {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .field input,
+  .field textarea {
+    font-size: 16px;
+  }
+
+  .submit-btn {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .dedicate-wrapper {
+    max-width: 620px;
   }
 }

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dedicate a Brick</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="dedicate.css" />
 <script src="dedicate.js" defer></script>
 </head>
@@ -13,72 +16,120 @@
 
 <div class="dedicate-wrapper">
 
-  <a href="wall.html" class="back-link">← Back to Wall</a>
+  <a href="wall.html" class="back-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Wall
+  </a>
 
-  <h1 class="page-title">Dedicate a Brick</h1>
+  <h1 class="page-title">Honor a memory.<br>Preserve a legacy.</h1>
+  <p class="support-note">
+    Every dedication also helps sustain the Jewish Atlas — preserving Jewish history for future generations.
+    </p>
 
-  <div class="tier-select">
-    <label>
-      <input type="radio" name="tier" value="brick" checked>
-      Brick
-    </label>
-
-    <label>
-      <input type="radio" name="tier" value="page">
-      Brick + Memorial Page
-    </label>
-  </div>
 
   <form id="dedicateForm" class="dedicate-form" enctype="multipart/form-data">
 
-    <div class="form-group">
-      <label>Hebrew Name</label>
-      <input type="text" name="he_name">
+    <!-- TIER BUTTONS -->
+    <div class="tier-buttons">
+      <button type="button" class="tier-btn active" data-tier="brick">
+        <span class="tier-name">Brick</span>
+        <span class="tier-desc">A name on the wall</span>
+        <span class="tier-price">₪180</span>
+      </button>
+      <button type="button" class="tier-btn" data-tier="page">
+        <span class="tier-name">Brick + Page</span>
+        <span class="tier-desc">Biography &amp; photo</span>
+        <span class="tier-price">₪360</span>
+      </button>
+      <input type="hidden" name="tier" id="tierValue" value="brick">
     </div>
 
-    <div class="form-group">
-      <label>English Name</label>
-      <input type="text" name="eng_name">
+    <!-- NAMES -->
+    <div class="field-pair">
+      <div class="field">
+        <input type="text" name="he_name" dir="rtl" placeholder=" " id="heName">
+        <label for="heName">שם</label>
+      </div>
+      <div class="field">
+        <input type="text" name="eng_name" placeholder=" " id="engName">
+        <label for="engName">English Name</label>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Hebrew Dates</label>
-      <input type="text" name="born_str" placeholder="א ניסן תש״פ – א אלול תשע״ד">
+    <!-- DATES -->
+    <div class="field-pair">
+      <div class="field">
+        <input type="date" name="born_date" id="bornDate">
+        <label for="bornDate">Born date</label>
+      </div>
+      <div class="field">
+        <input type="date" name="death_date" id="deathDate">
+        <label for="deathDate">Death date</label>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Gregorian Dates</label>
-      <input type="text" name="death_str" placeholder="1.1.1940 – 1.1.2000">
+    <div class="field-pair">
+      <div class="field">
+        <input type="text" name="born_str" dir="rtl" placeholder=" " id="bornStr">
+        <label for="bornStr">תאריך עברי לידה</label>
+      </div>
+      <div class="field">
+        <input type="text" name="death_str" dir="rtl" placeholder=" " id="deathStr">
+        <label for="deathStr">תאריך עברי פטירה</label>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Origin (City / Country)</label>
-      <input type="text" name="origin">
+    <!-- ORIGIN + EMAIL -->
+    <div class="field">
+      <input type="text" name="origin" placeholder=" " id="originField">
+      <label for="originField">Origin — city, country</label>
     </div>
 
-    <div class="form-group">
-      <label>Your Email</label>
-      <input type="email" name="dedicator_email" required>
+    <div class="field">
+      <input type="email" name="dedicator_email" required placeholder=" " id="emailField">
+      <label for="emailField">Your email</label>
     </div>
 
-    <!-- PAGE ONLY FIELDS -->
-    <div id="pageFields" class="page-extra" style="display:none;">
+    <!-- PAGE ONLY -->
+    <div id="pageFields" style="display:none;">
 
-      <div class="form-group">
-        <label>Full Biography</label>
-        <textarea name="full_bio" rows="6"></textarea>
+      <div class="field">
+        <textarea name="full_bio" rows="5" placeholder="Tell their story…" id="bioField"></textarea>
+        <label for="bioField" class="textarea-label">Biography</label>
       </div>
 
-      <div class="form-group">
-        <label>Upload Image (max 1MB)</label>
-        <input type="file" name="image" accept="image/*">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" name="image" id="imageInput" accept="image/*">
+        <div class="upload-idle" id="uploadIdle">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span>Upload a photo</span>
+          <small>JPG or PNG · under 1 MB</small>
+        </div>
+        <div id="imagePreview" class="upload-preview">
+          <img id="previewImg" src="" alt="Preview">
+          <button type="button" id="removeBtn" class="remove-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Remove
+          </button>
+        </div>
       </div>
 
     </div>
 
-    <button type="submit" class="submit-btn">
-      Continue
+    <!-- SUBMIT -->
+    <button type="submit" class="submit-btn" id="submitBtn">
+      <span class="btn-text">Continue</span>
+      <span class="btn-loading" style="display:none;">
+        <span class="dot-pulse"></span>
+        Submitting
+      </span>
     </button>
+
+    <p class="note">Memorials are reviewed before appearing on the wall.</p>
 
   </form>
 
