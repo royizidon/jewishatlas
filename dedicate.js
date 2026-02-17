@@ -125,8 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("Memorial submitted successfully.");
         window.location.href = "wall.html";
       } else {
-        alert("Error: " + (result.error || "Something went wrong."));
-      }
+      alert("Error: " + (typeof result.error === "string" ? result.error : JSON.stringify(result.error)));      }
 
     } catch (err) {
       console.error(err);
