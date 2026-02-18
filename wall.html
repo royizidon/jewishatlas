@@ -7,38 +7,35 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="wall.css" />
 </head>
 
 <body>
-  <div class="wall-page">
 
-    <!-- Top Bar -->
-    <div class="wall-topbar">
-      <button id="backBtn" class="wall-back">← Back to Map</button>
-      <button id="dedicateBtn" class="wall-dedicate-top">+ Dedicate</button>
+  <!-- Sticky header -->
+  <header class="wall-header">
+    <a href="/" class="header-link back-link">← Map</a>
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search name…"
+        autocomplete="off"
+      />
     </div>
+    <a href="dedicate.html" class="header-link dedicate-link">+ Dedicate</a>
+  </header>
 
-    <!-- Search -->
-    <div class="wall-hero">
-      <div class="wall-search">
-        <span class="wall-search-icon">⌕</span>
-        <input id="wallSearch" type="text" placeholder="Search names…" autocomplete="off" />
-      </div>
-    </div>
+  <!-- The Wall -->
+  <main id="wall" class="wall"></main>
 
-    <!-- Wall Grid -->
-    <div class="wall-grid-wrap">
-      <div id="wallGrid" class="wall-grid"></div>
-      <div id="wallEmpty" class="wall-empty">Could not load the wall right now.</div>
-    </div>
-
- 
-
+  <!-- Empty state -->
+  <div id="emptyState" class="empty-state" style="display:none;">
+    No memorials found.
   </div>
 
-  <script src="wall.js" defer></script>
+  <script src="wall.js"></script>
 </body>
 </html>

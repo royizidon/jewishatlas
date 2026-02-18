@@ -1,200 +1,257 @@
-:root{
-  --bg:#f2efe8;
-  --ink:#2a2a2a;
-  --stroke:rgba(0,0,0,.10);
-  --mortar:#d8d1c5;
-  --brick-bg:#f6f2ea;
-  --brick-border:rgba(0,0,0,.08);
+/* ===========================
+   THE WALL — Stone Memorial
+   =========================== */
+
+:root {
+  --wall-bg: #b8ad9e;
+  --mortar: #a89b8a;
+  --brick: #ede7db;
+  --brick-hover: #e8e1d3;
+  --brick-active: #e3dccf;
+  --text: #2b2722;
+  --text-soft: rgba(43, 39, 34, 0.55);
+  --shadow-soft: rgba(0, 0, 0, 0.08);
+  --shadow-lift: rgba(0, 0, 0, 0.18);
 }
 
-*{box-sizing:border-box;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-}
-
-/* PAGE */
-.wall-page{
-  min-height:100vh;
-  padding:18px 16px 40px;
+body {
+  background: var(--wall-bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
 }
 
-/* TOPBAR */
-.wall-topbar{
-  max-width:1100px;
-  margin:0 auto 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+/* ---- HEADER ---- */
+.wall-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: rgba(184, 173, 158, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.wall-back{
-  background:none;
-  border:none;
-  font-size:14px;
-  color:rgba(0,0,0,.55);
-  cursor:pointer;
+.header-link {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  white-space: nowrap;
 }
 
-.wall-back:hover{
-  color:rgba(0,0,0,.85);
+.header-link:hover {
+  opacity: 1;
 }
 
-.wall-dedicate-top{
-  border:1px solid rgba(0,0,0,.14);
-  background:rgba(255,255,255,.45);
-  border-radius:999px;
-  padding:8px 16px;
-  font-size:13px;
-  letter-spacing:.06em;
-  cursor:pointer;
-  transition:.2s ease;
+.search-box {
+  flex: 0 1 260px;
 }
 
-.wall-dedicate-top:hover{
-  background:rgba(255,255,255,.65);
-  border-color:rgba(0,0,0,.22);
+.search-box input {
+  width: 100%;
+  padding: 9px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
 }
 
-/* SEARCH */
-.wall-hero{
-  max-width:600px;
-  margin:0 auto 24px;
-  text-align:center;
+.search-box input::placeholder {
+  color: var(--text-soft);
 }
 
-.wall-search{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 16px;
-  border-radius:999px;
-  border:1px solid var(--stroke);
-  background:rgba(255,255,255,.55);
+.search-box input:focus {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
-.wall-search input{
-  width:100%;
-  border:none;
-  outline:none;
-  background:transparent;
-  font-size:16px;
+/* ---- THE WALL ---- */
+.wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+  padding: 6px;
+  min-height: calc(100vh - 56px);
+  background: var(--mortar);
 }
 
-/* GRID */
-.wall-grid-wrap{
-  max-width:1100px;
-  margin:0 auto;
-  padding:16px;
-  border-radius:18px;
-  background:var(--mortar);
-}
-
-.wall-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-}
-
-@media (max-width:1000px){
-  .wall-grid{grid-template-columns:repeat(3,1fr);}
-}
-@media (max-width:760px){
-  .wall-grid{grid-template-columns:repeat(2,1fr);}
-}
-@media (max-width:450px){
-  .wall-grid{grid-template-columns:1fr;}
-}
-
-/* BRICK */
-.brick{
-  padding:16px 14px;
-  border-radius:10px;
-  border:1px solid var(--brick-border);
-  background:var(--brick-bg);
+/* ---- BRICK ---- */
+.brick {
+  background: var(--brick);
+  padding: 20px 8px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    background 0.25s ease,
+    opacity 0.3s ease;
   box-shadow:
-    inset 0 2px 4px rgba(0,0,0,.08),
-    inset 0 -1px 2px rgba(255,255,255,.65),
-    0 6px 18px rgba(0,0,0,.06);
-  cursor:pointer;
-  text-align:center;
-  transition:.2s ease;
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 1px 2px var(--shadow-soft);
 }
 
-.brick:hover{
+.brick:hover {
+  background: var(--brick-hover);
+  transform: translateY(-1px);
   box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.12),
-    inset 0 -1px 2px rgba(255,255,255,.65),
-    0 8px 22px rgba(0,0,0,.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 3px 8px var(--shadow-soft);
 }
 
-/* TEXT HIERARCHY */
-
-.brick-he-name{
-  font-family:"Playfair Display", serif;
-  font-size:20px;
-  font-weight:700;
-  direction:rtl;
-  margin-bottom:4px;
+/* Brick name (default view) */
+.brick-name {
+  font-family: "Playfair Display", serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  direction: rtl;
+  unicode-bidi: plaintext;
 }
 
-.brick-name{
-  font-family:"Playfair Display", serif;
-  font-size:18px;
-  font-weight:600;
-  margin-bottom:8px;
+/* ---- ACTIVE / RAISED BRICK ---- */
+.brick.active {
+  background: var(--brick-active);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    0 8px 28px var(--shadow-lift),
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  z-index: 10;
 }
 
-.brick-date-he{
-  font-size:13px;
-  direction:rtl;
-  opacity:.8;
-  margin-top:4px;
+/* Expanded details */
+.brick-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 0.3s ease,
+    margin-top 0.3s ease;
+  margin-top: 0;
 }
 
-.brick-date{
-  font-size:13px;
-  opacity:.65;
-  margin-top:2px;
+.brick.active .brick-details {
+  max-height: 260px;
+  opacity: 1;
+  margin-top: 14px;
 }
 
-.brick-location{
-  font-size:12px;
-  opacity:.55;
-  margin-top:8px;
-  letter-spacing:.04em;
+.detail-divider {
+  width: 24px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 0 auto 10px;
 }
 
-/* EMPTY */
-.wall-empty{
-  display:none;
-  text-align:center;
-  padding:18px;
-  color:rgba(0,0,0,.6);
+.detail-names {
+  font-family: "Playfair Display", serif;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 8px;
 }
 
-/* FOOTER */
-.wall-footer{
-  text-align:center;
-  margin-top:22px;
-  opacity:.6;
+.detail-names .he { direction: rtl; }
+
+.detail-dates {
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 6px;
 }
 
-.wall-quote{
-  display:inline-block;
-  padding:8px 16px;
-  border-radius:999px;
-  border:1px solid rgba(0,0,0,.10);
-  background:rgba(255,255,255,.35);
+.detail-origin {
+  font-size: 11px;
+  color: var(--text-soft);
+  letter-spacing: 0.03em;
 }
 
-/* MOBILE REFINEMENT */
-@media (max-width:768px){
-  .brick-he-name{font-size:18px;}
-  .brick-name{font-size:16px;}
-  .brick-date-he,
-  .brick-date{font-size:12px;}
+.detail-more {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  opacity: 0.6;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.detail-more:hover {
+  opacity: 1;
+}
+
+/* ---- DIM OTHERS ---- */
+.wall.dim .brick:not(.active) {
+  opacity: 0.4;
+}
+
+/* ---- EMPTY STATE ---- */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 14px;
+  color: var(--text-soft);
+  letter-spacing: 0.02em;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (min-width: 900px) {
+  .wall {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 7px;
+    padding: 7px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .wall {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wall {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .wall-header {
+    padding: 12px 16px;
+  }
+
+  .search-box {
+    flex: 0 1 180px;
+  }
+
+  .brick {
+    padding: 16px 6px;
+  }
+
+  .brick-name {
+    font-size: 13px;
+  }
 }
