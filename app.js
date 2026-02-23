@@ -171,7 +171,6 @@ require([
   "esri/layers/GraphicsLayer",
   "esri/renderers/UniqueValueRenderer",
   "esri/widgets/Search",
-  "esri/widgets/Home",
   "esri/widgets/Zoom",
   "esri/Graphic",
   "esri/geometry/Point",
@@ -189,7 +188,6 @@ require([
   GraphicsLayer,
   UniqueValueRenderer,
   Search,
-  Home,
   Zoom,
   Graphic,
   Point,
@@ -485,45 +483,26 @@ view.when(() => {
 const locationSymbol = {
   type: "picture-marker",
   url: "data:image/svg+xml;base64," + btoa(`
-    <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <svg width="60" height="80" viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="centerGrad">
-          <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-          <stop offset="50%" style="stop-color:#4285F4;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#1967D2;stop-opacity:1" />
-        </radialGradient>
-        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#4285F4;stop-opacity:1" />
-          <stop offset="50%" style="stop-color:#34A853;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#4285F4;stop-opacity:1" />
-        </linearGradient>
+        <filter id="pinShadow" x="-40%" y="-20%" width="180%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.45"/>
+        </filter>
       </defs>
-      <circle cx="40" cy="40" r="25" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.3">
-        <animate attributeName="r" from="12" to="35" dur="2.5s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" from="0.9" to="0" dur="2.5s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-width" from="4" to="1" dur="2.5s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="40" cy="40" r="18" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.5">
-        <animate attributeName="r" from="12" to="35" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" from="0.9" to="0" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-width" from="4" to="1" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="40" cy="40" r="12" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.7">
-        <animate attributeName="r" from="12" to="35" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" from="0.9" to="0" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-width" from="4" to="1" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
-      </circle>
-      <filter id="shadow">
-        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
-      </filter>
-      <circle cx="40" cy="40" r="12" fill="url(#centerGrad)" stroke="#fff" stroke-width="4" filter="url(#shadow)"/>
-      <circle cx="40" cy="40" r="6" fill="#fff">
-        <animate attributeName="r" from="5" to="7" dur="1s" repeatCount="indefinite" values="5;7;5" />
-      </circle>
+      <!-- Drop shadow ellipse on ground -->
+      <ellipse cx="30" cy="76" rx="10" ry="3.5" fill="#000" opacity="0.2"/>
+      <!-- Pin teardrop -->
+      <path d="M30 75 C30 75 6 48 6 28 C6 15.3 17 5 30 5 C43 5 54 15.3 54 28 C54 48 30 75 30 75Z"
+        fill="#111111" stroke="#ffffff" stroke-width="2" filter="url(#pinShadow)"/>
+      <!-- White inner circle -->
+      <circle cx="30" cy="28" r="10" fill="#ffffff"/>
+      <!-- Black dot in centre -->
+      <circle cx="30" cy="28" r="4.5" fill="#111111"/>
     </svg>
   `),
-  width: "40px",
-  height: "40px"
+  width: "38px",
+  height: "52px",
+  yoffset: "10px"
 };
 
 const locationLayer = new GraphicsLayer({ title: "User Location", listMode: "hide" });
@@ -754,23 +733,34 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-// Auto-start on mobile
+// Auto-start on mobile – immediately center on user location
 view.when(() => {
   if (!DeviceInfo.isMobile() || !("geolocation" in navigator)) return;
 
-  setTimeout(() => {
+  const kickoff = () => {
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions.query({ name: "geolocation" })
         .then(result => {
           if (result.state === "granted") {
             startLocationTracking();
           } else if (result.state === "denied") {
-            showToast("⚠️ Location permission denied. Enable in Settings.");
+            showToast("⚠️ Location access is disabled. Enable it in your device Settings to center the map on your position.");
+          } else {
+            // 'prompt' – ask the user; startLocationTracking triggers the browser dialog
+            startLocationTracking();
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          // permissions API not supported – just try
+          startLocationTracking();
+        });
+    } else {
+      startLocationTracking();
     }
-  }, 3500);
+  };
+
+  // Small delay so map tiles start loading first, then request location
+  setTimeout(kickoff, 800);
 });
 
 window.startLocationTracking = startLocationTracking;
@@ -780,7 +770,6 @@ window.centerOnLocation = centerOnLocation;
 
   // -------- Other UI widgets --------
   view.ui.add(new Zoom({ view }), { position: "bottom-right", index: 0 });
-  view.ui.add(new Home({ view }), { position: "bottom-right", index: 1 });
 
 
 /* === Basemap control: Toggle on mobile, Gallery on desktop === */
@@ -922,7 +911,10 @@ view.when(() => {
 // WELCOME POPUP – Bilingual (EN / HE)
 // ========================================
 view.when(() => {
-  if (localStorage.getItem("ja_welcome_dismissed") === "1") return;
+  // Skip popup if user came back from Wall, About, or Upload
+  const _cameFromInternal = sessionStorage.getItem("ja_from_internal") === "1";
+  sessionStorage.removeItem("ja_from_internal"); // clear so it only skips once
+  if (localStorage.getItem("ja_welcome_v2") === "1" || _cameFromInternal) return;
 
   const isMobile = window.matchMedia("(max-width: 640px)").matches;
 
@@ -1114,7 +1106,7 @@ view.when(() => {
   // ---------- Close logic ----------
   function closeWelcome() {
     if (card.querySelector("#welcomeDontShow")?.checked) {
-      localStorage.setItem("ja_welcome_dismissed", "1");
+      localStorage.setItem("ja_welcome_v2", "1");
     }
     overlay.style.opacity = "0";
     card.style.transform = "scale(0.96)";
@@ -1280,7 +1272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!el) return;
     if (label) el.textContent = label;
     if (el.tagName.toLowerCase() === "a") el.setAttribute("href", href);
-    else el.addEventListener("click", () => { window.location.href = href; });
+    else el.addEventListener("click", () => { sessionStorage.setItem("ja_from_internal", "1"); window.location.href = href; });
   };
   wire("uploadBtn", "upload.html", "Upload Your Site");
   wire("wallBtn", "wall.html", "The Wall");
