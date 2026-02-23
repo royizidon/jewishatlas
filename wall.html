@@ -1,41 +1,426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>The Wall · Jewish Atlas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page-bg: #0f1216;
+  --mortar: #262a30;
+  --stone: #f2e7d6;
+  --stone-dark: #e4d3bd;
+  --gold: #c5a47e;
+  --text-dark: #121417;
+  --text-soft: rgba(232,228,220,0.55);
+}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <link rel="stylesheet" href="wall.css" />
+body {
+  background: radial-gradient(circle at 50% -20%, #141922 0%, #0f1216 60%, #0b0e12 100%);
+  font-family: 'Inter', sans-serif;
+  color: white;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.site-header {
+  position: sticky;
+  top: 0;
+  background: rgba(15,18,22,0.96);
+  backdrop-filter: blur(12px);
+  padding: 1.4rem 0 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  z-index: 100;
+}
+.nav-links {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 400;
+}
+
+.header-link {
+  font-size: 0.7rem;
+  text-decoration: none;
+  color: var(--gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  transition: opacity 0.2s;
+}
+.header-link:hover { opacity: 0.6; }
+.search-section {
+  max-width: 500px;
+  margin: 1.6rem auto 0;
+  padding: 0 20px;
+}
+.search-box input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 12px;
+  color: white;
+  text-align: center;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  outline: none;
+  font-family: Inter, sans-serif;
+}
+.search-box input::placeholder { color: rgba(255,255,255,0.3); }
+
+/* WALL */
+.wall-outer-container {
+  padding: 48px 20px 80px;
+  display: flex;
+  justify-content: center;
+}
+.wall-alcove {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--mortar);
+  padding: 8px;
+  box-shadow:
+    0 40px 100px rgba(0,0,0,0.6),
+    inset 0 2px 8px rgba(0,0,0,0.35),
+    inset 0 -2px 8px rgba(0,0,0,0.2);
+}
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px 7px;
+}
+/* Responsive columns */
+@media (max-width: 1100px) { .wall-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 860px)  { .wall-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 640px)  { .wall-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 420px)  { .wall-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.brick {
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(to bottom, var(--stone) 0%, var(--stone-dark) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.5),
+    inset 0 -1px 0 rgba(60,45,25,0.12),
+    inset 1px 0 0 rgba(255,255,255,0.15),
+    inset -1px 0 0 rgba(60,45,25,0.08);
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+/* Stone grain */
+.brick::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    92deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.012) 3px,
+    rgba(0,0,0,0.012) 4px
+  );
+  pointer-events: none;
+}
+.brick-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 1.05rem;
+  line-height: 1.15;
+  color: var(--text-dark);
+  direction: rtl;
+  text-align: center;
+  padding: 0 10px;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  max-height: calc(1.15em * 2);
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.9rem;
+  display: none;
+}
+
+/* MODAL */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: linear-gradient(to bottom, var(--stone), var(--stone-dark));
+  color: var(--text-dark);
+  width: 90%;
+  max-width: 520px;
+  padding: 70px 50px;
+  text-align: center;
+  position: relative;
+  border: 6px solid var(--mortar);
+  box-shadow: 0 50px 120px rgba(0,0,0,0.65);
+  border-radius: 6px;
+}
+.close-btn {
+  position: absolute;
+  top: 25px; right: 25px;
+  cursor: pointer;
+  opacity: 0.4;
+  font-size: 22px;
+  background: none;
+  border: none;
+  color: var(--text-dark);
+}
+.close-btn:hover { opacity: 0.7; }
+
+.modal-he {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 900;
+  direction: rtl;
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+.modal-en {
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  margin-bottom: 35px;
+  text-transform: uppercase;
+}
+.modal-divider {
+  width: 30px;
+  height: 1px;
+  background: rgba(0,0,0,0.15);
+  margin: 0 auto 24px;
+}
+.modal-dates-he {
+  font-size: 1rem;
+  opacity: 0.55;
+  margin-bottom: 6px;
+  direction: rtl;
+}
+.modal-dates-en {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.modal-origin {
+  font-size: 1rem;
+  margin-bottom: 36px;
+  opacity: 0.6;
+  direction: rtl;
+}
+.modal-link {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 3px;
+  transition: opacity 0.2s;
+}
+.modal-link:hover { opacity: 0.5; }
+
+@media (max-width: 600px) {
+  .nav-logo { display: none; }
+  .modal-he { font-size: 2.4rem; }
+  .modal { padding: 52px 28px 40px; }
+}
+</style>
 </head>
-
 <body>
 
-  <!-- Sticky header -->
-  <header class="wall-header">
-    <a href="/" class="header-link back-link">← Map</a>
-    <div class="search-box">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search name…"
-        autocomplete="off"
-      />
-    </div>
-    <a href="dedicate.html" class="header-link dedicate-link">+ Dedicate</a>
-  </header>
-
-  <!-- The Wall -->
-  <main id="wall" class="wall"></main>
-
-  <!-- Empty state -->
-  <div id="emptyState" class="empty-state" style="display:none;">
-    No memorials found.
+<header class="site-header">
+  <div class="nav-links">
+    <a href="index.html" class="header-link">← The Map</a>
+    <div class="nav-logo">Jewish Atlas</div>
+    <a href="dedicate.html" class="header-link">Dedicate</a>
   </div>
+  <div class="search-section">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search Hebrew or English...">
+    </div>
+  </div>
+</header>
 
-  <script src="wall.js"></script>
+<div class="wall-outer-container">
+  <div class="wall-alcove">
+    <main class="wall-grid" id="wall"></main>
+  </div>
+</div>
+<div id="emptyState" class="empty-state">No memorials found.</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <button class="close-btn" id="modalClose">✕</button>
+    <div class="modal-he"       id="modalHe"></div>
+    <div class="modal-en"       id="modalEn"></div>
+    <div class="modal-divider"></div>
+    <div class="modal-dates-he" id="modalDatesHe"></div>
+    <div class="modal-dates-en" id="modalDatesEn"></div>
+    <div class="modal-origin"   id="modalOrigin"></div>
+    <div id="modalLinkContainer"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://api.jewishatlas.org/api";
+
+const HARDCODED = [
+  {
+    he_name:       "משה כהן",
+    eng_name:      "Moshe Cohen",
+    born_str:      "תש״ס",
+    death_str:     "תשפ״ג",
+    born_display:  "1940",
+    death_display: "2023",
+    origin:        "ירושלים",
+    tier:          "brick"
+  },
+  {
+    he_name:       "מרים כהן",
+    eng_name:      "Miriam Cohen",
+    born_str:      "תרצ״ג",
+    death_str:     "תשפ״א",
+    born_display:  "1933",
+    death_display: "2021",
+    origin:        "חיפה",
+    tier:          "brick"
+  },
+  {
+    he_name:       "דוד שפירא",
+    eng_name:      "David Shapira",
+    born_str:      "תש״ה",
+    death_str:     "תשפ״ב",
+    born_display:  "1945",
+    death_display: "2022",
+    origin:        "פתח תקווה",
+    tier:          "brick"
+  },
+];
+
+const wallEl      = document.getElementById("wall");
+const searchInput = document.getElementById("searchInput");
+const emptyState  = document.getElementById("emptyState");
+const backdrop    = document.getElementById("modalBackdrop");
+
+let allBricks = [];
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c =>
+    ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c])
+  );
+}
+
+function renderBricks(data) {
+  wallEl.innerHTML = "";
+  if (!data.length) {
+    emptyState.style.display = "block";
+    return;
+  }
+  emptyState.style.display = "none";
+  data.forEach(p => {
+    const b = document.createElement("div");
+    b.className = "brick";
+    const name = p.he_name || p.eng_name || "";
+    b.innerHTML = `<div class="brick-name">${esc(name)}</div>`;
+    b.onclick = () => openModal(p);
+    wallEl.appendChild(b);
+  });
+}
+
+function toYear(val) {
+  if (!val) return "";
+  return String(val).substring(0, 4);
+}
+
+function openModal(p) {
+  document.getElementById("modalHe").textContent = p.he_name || "";
+  document.getElementById("modalEn").textContent = p.eng_name || "";
+
+  const datesHe = [p.born_str, p.death_str].filter(Boolean).join(" – ");
+  document.getElementById("modalDatesHe").textContent = datesHe;
+
+  const datesEn = [toYear(p.born_display), toYear(p.death_display)].filter(Boolean).join(" – ");
+  document.getElementById("modalDatesEn").textContent = datesEn;
+
+  document.getElementById("modalOrigin").textContent = p.origin || "";
+
+  document.getElementById("modalLinkContainer").innerHTML =
+    (p.tier === "page" && p.slug)
+      ? `<a class="modal-link" href="memory.html?slug=${encodeURIComponent(p.slug)}">VIEW FULL MEMORIAL PAGE</a>`
+      : "";
+
+  backdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  backdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("modalClose").onclick = closeModal;
+backdrop.addEventListener("click", e => { if (e.target === backdrop) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+searchInput.addEventListener("input", () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) { renderBricks(allBricks); return; }
+  renderBricks(allBricks.filter(p =>
+    (p.he_name  && p.he_name.includes(q)) ||
+    (p.eng_name && p.eng_name.toLowerCase().includes(q))
+  ));
+});
+
+async function loadWall() {
+  allBricks = [...HARDCODED];
+  renderBricks(allBricks);
+
+  try {
+    const res = await fetch(API_BASE + "/wall");
+    if (!res.ok) throw new Error("API error");
+    const data = await res.json();
+    const features = (data.features || []).map(f => f.attributes);
+    allBricks = [...HARDCODED, ...features];
+    renderBricks(allBricks);
+  } catch (err) {
+    console.error("Wall API error:", err);
+  }
+}
+
+loadWall();
+</script>
 </body>
 </html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="memory.css" />
+<title>Memorial · Jewish Atlas</title>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="wall.html" class="nav-link">← The Wall</a>
+  <div class="nav-logo">Jewish Atlas</div>
+  <a href="index.html" class="nav-link">The Map →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <img src="/static/images/memorial-hero.jpg" class="hero-bg" id="heroBg" alt="" />
+  <div class="hero-vignette"></div>
+  <div class="hero-content" id="heroContent">
+    <div class="hero-meta" id="heroMeta"></div>
+    <h1 class="he-name" id="heName"></h1>
+    <div class="en-name" id="enName"></div>
+    <div class="hero-dates" id="heroDates"></div>
+  </div>
+  <div class="hero-scroll-hint">↓</div>
+</section>
+
+<!-- BODY -->
+<main class="body" id="memBody" style="display:none;">
+
+  <!-- Portrait + Bio side by side -->
+  <div class="content-wrap">
+    <aside class="portrait-col" id="portraitCol" style="display:none;">
+      <div class="portrait-frame">
+        <img id="portraitImg" src="" alt="" />
+      </div>
+      <div class="portrait-caption" id="portraitCaption"></div>
+    </aside>
+
+    <article class="bio-col">
+      <div class="bio-rule"></div>
+      <div class="bio-text" id="bioText"></div>
+    </article>
+  </div>
+
+  <footer class="mem-footer">
+    <div class="footer-rule"></div>
+    
+    <a href="wall.html" class="footer-link">← Return to the Wall</a>
+  </footer>
+
+</main>
+
+<!-- LOADING -->
+<div class="loading-state" id="loadingState">
+  <div class="loader"></div>
+</div>
+
+<!-- ERROR -->
+<div class="error-state" id="errorState" style="display:none;">
+  <div class="error-msg" id="errorMsg">Memorial not found.</div>
+  <a href="wall.html" class="error-link">← Back to the Wall</a>
+</div>
+
+<script src="memory.js"></script>
+</body>
+</html>
