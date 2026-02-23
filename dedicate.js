@@ -16,6 +16,44 @@ document.addEventListener("DOMContentLoaded", function () {
   const previewImg = document.getElementById("previewImg");
   const removeBtn = document.getElementById("removeBtn");
 
+  // Terms modal
+  const termsModal = document.getElementById("termsModal");
+  const openTermsBtn = document.getElementById("openTermsBtn");
+  const closeTermsBtn = document.getElementById("closeTermsBtn");
+  const acceptTermsBtn = document.getElementById("acceptTermsBtn");
+
+  openTermsBtn.addEventListener("click", function () {
+    termsModal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  });
+
+  function closeModal() {
+    termsModal.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  closeTermsBtn.addEventListener("click", closeModal);
+
+  termsModal.addEventListener("click", function (e) {
+    if (e.target === termsModal) closeModal();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeModal();
+  });
+
+  acceptTermsBtn.addEventListener("click", function () {
+    termsCheck.checked = true;
+    submitBtn.disabled = false;
+    closeModal();
+  });
+
+  // Disable submit until terms are accepted
+  submitBtn.disabled = true;
+  termsCheck.addEventListener("change", function () {
+    submitBtn.disabled = !this.checked;
+  });
+
   // =============================
   // Tier toggle (buttons)
   // =============================
@@ -62,25 +100,6 @@ document.addEventListener("DOMContentLoaded", function () {
     imageInput.style.pointerEvents = "auto";
   });
 
-  // =============================
-  // Slug (unique)
-  // =============================
-  function generateSlug(data) {
-    const base =
-      data.get("eng_name") ||
-      data.get("he_name") ||
-      "memorial";
-
-    const suffix = Date.now().toString(36);
-
-    return base
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w\-\u0590-\u05fe]/g, "")
-      .replace(/-+/g, "-")
-      + "-" + suffix;
-  }
 
   // =============================
   // Submit
@@ -98,6 +117,21 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Email validation
+    const email = (formData.get("dedicator_email") || "").trim();
+    if (!email) {
+      alert("Please enter your email address.");
+      return;
+    }
+    if (!email.includes("@")) {
+      alert("Please enter a valid email address (must include @).");
+      return;
+    }
+    if (email.length > 256) {
+      alert("Email address must be 256 characters or fewer.");
+      return;
+    }
+
     // Image check
     const file = formData.get("image");
     if (file && file.size > 1024 * 1024) {
@@ -105,8 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Slug
-    formData.append("slug", generateSlug(formData));
+
 
     // Loading
     submitBtn.disabled = true;

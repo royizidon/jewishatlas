@@ -120,6 +120,17 @@
 
     </div>
 
+    <!-- TERMS & CONDITIONS -->
+    <label class="terms-label" id="termsLabel">
+      <input type="checkbox" id="termsCheck">
+      <span class="terms-box"></span>
+      <span class="terms-text">
+        I agree to the
+        <button type="button" class="terms-link terms-link-btn" id="openTermsBtn">Terms &amp; Conditions</button>
+        and confirm this dedication is accurate and respectful.
+      </span>
+    </label>
+
     <!-- SUBMIT -->
     <button type="submit" class="submit-btn" id="submitBtn">
       <span class="btn-text">Continue</span>
@@ -133,6 +144,48 @@
 
   </form>
 
+  <!-- CONTACT -->
+  <div class="contact-section">
+    <p class="contact-text">Have a question about your dedication?</p>
+    <a href="mailto:contact@jewishatlas.org" class="contact-link">contact@jewishatlas.org</a>
+  </div>
+
+</div>
+
+<!-- TERMS MODAL -->
+<div id="termsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Terms &amp; Conditions</h2>
+      <button type="button" class="modal-close" id="closeTermsBtn" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <p class="modal-section-title">1. Persistence of Dedications</p>
+      <p>Your brick inscription and memory page will remain on the Jewish Atlas Wall for as long as the Jewish Atlas platform is operational. We are committed to preserving these memorials as a living record of Jewish heritage and family history.</p>
+
+      <p class="modal-section-title">2. Accuracy &amp; Responsibility</p>
+      <p>By submitting a dedication, you confirm that all information provided — including names, dates, and biographical content — is accurate to the best of your knowledge. You take responsibility for the content you submit.</p>
+
+      <p class="modal-section-title">3. Review Process</p>
+      <p>All memorials are reviewed by our team before appearing on the wall. We reserve the right to decline or request changes to submissions that are incomplete, inaccurate, or inconsistent with the respectful spirit of the project.</p>
+
+      <p class="modal-section-title">4. Image Rights</p>
+      <p>By uploading a photo, you confirm that you hold the rights to the image or have permission to use it, and you grant the Jewish Atlas the right to display it as part of the dedication.</p>
+
+      <p class="modal-section-title">5. Privacy</p>
+      <p>Your email address is used solely to process and follow up on your dedication. It will not be displayed publicly or shared with third parties.</p>
+
+      <p class="modal-section-title">6. Changes &amp; Removal</p>
+      <p>To request edits or removal of a dedication, contact us at <a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a>. We will do our best to accommodate reasonable requests.</p>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="modal-accept-btn" id="acceptTermsBtn">I Understand &amp; Accept</button>
+    </div>
+  </div>
 </div>
 
 </body>
