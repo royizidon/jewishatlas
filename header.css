@@ -1,126 +1,181 @@
-/* ─── SHARED HEADER STYLES ───────────────────────────────────────────────────────── */
-#appHeader {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  background: #fff;
-  border-bottom: 1px solid #e2e8f0;
-  z-index: 1000;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+/* ─── SHARED HEADER STYLES (Improved) ─────────────────────────────────────────── */
+
+:root{
+  --header-h: 64px;
+
+  /* Brand + neutrals (softer) */
+  --navy: #0f172a;
+  --slate: #475569;
+  --muted: #64748b;
+
+  /* softer “blue” feel */
+  --accent: #4f7cff;
+
+  --border: rgba(15,23,42,.10);
+  --border-2: rgba(15,23,42,.06);
+
+  --bg: rgba(255,255,255,.92);
+  --bg2: rgba(248,250,252,.90);
+
+  --shadow: 0 8px 24px rgba(15,23,42,.06);
+  --shadow-sm: 0 2px 10px rgba(15,23,42,.06);
+
+  --radius: 12px;
 }
 
-#headerRow1 {
+/* Header container */
+#appHeader{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+
+  background: var(--bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Row 1: title + nav */
+#headerRow1{
+  height: var(--header-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  height: 64px;
+
+  /* IMPORTANT: padding that fits inside 64px */
+  padding: 0 18px;
+
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-#headerRow2 {
-  display: flex;
-  justify-content: flex-start;
-  padding: 12px 20px 16px;
-  border-top: 1px solid #f1f5f9;
-  background: #fafbfc;
-}
-
-/* Left side - Title and Navigation */
-#headerLeft {
+/* Row 2: filters/search area */
+#headerRow2{
   display: flex;
   align-items: center;
-  gap: 30px;
+  justify-content: flex-start;
+
+  padding: 10px 18px 12px;
+
+  background: var(--bg2);
+  border-top: 1px solid var(--border-2);
 }
 
-#siteTitle {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a365d;
-  margin: 0;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-#navButtons {
+/* Left side */
+#headerLeft{
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
+  min-width: 0; /* helps prevent overflow */
 }
 
-.navBtn {
-  padding: 10px 18px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background: #fff;
-  color: #475569;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* Site title */
+#siteTitle{
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  margin: 0;
+  line-height: 1;
+
+  /* calmer gradient */
+  background: linear-gradient(135deg, #0f172a 0%, #2b3a67 45%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  white-space: nowrap;
+}
+
+/* Nav */
+#navButtons{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  /* if buttons overflow, allow horizontal scroll instead of wrapping into 2 lines */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#navButtons::-webkit-scrollbar{ display:none; }
+
+/* Buttons: more “tab” than “button” */
+.navBtn{
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+
+  background: transparent;
+  color: var(--slate);
+
+  font-size: 13px;
+  font-weight: 600;
   font-family: 'Inter', sans-serif;
+
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+  white-space: nowrap;
 }
 
-.navBtn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #334155;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.navBtn:hover{
+  background: rgba(15,23,42,.04);
+  border-color: rgba(15,23,42,.08);
+  color: var(--navy);
+
+  /* remove “lift” + heavy shadow */
+  transform: none;
+  box-shadow: none;
 }
 
-.navBtn:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+.navBtn:active{
+  background: rgba(15,23,42,.06);
 }
 
-/* Responsive header */
-@media (max-width: 1024px) {
-  #headerRow1 {
-    flex-direction: column;
-    height: auto;
-    gap: 12px;
-    padding: 15px 20px;
-  }
-  
-  #headerLeft {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  #navButtons {
-    gap: 8px;
-  }
-  
-  .navBtn {
-    padding: 8px 14px;
-    font-size: 13px;
-  }
+.navBtn:focus-visible{
+  outline: 3px solid rgba(79,124,255,.25);
+  outline-offset: 2px;
 }
 
-@media (max-width: 640px) {
-  #headerRow1 {
-    padding: 12px 16px;
-    gap: 8px;
-    flex-wrap: wrap;
-    row-gap: 8px;
+/* Optional: active state (add/remove class in JS) */
+.navBtn.isActive{
+  background: rgba(79,124,255,.10);
+  border-color: rgba(79,124,255,.22);
+  color: #1e3a8a;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────────────── */
+
+/* Tablets: keep one row; shrink spacing */
+@media (max-width: 1024px){
+  #headerRow1{ padding: 0 14px; }
+  #headerRow2{ padding: 10px 14px 12px; }
+  #siteTitle{ font-size: 20px; }
+}
+
+/* Mobile: avoid stacking header into 2 rows unless absolutely needed */
+@media (max-width: 640px){
+  :root{ --header-h: 58px; }
+
+  #headerRow1{
+    height: var(--header-h);
+    padding: 0 12px;
+    gap: 10px;
   }
-  
-  #headerLeft {
-    gap: 16px;
-  }
-  
-  #navButtons {
-    gap: 6px;
-  }
-  
-  .navBtn {
-    padding: 6px 10px;
+
+  #siteTitle{ font-size: 18px; }
+
+  /* tighter buttons */
+  .navBtn{
+    padding: 7px 10px;
     font-size: 12px;
+    border-radius: 10px;
   }
-  
-  #siteTitle {
-    font-size: 22px;
+
+  /* Row 2 more compact */
+  #headerRow2{
+    padding: 8px 12px 10px;
   }
 }

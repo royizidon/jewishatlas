@@ -21,7 +21,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const openTermsBtn = document.getElementById("openTermsBtn");
   const closeTermsBtn = document.getElementById("closeTermsBtn");
   const acceptTermsBtn = document.getElementById("acceptTermsBtn");
+  const termsCheck = document.getElementById("termsCheck"); // ← fix: explicitly declared
 
+  // =============================
+  // Payment links
+  // =============================
+  const paymentLinks = {
+    brick: "https://mrng.to/qfUqZwJ1Pt",   // ₪180
+    page:  "https://mrng.to/RVyZt1jILJ"    // ₪360
+  };
+
+  // =============================
+  // Terms modal
+  // =============================
   openTermsBtn.addEventListener("click", function () {
     termsModal.classList.add("active");
     document.body.style.overflow = "hidden";
@@ -75,8 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const file = this.files[0];
     if (!file) return;
 
-    if (file.size > 1024 * 1024) {
-      alert("Image must be under 1 MB.");
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5 MB.");
       this.value = "";
       return;
     }
@@ -100,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function () {
     imageInput.style.pointerEvents = "auto";
   });
 
-
   // =============================
   // Submit
   // =============================
@@ -109,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const formData = new FormData(form);
 
-    // Validate
+    // Validate name
     const heName = (formData.get("he_name") || "").trim();
     const engName = (formData.get("eng_name") || "").trim();
     if (!heName && !engName) {
@@ -117,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Email validation
+    // Validate email
     const email = (formData.get("dedicator_email") || "").trim();
     if (!email) {
       alert("Please enter your email address.");
@@ -132,16 +143,14 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Image check
+    // Validate image size
     const file = formData.get("image");
-    if (file && file.size > 1024 * 1024) {
-      alert("Image must be under 1 MB.");
+    if (file && file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5 MB.");
       return;
     }
 
-
-
-    // Loading
+    // Loading state
     submitBtn.disabled = true;
     btnText.style.display = "none";
     btnLoading.style.display = "inline-flex";
@@ -155,10 +164,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        alert("Memorial submitted successfully.");
-        window.location.href = "wall.html";
+        // Redirect to Morning payment page based on tier
+        const tier = formData.get("tier");
+        window.location.href = paymentLinks[tier] || paymentLinks.brick;
       } else {
-      alert("Error: " + (typeof result.error === "string" ? result.error : JSON.stringify(result.error)));      }
+        alert("Error: " + (typeof result.error === "string" ? result.error : JSON.stringify(result.error)));
+      }
 
     } catch (err) {
       console.error(err);
