@@ -1,5 +1,13 @@
 const API_BASE = "https://api.jewishatlas.org/api";
 
+// ── Detect if text is primarily Hebrew/Arabic (RTL) ──
+function isRTL(text) {
+  if (!text) return false;
+  const rtlChars = (text.match(/[\u0590-\u05FF\u0600-\u06FF]/g) || []).length;
+  const ltrChars = (text.match(/[a-zA-Z]/g) || []).length;
+  return rtlChars > ltrChars;
+}
+
 // ── Format full date from ISO "1909-09-29" → "29.09.1909" ──
 function formatDate(val) {
   if (!val) return "";
@@ -81,6 +89,7 @@ function render(attrs, imageUrl) {
   const bioEl = document.getElementById("bioText");
   if (attrs.full_bio && attrs.full_bio.trim()) {
     bioEl.textContent = attrs.full_bio.trim();
+    if (isRTL(attrs.full_bio)) bioEl.classList.add("is-rtl");
   } else {
     // Hide the rule if no bio
     document.querySelector(".bio-rule").style.display = "none";

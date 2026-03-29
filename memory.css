@@ -1,3 +1,4 @@
+
 :root {
   --bg: #0a0c0f;
   --gold: #c5a47e;
@@ -83,6 +84,10 @@ body {
 }
 .hero:hover .hero-bg { transform: scale(1.0); }
 
+.hero.no-bg {
+  background: linear-gradient(160deg, #12151a 0%, #0a0c0f 60%, #0f1118 100%);
+}
+
 .hero-vignette {
   position: absolute;
   inset: 0;
@@ -114,7 +119,7 @@ body {
 }
 
 .he-name {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Frank Ruhl Libre', 'Cormorant Garamond', serif;
   font-size: clamp(3.4rem, 8vw, 6.5rem);
   font-weight: 700;
   line-height: 1.05;
@@ -142,7 +147,7 @@ body {
   gap: 8px;
 }
 .dates-he {
-  font-family: 'EB Garamond', serif;
+  font-family: 'Frank Ruhl Libre', 'EB Garamond', serif;
   font-size: 1.15rem;
   color: var(--text-soft);
   direction: rtl;
@@ -244,9 +249,12 @@ body {
   line-height: 2;
   color: rgba(232,228,220,0.82);
   white-space: pre-wrap;
-  direction: rtl;
 }
-.bio-text p { margin-bottom: 1.6em; }
+.bio-text.is-rtl {
+  direction: rtl;
+  font-family: 'Frank Ruhl Libre', 'EB Garamond', serif;
+  text-align: right;
+}
 
 /* Footer */
 .mem-footer {
