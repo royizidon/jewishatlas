@@ -88,8 +88,9 @@ function render(attrs, imageUrl) {
   // Bio
   const bioEl = document.getElementById("bioText");
   if (attrs.full_bio && attrs.full_bio.trim()) {
-    bioEl.textContent = attrs.full_bio.trim();
-    if (isRTL(attrs.full_bio)) bioEl.classList.add("is-rtl");
+    const cleanBio = attrs.full_bio.trim().replace(/[ \t]+/g, " ");
+    bioEl.textContent = cleanBio;
+    if (isRTL(cleanBio)) bioEl.classList.add("is-rtl");
   } else {
     // Hide the rule if no bio
     document.querySelector(".bio-rule").style.display = "none";
