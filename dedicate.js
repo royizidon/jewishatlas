@@ -164,9 +164,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Redirect to Morning payment page based on tier
         const tier = formData.get("tier");
-        window.location.href = paymentLinks[tier] || paymentLinks.brick;
+        const url = paymentLinks[tier] || paymentLinks.brick;
+
+        // Try new tab first, fall back to same tab if blocked
+        const newTab = window.open(url, '_blank');
+        if (!newTab || newTab.closed) {
+          window.location.href = url;
+        }
       } else {
         alert("Error: " + (typeof result.error === "string" ? result.error : JSON.stringify(result.error)));
       }

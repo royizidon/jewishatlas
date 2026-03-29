@@ -23,8 +23,31 @@ window.addEventListener("scroll", () => {
 
 // ── Render ──
 function render(attrs, imageUrl) {
-  const name = attrs.he_name || attrs.eng_name || "Memorial";
-  document.title = (attrs.eng_name || attrs.he_name || "Memorial") + " · Jewish Atlas";
+  const name = attrs.eng_name || attrs.he_name || "Memorial";
+  const title = `${name} · Jewish Atlas`;
+  const description = [
+    attrs.he_name, attrs.eng_name,
+    [formatDate(attrs.born_display), formatDate(attrs.death_display)].filter(Boolean).join(" – "),
+    attrs.origin
+  ].filter(Boolean).join(" · ");
+
+  // Title + meta
+  document.title = title;
+  const metaDesc = document.getElementById("metaDesc");
+  if (metaDesc) metaDesc.content = description || title;
+
+  // Open Graph
+  const ogTitle = document.getElementById("ogTitle");
+  const ogDesc  = document.getElementById("ogDesc");
+  const ogImage = document.getElementById("ogImage");
+  const ogUrl   = document.getElementById("ogUrl");
+  if (ogTitle) ogTitle.content = title;
+  if (ogDesc)  ogDesc.content  = description || title;
+  if (ogImage && imageUrl) ogImage.content = imageUrl;
+  if (ogUrl)   ogUrl.content   = window.location.href;
+
+  // Set lang based on content
+  document.getElementById("htmlRoot").lang = attrs.he_name ? "he" : "en";
 
   // Hero meta
   document.getElementById("heroMeta").textContent = "IN MEMORY OF";
@@ -49,6 +72,7 @@ function render(attrs, imageUrl) {
     const img = document.getElementById("portraitImg");
     img.src = imageUrl;
     img.alt = attrs.he_name || attrs.eng_name || "";
+    img.onerror = function() { document.getElementById("portraitCol").style.display = "none"; };
     document.getElementById("portraitCaption").textContent = attrs.eng_name || "";
     document.getElementById("portraitCol").style.display = "block";
   }

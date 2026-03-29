@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="htmlRoot">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="memory.css" />
 <title>Memorial · Jewish Atlas</title>
+<meta name="description" id="metaDesc" content="Memorial · Jewish Atlas" />
+<meta property="og:title"       id="ogTitle"   content="Memorial · Jewish Atlas" />
+<meta property="og:description" id="ogDesc"    content="A memorial on the Jewish Atlas." />
+<meta property="og:image"       id="ogImage"   content="https://jewishatlas.org/static/images/memorial-hero.jpg" />
+<meta property="og:type"                       content="profile" />
+<meta property="og:url"         id="ogUrl"     content="" />
 </head>
 <body>
 
@@ -17,7 +23,7 @@
 
 <!-- HERO -->
 <section class="hero" id="hero">
-  <img src="/static/images/memorial-hero.jpg" class="hero-bg" id="heroBg" alt="" />
+  <img src="/static/images/memorial-hero.jpg" class="hero-bg" id="heroBg" alt="" onerror="this.style.display='none'" />
   <div class="hero-vignette"></div>
   <div class="hero-content" id="heroContent">
     <div class="hero-meta" id="heroMeta"></div>
