@@ -14,7 +14,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: 'Cormorant Garamond', Georgia, serif;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
