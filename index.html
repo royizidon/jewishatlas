@@ -87,32 +87,17 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  
+   <!-- Styles -->
+  <link rel="stylesheet" href="header.css"/>
   <link rel="stylesheet" href="styles.css"/>
-
 </head>
 
 
 <body>
-  <header id="appHeader">
-  <div id="headerRow1" class="ja-container">
-    <div id="headerLeft">
-      <h1 id="siteTitle">Jewish Atlas</h1>
-      <nav id="navButtons">
-        <button class="navBtn" id="uploadBtn">Upload</button>
-        <button class="navBtn" id="wallBtn">The Wall</button>
-        <button class="navBtn" id="aboutBtn">About</button>
-      </nav>
-    </div>
-    <div id="searchContainer"></div>
-  </div>
-
-  <div id="headerRow2" class="ja-container">
-    <div id="filterContainer"></div>
-  </div>
-</header>
+<div id="ja-header" data-page="map"></div>
+  <script src="header.js"></script>
 
   <!-- Map -->
   <div id="viewDiv"></div>

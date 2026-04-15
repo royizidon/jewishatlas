@@ -820,10 +820,20 @@ view.when(() => {
     view,
     container: "searchContainer",
     includeDefaultSources: true,
-    allPlaceholder: "Search a landmark or address..."
+    searchMultipleSourcesEnabled: false,
+    allPlaceholder: "Search a city, country or place…"
   });
   search.popupEnabled = false;
-  search.resultGraphicEnabled = false;
+search.resultGraphicEnabled = false;
+search.when(() => {
+  if (search.sources && search.sources.length > 0) {
+    search.sources.getItemAt(0).placeholder = "Search a city, country or place…";
+  }
+  setTimeout(() => {
+    const input = document.querySelector("#searchContainer .esri-search__input");
+    if (input) input.placeholder = "Search a city, country or place…";
+  }, 500);
+});
 
 
   // -------- Renderer --------
@@ -1251,18 +1261,7 @@ view.when(() => {
     });
   }
 
-  // global layer → search + zoom
-  globalLayer.when(() => {
-    search.sources.unshift({
-      layer: globalLayer,
-      searchFields: ["eng_name"],
-      displayField: "eng_name",
-      exactMatch: false,
-      outFields: ["*"],
-      name: "Jewish Landmarks",
-      placeholder: "e.g., Mikveh Israel"
-    });
-  });
+
 });
 
 // ---- Wire header buttons ----

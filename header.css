@@ -1,181 +1,179 @@
-/* ─── SHARED HEADER STYLES (Improved) ─────────────────────────────────────────── */
+/* ============================================================
+   JEWISH ATLAS — UNIFIED HEADER
+   ============================================================ */
 
-:root{
-  --header-h: 64px;
-
-  /* Brand + neutrals (softer) */
-  --navy: #0f172a;
-  --slate: #475569;
-  --muted: #64748b;
-
-  /* softer “blue” feel */
-  --accent: #4f7cff;
-
-  --border: rgba(15,23,42,.10);
-  --border-2: rgba(15,23,42,.06);
-
-  --bg: rgba(255,255,255,.92);
-  --bg2: rgba(248,250,252,.90);
-
-  --shadow: 0 8px 24px rgba(15,23,42,.06);
-  --shadow-sm: 0 2px 10px rgba(15,23,42,.06);
-
-  --radius: 12px;
+:root {
+  --header-h: 58px;
+  --ja-gold:   #c5a47e;
+  --ja-border: rgba(15,23,42,.09);
 }
 
-/* Header container */
-#appHeader{
+/* ── SHELL ───────────────────────────────────────────────── */
+#appHeader {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
-
-  background: var(--bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  width: 100%;
+  overflow: visible;
+}
+#appHeader.ja-light {
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid var(--ja-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+#appHeader.ja-dark {
+  background: rgba(10,12,15,.96);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+#appHeader.ja-memorial {
+  background: linear-gradient(to bottom, rgba(10,12,15,.85), transparent);
+  border-bottom: none;
 }
 
-/* Row 1: title + nav */
-#headerRow1{
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  /* IMPORTANT: padding that fits inside 64px */
-  padding: 0 18px;
-
+/* ── ROW 1 ───────────────────────────────────────────────── */
+#headerRow1 {
+  height: 50px;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-/* Row 2: filters/search area */
-#headerRow2{
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  padding: 10px 18px 12px;
-
-  background: var(--bg2);
-  border-top: 1px solid var(--border-2);
-}
-
-/* Left side */
-#headerLeft{
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0; /* helps prevent overflow */
-}
-
-/* Site title */
-#siteTitle{
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.6px;
-  margin: 0;
-  line-height: 1;
-
-  /* calmer gradient */
-  background: linear-gradient(135deg, #0f172a 0%, #2b3a67 45%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  white-space: nowrap;
-}
-
-/* Nav */
-#navButtons{
+  padding: 0 28px;
   display: flex;
   align-items: center;
   gap: 8px;
-
-  /* if buttons overflow, allow horizontal scroll instead of wrapping into 2 lines */
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  overflow: visible;
 }
-#navButtons::-webkit-scrollbar{ display:none; }
 
-/* Buttons: more “tab” than “button” */
-.navBtn{
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-
-  background: transparent;
-  color: var(--slate);
-
-  font-size: 13px;
+/* ── LOGO ────────────────────────────────────────────────── */
+#siteTitle {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.6rem;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
-
-  cursor: pointer;
-  transition: background .15s ease, color .15s ease, border-color .15s ease;
+  letter-spacing: .02em;
+  text-decoration: none;
   white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  transition: opacity .2s;
+  margin: 0;
+}
+#siteTitle:hover { opacity: .7; }
+.ja-light    #siteTitle { color: #111 !important; }
+.ja-dark     #siteTitle,
+.ja-memorial #siteTitle { color: rgba(232,228,220,.9) !important; }
+
+/* ── NAV ─────────────────────────────────────────────────── */
+#navButtons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  padding-left: 20px;
+  border-left: 1px solid rgba(15,23,42,.15);
+  margin-left: 4px;
 }
 
-.navBtn:hover{
-  background: rgba(15,23,42,.04);
-  border-color: rgba(15,23,42,.08);
-  color: var(--navy);
+.navBtn {
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background .15s;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.navBtn:hover                { transform: none !important; box-shadow: none !important; background: rgba(15,23,42,.05); }
+.ja-light    .navBtn         { color: #333; }
+.ja-dark     .navBtn,
+.ja-memorial .navBtn         { color: rgba(232,228,220,.5); }
+.ja-dark     .navBtn:hover,
+.ja-memorial .navBtn:hover   { background: rgba(255,255,255,.06); }
 
-  /* remove “lift” + heavy shadow */
-  transform: none;
-  box-shadow: none;
+/* ── SEARCH (ArcGIS mounts here on map page) ─────────────── */
+#searchContainer {
+  flex: 1;
+  min-width: 0;
+  max-width: 340px;
 }
 
-.navBtn:active{
-  background: rgba(15,23,42,.06);
+/* ── DEDICATE BUTTON ─────────────────────────────────────── */
+#ja-dedicate-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: .875rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  text-decoration: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: opacity .2s;
+  cursor: pointer;
+  border: none;
+}
+#ja-dedicate-btn:hover        { opacity: .82; }
+.ja-light    #ja-dedicate-btn { background: #c5a47e; color: #fff; border: none; }
+.ja-dark     #ja-dedicate-btn,
+.ja-memorial #ja-dedicate-btn { background: var(--ja-gold); color: #0a0c0f; }
+
+/* ── ROW 2 — filters ────────────────────────────────────── */
+#headerRow2 {
+  background: rgba(255,255,255,.96);
+  padding: 8px 28px 10px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid rgba(15,23,42,.06);
+}
+#filterContainer {
+  width: fit-content;
 }
 
-.navBtn:focus-visible{
-  outline: 3px solid rgba(79,124,255,.25);
-  outline-offset: 2px;
-}
+/* no hamburger — links always visible */
+#ja-hamburger   { display: none !important; }
+#ja-mobile-menu { display: none !important; }
 
-/* Optional: active state (add/remove class in JS) */
-.navBtn.isActive{
-  background: rgba(79,124,255,.10);
-  border-color: rgba(79,124,255,.22);
-  color: #1e3a8a;
-}
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
 
-/* ─── RESPONSIVE ─────────────────────────────────────────────────────────────── */
-
-/* Tablets: keep one row; shrink spacing */
-@media (max-width: 1024px){
-  #headerRow1{ padding: 0 14px; }
-  #headerRow2{ padding: 10px 14px 12px; }
-  #siteTitle{ font-size: 20px; }
-}
-
-/* Mobile: avoid stacking header into 2 rows unless absolutely needed */
-@media (max-width: 640px){
-  :root{ --header-h: 58px; }
-
-  #headerRow1{
-    height: var(--header-h);
-    padding: 0 12px;
-    gap: 10px;
+  /* Row 1 wraps: logo+nav+dedicate on line 1, search on line 2 */
+  #headerRow1 {
+    height: auto;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
   }
 
-  #siteTitle{ font-size: 18px; }
+  #siteTitle       { font-size: 1rem; order: 1; flex-shrink: 0; }
+  #navButtons      { order: 2; flex: 1; gap: 0; min-width: 0; }
+  #ja-dedicate-btn { order: 3; font-size: .7rem; padding: 6px 11px; flex-shrink: 0; }
 
-  /* tighter buttons */
-  .navBtn{
-    padding: 7px 10px;
-    font-size: 12px;
-    border-radius: 10px;
+  .navBtn          { padding: 5px 6px; font-size: .72rem; }
+
+  /* Search becomes full-width second line */
+  #searchContainer {
+    order: 4;
+    flex-basis: 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 4px 0 2px;
   }
 
-  /* Row 2 more compact */
-  #headerRow2{
-    padding: 8px 12px 10px;
-  }
+  /* Filters row */
+  #headerRow2      { padding: 6px 12px 8px; justify-content: flex-start; }
+  #filterContainer { width: 100%; }
 }
