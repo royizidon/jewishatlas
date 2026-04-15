@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <title>Share a Jewish Site · Jewish Atlas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" href="header.css">
-  <!-- App config (if you use it in upload.js) -->
+
+  <link rel="stylesheet" href="header.css">
   <script src="config.js"></script>
 
   <!-- ArcGIS -->
@@ -15,372 +15,437 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
- <style>
-/* Hide search/filter row on non-map pages */
-#headerRow2 { 
-  display: none !important; 
-}
+  <style>
 
-:root{
-  --hero-a: #0f1838;                /* deep navy */
-  --hero-b: #202a74;                /* indigo */
-  --hero-c: #3b32cc;                /* royal purple */
-  --ring:   rgba(79,70,229,.15);    /* focus ring */
-  --gray-100:#f8fafc; --gray-200:#e5e7eb; --gray-300:#e2e8f0; --ink:#0f172a;
-  --btn:#4f46e5; --btn-hover:#4338ca;
-}
+    #headerRow2 { display: none !important; }
 
-/* Base */
-html, body { margin:0; height:100%; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-body { background:#f6f7fb; color:var(--ink); overflow:auto; }
-.ja-container{ max-width:1100px; margin:0 auto; padding:0 16px; }
+    :root {
+      --gold: #c5a47e;
+      --gold-ring: rgba(197,164,126,.2);
+      --navy: #0f172a;
+      --ink: #0f172a;
+      --slate: #475569;
+      --gray-100: #f8fafc;
+      --gray-200: #e5e7eb;
+      --gray-300: #e2e8f0;
+      --bg: #fcfcfd;
+      --btn: #111;
+      --btn-hover: #333;
+      --ring: rgba(197,164,126,.2);
+    }
 
-/* ========= FIX FOR FIXED HEADER OVERLAP ========= */
-body.upload-page {
-  padding-top: 95px; /* Accounts for fixed header */
-  margin: 0;
-}
+    html, body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #fcfcfd;
+      color: var(--ink);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
 
-/* Dynamically adjust for actual header height */
-@media (max-width: 1024px) {
-  body.upload-page {
-    padding-top: 110px; /* Header is taller on tablets */
-  }
-}
+    .ja-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
 
-@media (max-width: 640px) {
-  body.upload-page {
-    padding-top: 90px; /* Compact header on mobile */
-  }
-}
+    /* ── HERO ── */
+    .ja-hero {
+      text-align: center;
+      padding: 48px 20px 32px;
+    }
 
-/* ---- HERO TITLE WITH PROPER FALLBACK (ONLY ONE VERSION) ---- */
-.ja-heroText {
-  padding: 40px 16px 28px;
-  text-align: center;
-}
+    .ja-hero-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c5a47e;
+      margin: 0 0 12px;
+    }
 
-.ja-heroText .hero-title {
-  font-family: "Playfair Display", Georgia, serif;
-  font-weight: 800;
-  font-size: 38px;
-  line-height: 1.3;
-  margin: 0 0 12px;
-  
-  /* Fallback color that always works */
-  color: #2563eb;
-  
-  /* Gradient for browsers that support it */
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -moz-background-clip: text;
-  background-clip: text;
-}
+    .ja-hero h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 2.6rem);
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 14px;
+      line-height: 1.15;
+    }
 
-/* Only make text transparent if gradient is actually supported */
-@supports (-webkit-background-clip: text) or (background-clip: text) {
-  .ja-heroText .hero-title {
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-}
+    .ja-hero p {
+      font-size: 1rem;
+      color: var(--slate);
+      margin: 0 auto;
+      max-width: 480px;
+      line-height: 1.65;
+    }
 
-.ja-heroText .hero-subtitle {
-  font-size: 18px;
-  line-height: 1.6;
-  color: #475569;
-  margin: 0 auto;
-  max-width: 640px;
-}
+    /* ── CARD ── */
+    .ja-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
 
-/* Card & form */
-.ja-card { 
-  background:#fff; 
-  border:1px solid var(--gray-200); 
-  border-radius:16px;
-  box-shadow:0 8px 24px rgba(15,23,42,.05); 
-  padding:24px; 
-  margin-bottom:24px; 
-}
-.ja-field{ margin-top:16px; }
-.ja-label{ display:block; font-weight:600; margin:0 0 6px; color:var(--ink); }
-.ja-input,.ja-select,.ja-textarea{
-  width:100%; border:1px solid var(--gray-200); border-radius:12px; background:#fff;
-  padding:12px 14px; font-size:16px; box-sizing:border-box; transition:border-color .2s, box-shadow .2s;
-}
-.ja-input:focus,.ja-select:focus,.ja-textarea:focus{ outline:0; border-color:#4f46e5; box-shadow:0 0 0 3px var(--ring); }
-.ja-textarea{ resize:vertical; min-height:80px; }
+    .ja-card-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 20px;
+    }
 
-/* Two columns on desktop */
-.ja-two-col{ display:grid; gap:12px; grid-template-columns:1fr; }
-@media (min-width:768px){ .ja-two-col{ grid-template-columns:1fr 1fr; } }
+    /* ── FIELDS ── */
+    .ja-field { margin-bottom: 20px; }
 
-/* Map block */
-#viewWrap{ margin-top:10px; }
-#viewDiv{
-  position:relative; height:420px; border:1px solid var(--gray-200); border-radius:16px;
-  overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.04);
-}
-#searchDock{
-  position:absolute; left:50%; top:12px; transform:translateX(-50%); z-index:10;
-  width:clamp(320px,62vw,900px);
-}
-#selectedAddress{ color:#64748b; background:var(--gray-100); }
+    .ja-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #334155;
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
 
-/* Actions */
-.ja-actions{ 
-  margin-top:18px; 
-  padding:10px; 
-  background:#fff; 
-  border-radius:12px; 
-  display:flex; 
-  gap:10px; 
-  align-items:center; 
-  border:1px solid var(--gray-300); 
-}
-.btn-primary{
-  background:var(--btn); color:#fff; border:none; padding:12px 18px; border-radius:12px;
-  font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(79,70,229,.25);
-  transition:background .15s ease, transform .15s ease, box-shadow .15s ease;
-}
-.btn-primary:hover{ background:var(--btn-hover); transform:translateY(-1px); box-shadow:0 6px 16px rgba(79,70,229,.32); }
-.btn-primary:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+    .ja-input, .ja-select, .ja-textarea {
+      width: 100%;
+      border: 1px solid var(--gray-300);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 14px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+      color: var(--ink);
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
 
-/* Search bar styling */
-#searchDock .esri-search__input-container {
-  border: 1.5px solid #3b82f6;
-  border-radius: 9999px;
-  background: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,.08);
-  overflow: hidden;
-}
+    .ja-input:focus, .ja-select:focus, .ja-textarea:focus {
+      outline: 0;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
 
-#searchDock .esri-input {
-  height: 44px;
-  font-size: 16px;
-  padding: 0 14px;
-}
+    .ja-input::placeholder { color: #94a3b8; }
+    .ja-input:disabled { background: var(--gray-100); color: #64748b; cursor: default; }
+    .ja-textarea { resize: vertical; min-height: 90px; }
 
-#searchDock .esri-input::placeholder {
-  color: #64748b;
-}
+    .ja-hint {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 5px;
+    }
 
-#searchDock .esri-search__submit-button {
-  border-left: 1px solid #e5e7eb;
-  height: 44px;
-  width: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0 9999px 9999px 0;
-  background: #fff;
-}
+    /* ── MAP ── */
+    #viewWrap { margin-top: 8px; }
 
-#searchDock .esri-search__submit-button .esri-icon-search {
-  font-size: 16px;
-  color: #334155;
-}
+    #viewDiv {
+      position: relative;
+      height: 300px;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f1f5f9;
+    }
 
-#searchDock .esri-search__suggestions-menu{
-  margin-top:8px; 
-  border-radius:12px; 
-  box-shadow:0 14px 30px rgba(0,0,0,.16);
-  max-height:55vh; 
-  overflow:auto; 
-  width:100% !important;
-}
+    #searchDock {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      z-index: 10;
+      width: clamp(260px, 80%, 500px);
+    }
 
-/* Mobile optimizations */
-@media (max-width:640px){
-  #viewDiv{ height:56vh; border-radius:14px; }
-  #searchDock{ width:min(92vw,560px); top:8px; }
-  
-  .ja-heroText { padding: 28px 12px 20px; }
-  .ja-heroText .hero-title { font-size: 28px; }
-  .ja-heroText .hero-subtitle { font-size: 16px; }
-}
+    #selectedAddress { color: #64748b; background: var(--gray-100); }
 
-/* Mobile search bar improvements */
-@media (max-width: 768px) {
-  #searchDock {
-    width: min(80vw, 320px) !important;
-    top: 3px !important;
-  }
-  
-  #searchDock .esri-search__input-container {
-    border: 1px solid #d1d5db !important;
-    box-shadow: none !important;
-    height: 28px !important;
-    border-radius: 20px !important;
-  }
-  
-  #searchDock .esri-input {
-    height: 26px !important;
-    font-size: 13px !important;
-    padding: 0 8px !important;
-    line-height: 26px !important;
-  }
-  
-  #searchDock .esri-search__submit-button {
-    height: 26px !important;
-    width: 30px !important;
-    border-left: 1px solid #d1d5db !important;
-    border-radius: 0 20px 20px 0 !important;
-  }
-  
-  #searchDock .esri-search__submit-button .esri-icon-search {
-    font-size: 11px !important;
-  }
-  
-  #searchDock .esri-search__suggestions-menu {
-    margin-top: 1px !important;
-    max-height: 30vh !important;
-    border-radius: 6px !important;
-    font-size: 13px !important;
-  }
-  
-  #viewDiv {
-    height: 48vh !important;
-    border-radius: 12px !important;
-  }
-  
-  .ja-card {
-    padding: 14px !important;
-    margin-bottom: 12px !important;
-  }
-  
-  .ja-input, .ja-select, .ja-textarea {
-    font-size: 16px !important;
-    padding: 9px 11px !important;
-  }
-  
-  #viewWrap + p {
-    font-size: 12px !important;
-    margin: 4px 2px 0 !important;
-  }
-}
-</style>
+    /* ── TOGGLE ── */
+    .ja-toggle-btn {
+      width: 100%;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #fff;
+      border: 1px solid var(--gray-300);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #334155;
+      margin-bottom: 0;
+      transition: border-color .2s, background .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-<!-- Add this JavaScript right after the styles to dynamically adjust padding -->
+    .ja-toggle-btn:hover { border-color: #cbd5e1; background: #fafafa; }
 
+    .ja-toggle-chevron {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      transition: transform .2s;
+    }
+
+    .ja-toggle-btn.open .ja-toggle-chevron {
+      transform: rotate(180deg);
+    }
+
+    .ja-toggle-content {
+      display: none;
+      padding-top: 20px;
+    }
+
+    .ja-toggle-content.open { display: block; }
+
+    /* ── TWO COL ── */
+    .ja-two-col {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 600px) {
+      .ja-two-col { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── DIVIDER ── */
+    .ja-divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin: 20px 0;
+    }
+
+    /* ── SUBMIT ── */
+    .ja-actions {
+      margin-top: 8px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      min-height: 52px;
+      background: var(--btn);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background .15s, opacity .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-primary:hover { background: var(--btn-hover); }
+    .btn-primary:active { opacity: 0.9; }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    #status {
+      margin-top: 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    /* ── SEARCH BAR in map ── */
+    #searchDock .esri-search__input-container {
+      border: 1px solid #d1d5db;
+      border-radius: 9999px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+
+    #searchDock .esri-input {
+      height: 40px;
+      font-size: 14px;
+      padding: 0 14px;
+    }
+
+    #searchDock .esri-input::placeholder { color: #64748b; }
+
+    #searchDock .esri-search__submit-button {
+      height: 40px;
+      width: 40px;
+      border-left: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 0 9999px 9999px 0;
+    }
+
+    #searchDock .esri-search__suggestions-menu {
+      margin-top: 6px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      max-height: 40vh;
+      overflow: auto;
+      width: 100% !important;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .ja-hero { padding: 36px 20px 24px; }
+      .ja-card { padding: 20px 16px; }
+      #viewDiv { height: 240px; }
+      #searchDock { width: min(85vw, 320px); top: 8px; }
+    }
+
+  </style>
 </head>
-<script src="header.js"></script>
 
-<body class="upload-page">
-  <!-- Header -->
-  <header id="appHeader">
-    <div id="headerRow1" >
-      <div id="headerLeft">
-        <h1 id="siteTitle">Jewish Atlas</h1>
-        <nav id="navButtons">
-          <button class="navBtn" id="aboutBtn" type="button">About</button>
-          <button class="navBtn" id="wallBtn"  type="button">The Wall</button>
-          <button class="navBtn" id="backBtn"  type="button">Map</button>
-        </nav>
-      </div>
-      <div id="searchContainer" aria-hidden="true"></div>
-    </div>
-  </header>
+<body>
+  <div id="ja-header" data-page="upload"></div>
+  <script src="header.js"></script>
 
-  <!-- NEW: Title only (no dark container) -->
-  <section class="ja-heroText">
-    <h2 class="hero-title">Your Contribution Tells the Story.</h2>
-    <p class="hero-subtitle">Add Jewish sites to help map our shared history.</p>
-  </section>
+  <!-- HERO -->
+  <div class="ja-hero">
+    <div class="ja-hero-eyebrow">Jewish Atlas</div>
+    <h1>Help us map Jewish heritage.</h1>
+    <p>Every site you add helps preserve Jewish heritage for future generations.</p>
+  </div>
 
-  <!-- Form -->
+  <!-- FORM -->
   <main class="ja-container">
-    <section class="ja-card" aria-labelledby="submit-title">
-      <h3 id="submit-title" class="ja-label" style="margin:0 0 14px;">Submit a Site</h3>
+    <div class="ja-card">
+      <p class="ja-card-title">Tell us about the site</p>
 
-      <form id="addForm" class="ja-form" autocomplete="off">
+      <form id="addForm" autocomplete="off">
+
+        <!-- ESSENTIAL FIELDS -->
         <div class="ja-field">
-          <label for="siteName" class="ja-label">Site Name</label>
-          <input id="siteName" class="ja-input" placeholder='e.g., “Beit Knesset HaGadol”, “Mikveh in Kraków”' />
+          <label for="siteName" class="ja-label">What is this place called?</label>
+          <input id="siteName" class="ja-input" placeholder='e.g. "Beit Knesset HaGadol" or "Old Jewish Cemetery"' />
         </div>
 
         <div class="ja-field">
-          <label for="type" class="ja-label">Type (select category) <span aria-hidden="true" style="color:#e11d48">*</span></label>
+          <label for="type" class="ja-label">What type of site is it? <span style="color:#e11d48">*</span></label>
           <select id="type" class="ja-select" required>
-            <option value="">Choose…</option>
-            <option>Synagogue</option><option>Cemetery</option><option>Kosher Restaurant</option>            <option>Tomb</option><option>Monument</option><option>Yeshiva</option><option>Summer Camp</option>            <option>Jewish Quarter</option><option>Mikve</option><option>Museum</option>
-            <option>Heritage Site</option><option>Ghetto</option><option>Karaite Site</option>
+            <option value="">Choose a category…</option>
+            <option>Synagogue</option>
+            <option>Cemetery</option>
+            <option>Holocaust Memorial</option>
+            <option>Heritage Site</option>
+            <option>Historic Ghetto</option>
+            <option>Museum</option>
+            <option>School</option>
+            <option>Yeshiva</option>
+            <option>Community Center</option>
+            <option>Kosher Restaurant</option>
+            <option>Mikve</option>
+            <option>Tomb</option>
+            <option>Monument</option>
           </select>
         </div>
 
         <div class="ja-field">
-          <label class="ja-label">Address (search & choose) <span aria-hidden="true" style="color:#e11d48">*</span></label>
-          <input id="selectedAddress" class="ja-input" disabled placeholder="No address selected yet" />
+          <label class="ja-label">Where is it? <span style="color:#e11d48">*</span></label>
+          <input id="selectedAddress" class="ja-input" disabled placeholder="Search the map below or tap to drop a pin" />
+          <p class="ja-hint" style="margin-bottom: 8px;">Use the search bar on the map, or tap directly on the location.</p>
           <div id="viewWrap">
             <div id="viewDiv">
               <div id="searchDock"></div>
             </div>
           </div>
-          <p style="margin:6px 4px 0; color:#64748b; font-size:13px">
-            Use the map’s search (OpenStreetMap only). Pick a result or tap the map to drop the pin.
-          </p>
         </div>
 
         <div class="ja-field">
-          <label for="desc" class="ja-label">Short Description</label>
-          <textarea id="desc" class="ja-textarea" rows="3" placeholder="A one- or two-sentence description…"></textarea>
+          <label for="photoFile" class="ja-label">Got a photo? (optional)</label>
+          <input id="photoFile" type="file" accept="image/*" capture="environment" class="ja-input" style="padding: 10px 14px;" />
+          <p class="ja-hint">A photo helps us verify and display the site. Any quality is fine.</p>
         </div>
 
+        <!-- MORE DETAILS TOGGLE -->
         <div class="ja-field">
-          <label for="preservation" class="ja-label">Preservation Status</label>
-          <select id="preservation" class="ja-select">
-            <option value="">Choose…</option>
-            <option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option>
-            <option>Ruins</option><option>No longer exists</option><option>Unknown</option>
-          </select>
-        </div>
+          <button type="button" class="ja-toggle-btn" id="toggleDetails">
+            <span>Add more details</span>
+            <span class="ja-toggle-chevron">▼</span>
+          </button>
+          <div class="ja-toggle-content" id="toggleContent">
 
-        <div class="ja-field ja-two-col">
-          <div>
-            <label for="photoFile" class="ja-label">Photo (camera or file)</label>
-            <input id="photoFile" type="file" accept="image/*,application/pdf" capture="environment" class="ja-input" />
-            <div style="color:#64748b; font-size:13px; margin-top:6px">Large images are resized in the browser.</div>
+            <div class="ja-field">
+              <label for="desc" class="ja-label">Short description</label>
+              <textarea id="desc" class="ja-textarea" rows="3" placeholder="A sentence or two about the site — history, significance, current state…"></textarea>
+            </div>
+
+            <div class="ja-field">
+              <label for="preservation" class="ja-label">Preservation status</label>
+              <select id="preservation" class="ja-select">
+                <option value="">Choose…</option>
+                <option>Excellent</option>
+                <option>Good</option>
+                <option>Fair</option>
+                <option>Poor</option>
+                <option>Ruins</option>
+                <option>No longer exists</option>
+                <option>Unknown</option>
+              </select>
+            </div>
+
+            <div class="ja-divider"></div>
+
+            <p class="ja-label" style="margin-bottom: 12px;">Site contact info (if known)</p>
+
+            <div class="ja-two-col">
+              <div class="ja-field" style="margin-bottom: 0;">
+                <label for="sitePhone" class="ja-label">Phone</label>
+                <input id="sitePhone" class="ja-input" type="tel" inputmode="tel" placeholder="+1 212-555-0123" />
+              </div>
+              <div class="ja-field" style="margin-bottom: 0;">
+                <label for="siteWebsite" class="ja-label">Website</label>
+                <input id="siteWebsite" class="ja-input" type="url" placeholder="https://example.org" />
+              </div>
+            </div>
+
+            <div class="ja-field" style="margin-top: 12px;">
+              <label for="siteEmail" class="ja-label">Site email</label>
+              <input id="siteEmail" class="ja-input" type="email" inputmode="email" placeholder="contact@example.org" />
+            </div>
+
+            <div class="ja-field">
+              <label for="comments" class="ja-label">Anything else to add?</label>
+              <textarea id="comments" class="ja-textarea" rows="3" placeholder="Personal story, how you found it, anything that helps us verify…"></textarea>
+            </div>
+
           </div>
-          
         </div>
-<!-- Contact details for the site (optional) -->
-<div class="ja-field ja-two-col">
-  <div>
-    <label for="sitePhone" class="ja-label">Site Phone</label>
-    <input id="sitePhone" class="ja-input" type="tel" inputmode="tel" placeholder="+1 212-555-0123" />
-  </div>
-  <div>
-    <label for="siteWebsite" class="ja-label">Site Website </label>
-    <input id="siteWebsite" class="ja-input" type="url" placeholder="https://example.org" />
-  </div>
-</div>
 
-<div class="ja-field">
-  <label for="siteEmail" class="ja-label">Site Email </label>
-  <input id="siteEmail" class="ja-input" type="email" inputmode="email" autocomplete="email" placeholder="contact@example.org" />
-</div>
+        <div class="ja-divider"></div>
 
+        <!-- YOUR EMAIL -->
         <div class="ja-field">
-          <label for="comments" class="ja-label">Any Comments</label>
-          <textarea id="comments" class="ja-textarea" rows="3" placeholder="Personal story, context, or anything that helps us verify."></textarea>
+          <label for="contactEmail" class="ja-label">Your email <span style="color: #94a3b8; font-weight: 400;">(optional — we'll let you know when it's live)</span></label>
+          <input id="contactEmail" name="email" class="ja-input" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
         </div>
-<!-- Submitter contact (optional) -->
-<div class="ja-field">
-  <label for="contactEmail" class="ja-label">Your Email <span style="color:#64748b;font-weight:500">(optional, for follow-up only)</span></label>
-  <input id="contactEmail" name="email" class="ja-input" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
-</div>
+
+        <!-- SUBMIT -->
         <div class="ja-actions">
-          <button id="submitBtn" class="btn-primary" type="submit" disabled>Submit</button>
-          <div id="status" style="font-size:14px; color:var(--ink); display:none"></div>
+          <button id="submitBtn" class="btn-primary" type="submit" disabled>Share this site →</button>
+          <div id="status" style="display:none;"></div>
         </div>
+
+        <p style="text-align: center; font-size: 12px; color: #94a3b8; margin-top: 12px;">Every submission is reviewed before appearing on the map.</p>
 
       </form>
-    </section>
+    </div>
   </main>
 
-  <!-- Your map & submission logic -->
+  <script>
+    const toggleBtn = document.getElementById('toggleDetails');
+    const toggleContent = document.getElementById('toggleContent');
+    toggleBtn.addEventListener('click', function() {
+      const isOpen = toggleContent.classList.toggle('open');
+      toggleBtn.classList.toggle('open', isOpen);
+      toggleBtn.querySelector('span:first-child').textContent = isOpen ? 'Hide details' : 'Add more details';
+    });
+  </script>
+
   <script src="upload.js"></script>
 </body>
 </html>

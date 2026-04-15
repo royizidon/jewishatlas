@@ -7,15 +7,15 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="header.css">
 
   <style>
     :root {
       --navy: #0f172a;
       --slate: #475569;
       --slate-light: #64748b;
-      --gold: #f4bf4f;
-      --accent: #1e3a8a;
+      --gold: #c5a47e;
       --bg: #fcfcfd;
       --white: #ffffff;
       --radius: 12px;
@@ -32,102 +32,181 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Unified Container Width */
     .container {
-      max-width: 680px; 
+      max-width: 680px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
-    /* --- HEADER --- */
-    header {
-      background: var(--white);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      padding: 16px 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--navy);
-      text-decoration: none;
-    }
-
-    nav { display: flex; gap: 8px; }
-
-    .nav-link {
-      text-decoration: none;
-      color: var(--slate);
-      font-weight: 600;
-      font-size: 0.85rem;
-      padding: 8px 14px;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
-
-    .nav-link:hover { background: rgba(0,0,0,0.05); }
-    
-
     /* --- HERO --- */
-    .hero {
+   .hero {
       text-align: center;
-      padding: 50px 0 20px;
+      padding: 72px 0 20px;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
     }
 
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.2rem, 5vw, 2.8rem);
-      margin-bottom: 16px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.6rem, 5vw, 3.4rem);
+      font-weight: 600;
+      margin: 0 0 20px;
       line-height: 1.1;
       color: var(--navy);
     }
 
     .hero-sub {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--slate);
       margin: 0 auto;
+      max-width: 520px;
+      line-height: 1.65;
+    }
+
+    /* --- STATS ROW --- */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin: 40px 0 8px;
+      border-top: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 24px 0;
+    }
+
+    .stat {
+      flex: 1;
+      text-align: center;
+      padding: 0 16px;
+      border-right: 1px solid #f1f5f9;
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-number {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.4rem;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--slate-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
     }
 
     /* --- CONTENT SECTIONS --- */
     .section-intro, .section {
-      padding: 20px 0;
-    }    
-    
-    h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      margin-bottom: 12px;
+      padding: 32px 0 16px;
     }
 
-    p { margin-bottom: 16px; font-size: 1.05rem; color: #334155; }
+    h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--navy);
+    }
+
+    p { margin-bottom: 16px; font-size: 1.05rem; color: #1e293b; line-height: 1.75; }
 
     .audience-tag {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--slate-light);
       border-top: 1px solid #f1f5f9;
       padding-top: 12px;
       margin-top: 20px;
     }
 
+    .urgency-line {
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--slate);
+      border-left: 2px solid var(--gold);
+      padding-left: 16px;
+      margin: 20px 0;
+    }
+
+    /* --- WHAT WE MAP --- */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 20px 0 32px;
+    }
+
+    .category-item {
+      background: #fff;
+      border: 1px solid #f1f5f9;
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+
+    .category-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .category-desc {
+      font-size: 0.82rem;
+      color: var(--slate-light);
+      line-height: 1.4;
+    }
+
+    /* --- HOW PEOPLE USE IT --- */
+    .use-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+    }
+
+    .use-list li {
+      font-size: 1rem;
+      color: #334155;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .use-list li:last-child { border-bottom: none; }
+
+    .use-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+      margin-top: 8px;
+    }
+
+    /* --- PULL QUOTE --- */
     .pull-quote {
-      border-left: 4px solid var(--gold);
+      border-left: 3px solid var(--gold);
       padding: 10px 0 10px 24px;
       margin: 32px 0;
       font-style: italic;
-      font-size: 1.15rem;
-      font-weight: 500;
-      background: #fffbeb;
+      font-size: 1.1rem;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       color: var(--navy);
+      line-height: 1.6;
     }
 
     /* --- IMAGES --- */
@@ -135,150 +214,192 @@
       margin: 30px 0;
       border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
     .featured-image img {
       width: 100%;
       height: auto;
-      max-height: 450px;
+      max-height: 400px;
       object-fit: cover;
       display: block;
     }
 
     figcaption {
-      padding: 12px;
+      padding: 10px 12px;
       background: #f8fafc;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--slate-light);
       text-align: center;
     }
 
-    /* --- THE BRICK CARD --- */
+    /* --- DEDICATE CARD --- */
     .card-dark {
       background: var(--navy);
       color: var(--white);
-      padding: 45px 30px;
-      border-radius: 20px;
+      padding: 44px 32px;
+      border-radius: 16px;
       text-align: center;
-      margin: 35px 0;
+      margin: 40px 0;
     }
 
     .card-dark h2 { color: var(--white); margin-top: 0; }
-    .card-dark p { color: #f1f5f9; font-size: 1.05rem; max-width: 500px; margin: 0 auto 20px; }
+    .card-dark p { color: rgba(232,228,220,0.8); font-size: 1rem; max-width: 500px; margin: 0 auto 20px; }
 
     .brick-preview {
       display: inline-block;
-      font-family: 'Playfair Display', serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
       color: var(--gold);
-      border: 1px dashed rgba(244, 191, 79, 0.4);
+      border: 1px dashed rgba(197,164,126,0.4);
       padding: 10px 20px;
       border-radius: 8px;
-      margin-bottom: 25px;
-      font-size: 0.95rem;
+      margin-bottom: 24px;
+      font-size: 1rem;
     }
 
     .btn-gold {
       display: inline-block;
       background: var(--gold);
       color: var(--navy);
-      padding: 16px 32px;
-      border-radius: var(--radius);
-      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
       text-decoration: none;
-      transition: transform 0.2s;
+      transition: opacity 0.2s;
+      font-family: 'Inter', sans-serif;
     }
-    .btn-gold:hover { transform: translateY(-2px); }
+    .btn-gold:hover { opacity: 0.85; }
 
-    /* --- UPLOAD FOOTER BOX --- */
+    /* --- UPLOAD BOX --- */
     .upload-subtle {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 16px;
+      border-radius: 12px;
       padding: 24px;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 48px;
     }
 
-    .upload-subtle p { margin: 0; font-weight: 600; color: var(--navy); }
+    .upload-subtle p { margin: 0; font-size: 0.95rem; color: var(--navy); }
 
     .upload-link {
       color: var(--navy);
       text-decoration: none;
-      font-weight: 700;
-      border-bottom: 2px solid var(--gold);
+      font-weight: 500;
+      border-bottom: 1px solid var(--gold);
       padding-bottom: 1px;
-      margin-left: 5px;
-      white-space: nowrap;
+      margin-left: 4px;
     }
 
     .review-note {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--slate-light);
-      margin-top: 8px;
-      font-weight: 400;
+      margin-top: 6px;
     }
 
     /* --- FOOTER --- */
     .minimal-footer {
-      padding: 40px 0;
+      padding: 36px 0;
       border-top: 1px solid #e2e8f0;
       text-align: center;
     }
 
-    .minimal-footer p { font-size: 0.9rem; color: var(--slate-light); margin: 0; }
-    .minimal-footer a { color: var(--navy); text-decoration: none; font-weight: 600; }
+    .minimal-footer p { font-size: 0.85rem; color: var(--slate-light); margin: 0; }
+    .minimal-footer a { color: var(--navy); text-decoration: none; font-weight: 500; }
 
     @media (max-width: 600px) {
-      .header-content { flex-direction: column; gap: 12px; }
       .container { padding: 0 20px; }
+      .stats-row { gap: 0; }
+      .stat { padding: 0 10px; }
+      .stat-number { font-size: 1.6rem; }
+      .categories-grid { grid-template-columns: 1fr; }
+      .hero { padding: 40px 0 8px; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="container header-content">
-      <a href="index.html" class="logo">Jewish Atlas</a>
-      <nav>
-        <a href="index.html" class="nav-link">Map</a>
-        <a href="wall.html" class="nav-link">The Wall</a>
-        <a href="upload.html" class="nav-link">Upload</a>
-      </nav>
-    </div>
-  </header>
+  <div id="ja-header" data-page="about"></div>
+  <script src="header.js"></script>
 
   <main class="container">
+
+    <!-- HERO -->
     <section class="hero">
+      <p class="hero-eyebrow">Jewish Atlas</p>
       <h1>Every place tells a story.</h1>
-      <p class="hero-sub">Mapping synagogues, cemeteries, and heritage sites across 121 countries. Many are forgotten. We map them all.</p>
+     <p class="hero-sub">Mapping synagogues, cemeteries, and heritage sites across 121 countries. Many are forgotten. We map them all.</p>
+      <div style="width: 40px; height: 1px; background: #c5a47e; margin: 28px auto 0; opacity: 0.7;"></div>
     </section>
 
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-number">35,000+</div>
+        <div class="stat-label">Sites mapped</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">121</div>
+        <div class="stat-label">Countries</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Categories</div>
+      </div>
+   </div>
+
+    <p style="text-align: center; font-style: italic; font-size: 0.95rem; color: #64748b; margin: 20px auto 0; max-width: 480px; line-height: 1.6;">As communities change and physical traces disappear, memory needs a map.</p>
+
+    <!-- WHAT WE MAP -->
     <section class="section-intro">
-      <h2>A Living Map</h2>
-      <div class="living-map-text">
-        <p>
-          Jewish Atlas is a global record of heritage—weaving fragments from old archives 
-          and local knowledge into one reliable digital record.
-        </p>
-        <p>
-          <strong>More than a database, this is a bridge.</strong> By making history visible, 
-          we connect people to their roots and help local communities reclaim their stories 
-          to prosper through shared heritage.
-        </p>
-        <p class="audience-tag">
-          Built for travelers, educators, and families seeking to connect.
-        </p>
+      <h2>What the Atlas includes</h2>
+      <div class="categories-grid">
+        <div class="category-item">
+          <div class="category-name">Synagogues</div>
+          <div class="category-desc">Active, historic, and lost houses of prayer worldwide</div>
+        </div>
+        <div class="category-item">
+          <div class="category-name">Cemeteries &amp; memorials</div>
+          <div class="category-desc">Jewish burial grounds and memorial sites across generations</div>
+        </div>
+        <div class="category-item">
+          <div class="category-name">Heritage sites</div>
+          <div class="category-desc">Former Jewish quarters, ruins, and places of cultural significance</div>
+        </div>
+        <div class="category-item">
+          <div class="category-name">Community &amp; kosher life</div>
+          <div class="category-desc">Living Jewish communities, kosher food, and cultural spaces</div>
+        </div>
       </div>
     </section>
 
+    <!-- MISSION -->
+    <section class="section-intro">
+      <h2>Preserving What Might Disappear</h2>
+      <p>Jewish Atlas is a global record of heritage — weaving fragments from old archives and local knowledge into one reliable digital record.</p>
+      <p>More than a database, this is a bridge. By making history visible, we connect people to their roots and help local communities reclaim their stories.</p>
+      <p class="audience-tag">Built for travelers, educators, and families seeking to connect.</p>
+    </section>
+
+    <!-- IMAGE -->
     <figure class="featured-image">
       <img src="prague-cemetery.jpg" alt="Old Jewish Cemetery, Prague">
       <figcaption>Old Jewish Cemetery, Prague — one of 35,000+ sites on the atlas</figcaption>
     </figure>
 
+    <!-- HOW PEOPLE USE IT -->
+    <section class="section">
+      <h2>How people use it</h2>
+      <ul class="use-list">
+        <li><span class="use-dot"></span>Explore Jewish heritage by city, country, or region</li>
+        <li><span class="use-dot"></span>Plan visits and discover nearby sites before traveling</li>
+        <li><span class="use-dot"></span>Help preserve memory by uploading forgotten or undocumented places</li>
+      </ul>
+    </section>
+
+    <!-- WHY THIS MATTERS -->
     <section class="section">
       <h2>Why This Matters</h2>
       <p>Preservation is about continuity. By keeping Jewish presence visible and its history accessible, we ensure that these stories remain part of the global landscape, even when physical sites are vulnerable.</p>
@@ -287,31 +408,30 @@
       </div>
     </section>
 
+    <!-- DEDICATE -->
     <section class="card-dark">
       <h2>Dedicate a Brick</h2>
       <p>Create a permanent tribute to a person, family, or community. Your support keeps the Atlas free for everyone.</p>
-      
-      <div class="brick-preview">
-        In memory of the Goldstein Family — Warsaw
-      </div>
-
+      <div class="brick-preview">In memory of the Goldstein Family — Warsaw</div>
       <div>
-        <a href="https://jewishatlas.org/dedicate.html" class="btn-gold">Dedicate a Brick — ₪180</a>
+        <a href="dedicate.html" class="btn-gold">Dedicate a Brick — ₪180</a>
       </div>
     </section>
 
+    <!-- UPLOAD -->
     <section class="upload-subtle">
       <p>
-        Know a site we missed? 
-        <a href="upload.html" class="upload-link">Upload a Site &rarr;</a>
+        Know a site we missed?
+        <a href="upload.html" class="upload-link">Upload a Site →</a>
         <span class="review-note">Submissions reviewed before publishing</span>
       </p>
     </section>
+
   </main>
 
   <footer class="minimal-footer">
     <div class="container">
-      <p>&copy; 2025 Jewish Atlas &middot; <a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a></p>
+      <p>&copy; 2025 Jewish Atlas · <a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a></p>
     </div>
   </footer>
 

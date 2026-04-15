@@ -918,193 +918,160 @@ search.when(() => {
   map.add(globalLayer);
   
 // ========================================
-// WELCOME POPUP – Bilingual (EN / HE)
+// WELCOME POPUP
 // ========================================
 view.when(() => {
-  // Skip popup if user came back from Wall, About, or Upload
   const _cameFromInternal = sessionStorage.getItem("ja_from_internal") === "1";
-  sessionStorage.removeItem("ja_from_internal"); // clear so it only skips once
+  sessionStorage.removeItem("ja_from_internal");
   if (localStorage.getItem("ja_welcome_v2") === "1" || _cameFromInternal) return;
 
   const isMobile = window.matchMedia("(max-width: 640px)").matches;
 
-  // ---------- Language detection ----------
-  const langs = navigator.languages?.length
-    ? navigator.languages
-    : [navigator.language || ""];
-  const isHebrew = langs.some((l) => String(l).toLowerCase().startsWith("he"));
-
-  // ---------- Copy ----------
-  const t = isHebrew
-    ? {
-        dir: "rtl",
-        align: "right",
-        closeSide: "left",
-        title: "ברוכים הבאים לאטלס היהודי",
-        subtitle: "המפה שמחברת עבר, הווה ועתיד — אלפי אתרי מורשת יהודית במקום אחד.",
-        tips: [
-          "הגדילו את המפה כדי לגלות אתרים",
-          "סננו לפי קטגוריה: בתי כנסת · מורשת · אוכל כשר · קהילה",
-          "חפשו עיר או יעד כדי להתחיל לתכנן ביקור",
-        ],
-        cta: "המפה",
-        brick: "הקדישו לבנה",
-        upload: "הוסיפו אתר למפה",
-        hint: "",
-        tagline: "שומרים על הזיכרון. בונים את המפה.",
-        dontShow: "אל תציגו שוב",
-      }
-    : {
-        dir: "ltr",
-        align: "left",
-        closeSide: "right",
-        title: "Welcome to The Jewish Atlas",
-        subtitle:
-          "Explore thousands of Jewish heritage sites around the world — and plan your next visit.",
-        tips: [
-          "🗺️ Zoom in anywhere to discover sites nearby",
-          "🗂️ Filter by category: synagogues · heritage · kosher food · community",
-          "🔍 Search any city to start planning your trip",
-        ],
-        cta: "Start Exploring",
-        brick: "Dedicate a Brick",
-        upload: "Upload a Site",
-        hint: isMobile ? "" : `<span style="color:#999; font-weight:400;"> — help us grow</span>`,
-        tagline: "Preserve memory. Build the map.",
-        dontShow: "Don't show this again",
-      };
-
-  // ---------- Overlay ----------
   const overlay = document.createElement("div");
   overlay.style.cssText = `
     position: fixed; inset: 0; z-index: 9999;
-    background: rgba(0,0,0,0.35);
+    background: rgba(0,0,0,0.4);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; transition: opacity 280ms ease;
     padding: 16px;
   `;
 
-  // ---------- Card ----------
   const card = document.createElement("div");
   card.style.cssText = `
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    padding: ${isMobile ? "24px 20px 18px" : "36px 40px 28px"};
+    background: #faf8f4;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    padding: ${isMobile ? "24px 24px 20px" : "36px 40px 32px"};
     max-width: ${isMobile ? "360px" : "460px"};
     width: 100%;
     position: relative;
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    direction: ${t.dir};
+    font-family: 'Inter', sans-serif;
     transform: scale(0.96);
     opacity: 0;
     transition: transform 280ms ease, opacity 280ms ease;
-    max-height: 85vh;
+    max-height: 90vh;
     overflow: auto;
   `;
 
-  // ---------- Build tips HTML ----------
-  const tipPadSide = t.dir === "rtl" ? "right" : "left";
-
-  const tipsHtml = t.tips
-    .map(
-      (tip) =>
-        `<li style="margin-bottom: 8px; padding-${tipPadSide}: 4px;">${tip}</li>`
-    )
-    .join("");
-
-  // ---------- Card content ----------
   card.innerHTML = `
-    <button id="welcomeClose" style="
-      position: absolute; top: 6px; ${t.closeSide}: 6px;
-      background: none; border: none;
-      min-width: 44px; min-height: 44px;
+   <button id="welcomeClose" style="
+      position: absolute; top: 14px; right: 14px;
+      background: #f5f5f5; border: none;
+      width: 24px; height: 24px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; color: #999; cursor: pointer;
-      border-radius: 10px;
+      font-size: 12px; color: #888; cursor: pointer;
+      border-radius: 50%;
     " aria-label="Close" type="button">✕</button>
 
+    <p style="
+      margin: 0 0 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c5a47e;
+    ">Jewish Atlas</p>
     <h2 style="
       margin: 0 0 8px;
-      font-size: ${isMobile ? "20px" : "23px"};
-      font-weight: 700;
-      color: #1a1a1a;
-    ">${t.title}</h2>
+      padding-top: 0;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: ${isMobile ? "19px" : "21px"};
+      font-weight: 600;
+      color: #111;
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      padding-right: 32px;
+    ">A living map of Jewish heritage and memory.</h2>
 
     <p style="
-      margin: 0 0 18px;
-      font-size: ${isMobile ? "13.5px" : "14.5px"};
-      color: #555;
-      line-height: 1.55;
-    ">${t.subtitle}</p>
+      margin: 0 0 16px;
+      font-size: ${isMobile ? "14px" : "15px"};
+      color: #666;
+      line-height: 1.6;
+    ">Discover Jewish places and community around the world.</p>
 
     <ul style="
       list-style: none;
       padding: 0;
-      margin: 0 0 22px;
-      text-align: ${t.align};
-      font-size: ${isMobile ? "13px" : "14px"};
-      color: #444;
-      line-height: 1.65;
-    ">${tipsHtml}</ul>
+      margin: 0 0 28px;
+      text-align: left;
+      font-size: 14px;
+      color: #555;
+      line-height: 1.7;
+    ">
+     <li style="margin-bottom: 6px; padding-left: 4px; color: #555;">Search any city or landmark</li>
+<li style="padding-left: 4px; color: #555;">Filter by synagogue, heritage, kosher food, or community</li>
+    </ul>
 
     <button id="welcomeExplore" style="
       display: block;
       width: 100%;
-      padding: ${isMobile ? "15px 0" : "13px 0"};
+      padding: 13px 0;
       min-height: 44px;
-      background: #3b5998;
+      background: #111;
       color: #fff;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 500;
       cursor: pointer;
-      margin-bottom: 14px;
-      transition: background 200ms ease;
-    " type="button">${t.cta}</button>
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+      transition: opacity 200ms ease;
+    " type="button">Start Exploring</button>
 
-    <div style="
-      font-size: 13px;
-      margin-bottom: 14px;
-      color: #3b5998;
-      line-height: 1.5;
-    ">
-      <a href="/wall.html" style="color:#3b5998; text-decoration:none; font-weight:600;">${t.brick}</a>
-      <span style="color:#ccc; margin: 0 8px;">·</span>
-      <a href="/upload.html" style="color:#3b5998; text-decoration:none; font-weight:600;">${t.upload}</a>
-      ${t.hint}
-    </div>
+    <a href="dedicate.html" style="
+      display: block;
+      width: 100%;
+      padding: 13px 0;
+      min-height: 44px;
+      background: #c5a47e;
+      color: #0a0c0f;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 200ms ease;
+    ">Dedicate a Brick</a>
 
     <p style="
-      margin: 0 0 14px;
-      font-size: 12.5px;
-      color: #888;
+      margin: 0 0 16px;
+      font-size: 12px;
+      color: #999;
       font-style: italic;
       letter-spacing: 0.2px;
-    ">${t.tagline}</p>
+    ">Preserve memory. Build the map.</p>
 
     <label style="
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      font-size: 12.5px;
-      color: #999;
+      gap: 8px;
+      font-size: 12px;
+      color: #888;
       cursor: pointer;
-      padding: 8px 0;
       user-select: none;
     ">
       <input type="checkbox" id="welcomeDontShow"
-        style="width: 18px; height: 18px; accent-color: #3b5998; cursor: pointer;">
-      ${t.dontShow}
+        style="width: 16px; height: 16px; accent-color: #111; cursor: pointer;">
+      Don't show this again
     </label>
   `;
 
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 
-  // ---------- Animate in ----------
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
@@ -1113,7 +1080,6 @@ view.when(() => {
     });
   });
 
-  // ---------- Close logic ----------
   function closeWelcome() {
     if (card.querySelector("#welcomeDontShow")?.checked) {
       localStorage.setItem("ja_welcome_v2", "1");
@@ -1131,13 +1097,13 @@ view.when(() => {
     if (e.target === overlay) closeWelcome();
   });
 
-  // Hover effect only on hover-capable devices
   if (window.matchMedia("(hover: hover)").matches) {
-    const btn = card.querySelector("#welcomeExplore");
-    btn.addEventListener("mouseenter", () => (btn.style.background = "#2d4373"));
-    btn.addEventListener("mouseleave", () => (btn.style.background = "#3b5998"));
+    const explore = card.querySelector("#welcomeExplore");
+    explore.addEventListener("mouseenter", () => (explore.style.opacity = "0.85"));
+    explore.addEventListener("mouseleave", () => (explore.style.opacity = "1"));
   }
 });
+
 
 // -------- Toggle clustering by zoom level --------
   const CLUSTER_ZOOM_THRESHOLD = 12;
