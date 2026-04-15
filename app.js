@@ -318,55 +318,53 @@ const createPopupTemplate = () => ({
       </div>
 
       <div class="popup-tabs">
-        <button class="tab-button active" data-tab="info">📍 Info</button>
-        <button class="tab-button" data-tab="navigate">🧭 Navigate</button>
-        <button class="tab-button" data-tab="feedback">💬 Feedback</button>
+        <button class="tab-button active" data-tab="info">Info</button>
+        <button class="tab-button" data-tab="navigate">Navigate</button>
+        <button class="tab-button" data-tab="feedback">Feedback</button>
       </div>
 
       <div class="popup-content-wrapper">
         <div class="tab-content active" data-content="info">
           <div class="info-section">
-            <div class="info-label">📍 Address</div>
+            <div class="info-label">Address</div>
             <div class="info-value">${fullAddress}</div>
           </div>
 
           ${description?.trim() ? `
           <div class="info-section">
-            <div class="info-label">ℹ️ About</div>
+            <div class="info-label">About</div>
             <div class="info-value clamp-4">${description}</div>
           </div>` : ""}
 
           ${hours?.trim() ? `
           <div class="info-section">
-            <div class="info-label">🕒 Hours & Fees</div>
+            <div class="info-label">Hours & Fees</div>
             <div class="info-value clamp-4">${hours}</div>
           </div>` : ""}
 
           <a href="${googleSearchUrl}" class="primary-button">
-            🔍 Search for More Details
+            Search for More Details
           </a>
 
-          ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">🌐 Visit website</a>` : ""}
-        </div>
+        ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">Visit website</a>` : ""}        </div>
 
         <div class="tab-content" data-content="navigate">
           <div class="nav-info-top">Get directions from your current location:</div>
           <a class="nav-button google-maps" target="_blank" rel="noopener">
-            📍 Directions via Google Maps
+            Directions via Google Maps
           </a>
           <a class="nav-button waze" target="_blank" rel="noopener">
-            🚗 Directions via Waze
+            Directions via Waze
           </a>
           <div class="nav-info">Opens your preferred navigation app</div>
         </div>
 
         <div class="tab-content" data-content="feedback">
           <div class="feedback-block">
-            <div class="feedback-emoji">💬</div>
-            <h3 class="feedback-title">Help us improve!</h3>
-            <p class="feedback-text">Found an issue? Have updates to share?</p>
+            <h3 class="feedback-title">Help us improve</h3>
+            <p class="feedback-text">Found an issue or have updates to share?</p>
             <a href="${feedbackUrl}" target="_blank" rel="noopener" class="primary-button feedback-submit">
-              ✏️ Submit Feedback
+              Submit Feedback
             </a>
           </div>
         </div>
