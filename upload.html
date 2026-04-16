@@ -147,7 +147,7 @@
 
     #viewDiv {
       position: relative;
-      height: 300px;
+      height: 420px;
       border: 1px solid var(--gray-200);
       border-radius: 12px;
       overflow: hidden;
@@ -265,9 +265,9 @@
     }
 
     #searchDock .esri-input {
-      height: 40px;
-      font-size: 14px;
-      padding: 0 14px;
+      height: 36px;
+      font-size: 13px;
+      padding: 0 10px;
     }
 
     #searchDock .esri-input::placeholder { color: #64748b; }
@@ -290,11 +290,12 @@
     }
 
     /* ── MOBILE ── */
-    @media (max-width: 640px) {
+  @media (max-width: 640px) {
       .ja-hero { padding: 36px 20px 24px; }
       .ja-card { padding: 20px 16px; }
-      #viewDiv { height: 240px; }
-      #searchDock { width: min(85vw, 320px); top: 8px; }
+      #viewDiv { height: 320px; }
+      #searchDock { width: min(75vw, 260px); top: 8px; }
+      #selectedAddress { font-size: 14px; }
     }
 
   </style>
@@ -306,7 +307,7 @@
 
   <!-- HERO -->
   <div class="ja-hero">
-    <div class="ja-hero-eyebrow">Jewish Atlas</div>
+    <a href="index.html" class="ja-hero-eyebrow" style="text-decoration: none;">Jewish Atlas</a>
     <h1>Help us map Jewish heritage.</h1>
     <p>Every site you add helps preserve Jewish heritage for future generations.</p>
   </div>

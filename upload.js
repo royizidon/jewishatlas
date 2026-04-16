@@ -112,6 +112,15 @@ require([
     view.popup.dockEnabled = true;
     view.popup.dockOptions = { position: "bottom-center", breakpoint: false, buttonEnabled: false };
     view.popup.watch("visible", v => { if (v) view.popup.collapsed = false; });
+
+    if (window.innerWidth <= 768 && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        view.goTo({
+          center: [pos.coords.longitude, pos.coords.latitude],
+          zoom: 14
+        }, { duration: 800 });
+      }, function() {}, { enableHighAccuracy: true, timeout: 8000 });
+    }
   });
 
   // Your public layer (read + write if public editing is enabled)
