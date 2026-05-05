@@ -552,7 +552,7 @@ function updateLocation(centerOnFirst = false) {
       updateLocationMarker(latitude, longitude);
 
       if (centerOnFirst && !hasInitiallyCentered && DeviceInfo.isMobile()) {
-        view.goTo({ center: [longitude, latitude], zoom: 14 }, { duration: 800, easing: "ease-in-out" })
+        view.goTo({ center: [longitude, latitude], zoom: 17 }, { duration: 800, easing: "ease-in-out" })
           .then(() => { hasInitiallyCentered = true; })
           .catch(() => {});
       }
@@ -574,11 +574,26 @@ function updateLocation(centerOnFirst = false) {
 }
 
 function centerOnLocation() {
-  if (!lastPosition) { updateLocation(); return; }
-  view.goTo({
-    center: [lastPosition.lon, lastPosition.lat],
-    zoom: Math.max(view.zoom || 3, 15)
-  }, { duration: 800, easing: "ease-in-out" }).catch(() => {});
+  if (!lastPosition) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        updateLocationMarker(latitude, longitude);
+        view.goTo(
+          { center: [longitude, latitude], zoom: Math.max(view.zoom || 3, 17) },
+          { duration: 800, easing: "ease-in-out" }
+        ).catch(() => {});
+      },
+      () => { showToast("⚠️ Could not get location"); },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
+    );
+    return;
+  }
+
+  view.goTo(
+    { center: [lastPosition.lon, lastPosition.lat], zoom: Math.max(view.zoom || 3, 17) },
+    { duration: 800, easing: "ease-in-out" }
+  ).catch(() => {});
 }
 
 function startLocationTracking() {
