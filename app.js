@@ -666,6 +666,7 @@ locateBtn.style.cursor = "pointer";
 locateBtn.style.zIndex = "1000";
 
 let pressTimer = null;
+let longPressDidFire = false;
 
 locateBtn.addEventListener("click", (event) => {
   event.preventDefault();
@@ -681,18 +682,16 @@ locateBtn.addEventListener("click", (event) => {
 locateBtn.addEventListener("touchend", (event) => {
   event.preventDefault();
   event.stopPropagation();
-  
-  const wasLongPress = pressTimer !== null;
   clearTimeout(pressTimer);
   pressTimer = null;
-  
-  if (!wasLongPress) {
+  if (!longPressDidFire) {
     if (!tracking) {
       startLocationTracking();
     } else {
       centerOnLocation();
     }
   }
+  longPressDidFire = false;
 }, { passive: false });
 
 locateBtn.addEventListener("mousedown", (event) => {
@@ -715,7 +714,9 @@ locateBtn.addEventListener("mouseleave", () => {
 
 locateBtn.addEventListener("touchstart", (event) => {
   if (tracking) {
+    longPressDidFire = false;
     pressTimer = setTimeout(() => {
+      longPressDidFire = true;
       stopLocationTracking();
     }, 1000);
   }
