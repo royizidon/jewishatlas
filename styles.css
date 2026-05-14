@@ -339,6 +339,11 @@ html, body {
 .esri-popup__button--close                      { display: none !important; }
 .esri-popup:not(.esri-popup--visible)           { pointer-events: none !important; }
 
+/* Hide the "Zoom to" / action bar on all popups (places + memories) */
+.esri-popup__action-buttons,
+.esri-popup__actions,
+.esri-popup__navigation { display: none !important; }
+
 .esri-popup__header-title {
   font-family: 'Inter', sans-serif !important;
   font-size: 12px !important;
