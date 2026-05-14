@@ -1171,8 +1171,12 @@ view.when(() => {
         )
       ]).catch(() => ({ results: [] }));
 
-      // Check globalLayer only
-      const hit = results.find(r => r.graphic?.layer === globalLayer);
+      // Check globalLayer OR memoriesLayer
+      const hit = results.find(r => {
+        const layer = r.graphic?.layer;
+        return layer === globalLayer ||
+               (window.__memoriesIsLayer && window.__memoriesIsLayer(layer));
+      });
       if (hit?.graphic) {
         const hitGraphic = hit.graphic;
 
@@ -1241,6 +1245,19 @@ view.when(() => {
     });
   }
 
+  if (typeof window.initMemoriesMode === "function") {
+    window.initMemoriesMode({
+      view,
+      map,
+      FeatureLayer,
+      UniqueValueRenderer,
+      Search,
+      search,
+      globalLayer,
+      filterContainer: filterDiv,
+      DeviceInfo
+    });
+  }           
 
 });
 

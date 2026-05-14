@@ -345,3 +345,409 @@ html, body {
   font-weight: 400 !important;
   color: #94a3b8 !important;
 }
+
+
+
+/* ============================================================
+   MEMORIES MODE — chip + popup styles
+   Append to styles.css
+
+   A compact memorial brick popup. Target height ~300px so it
+   never triggers the .esri-popup__content scrollbar. Reads as
+   a focused detail card, not a memorial poster.
+
+   Sizing philosophy: every value here is deliberately small.
+   If you're tempted to bump something up, the popup will start
+   to feel ceremonial again. Resist.
+   ============================================================ */
+
+/* ─── Chip color ──────────────────────────────────────────── */
+.filterBtn[data-cat="Memories"] { --c: #c5a47e; }
+
+/* ─── Brick palette (mirrors wall.html :root) ─────────────── */
+.memories-popup {
+  --brick-stone:      #f2e7d6;
+  --brick-stone-dark: #e4d3bd;
+  --brick-text:       #121417;
+  --brick-gold:       #c5a47e;
+}
+
+/* ============================================================
+   ESRI CHROME — kill it on Memories popups only
+   ============================================================ */
+.esri-popup__main-container:has(.memories-popup) .esri-popup__action-buttons,
+.esri-popup__main-container:has(.memories-popup) .esri-popup__navigation,
+.esri-popup__main-container:has(.memories-popup) .esri-popup__feature-menu,
+.esri-popup__main-container:has(.memories-popup) .esri-popup__footer,
+.esri-popup__main-container:has(.memories-popup) .esri-popup__header {
+  display: none !important;
+}
+
+/* Kill the blue browser focus outline on the Memories popup and its
+   container. ArcGIS moves focus programmatically when a popup opens,
+   which makes the browser draw its default :focus ring. Scoped to the
+   popup only — we don't blanket-suppress on .esri-view because that
+   would affect the whole app. If the blue ring is on the view itself,
+   see the JS-side fix note in INTEGRATION.md. */
+.esri-popup:has(.memories-popup),
+.esri-popup:has(.memories-popup) *,
+.esri-popup__main-container:has(.memories-popup),
+.esri-popup__main-container:has(.memories-popup) * {
+  outline: none !important;
+}
+/* Restore a focus ring ONLY for genuine keyboard navigation */
+.esri-popup__main-container:has(.memories-popup) a:focus-visible,
+.esri-popup__main-container:has(.memories-popup) button:focus-visible {
+  outline: 2px solid var(--brick-gold) !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================================
+   THE BRICK CONTAINER
+   Narrower + shorter than before. Brick-edge shadows from
+   wall.html .brick. No scrollbar because content is short.
+   ============================================================ */
+.esri-popup__main-container:has(.memories-popup) {
+  position: relative !important;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(to bottom, #f2e7d6 0%, #e4d3bd 100%) !important;
+  border: none !important;
+  border-radius: 3px !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.7),
+    inset 2px 0 0 rgba(255,255,255,0.3),
+    inset 0 -5px 0 rgba(50,30,8,0.34),
+    inset -3px 0 0 rgba(50,30,8,0.18),
+    0 14px 36px rgba(50,30,8,0.4),
+    0 3px 8px rgba(0,0,0,0.2) !important;
+  overflow: hidden !important;
+}
+
+/* Desktop only — fixed brick width. On mobile we deliberately DON'T set
+   width here, so the docked bottom-sheet rules in styles.css win cleanly
+   (the places popup docks fine; Memories should dock the same way). */
+@media (min-width: 769px) {
+  .esri-popup__main-container:has(.memories-popup) {
+    width: 340px !important;
+    max-width: 90vw !important;
+  }
+}
+
+/* The content area — let it size to content, no forced min-height,
+   no scroll. Override the tall max-height from styles.css. */
+.esri-popup__main-container:has(.memories-popup) .esri-popup__content {
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 0 !important;
+}
+
+.memories-popup.enhanced-popup-container {
+  padding: 0;
+  background: transparent;
+  border-radius: 3px;
+  position: relative;
+}
+
+/* Stone-grain overlay */
+.memories-popup.enhanced-popup-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    92deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.013) 3px,
+    rgba(0,0,0,0.013) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+.memories-popup.enhanced-popup-container > * {
+  position: relative;
+  z-index: 1;
+}
+.memories-popup .popup-content-wrapper {
+  padding-bottom: 0;
+}
+
+/* ============================================================
+   CLOSE BUTTON — pinned top-right against the non-scrolling
+   outer container. Forced with !important to beat styles.css.
+   ============================================================ */
+.esri-popup__main-container:has(.memories-popup) .custom-close-btn {
+  position: absolute !important;
+  top: 9px !important;
+  right: 9px !important;
+  left: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  background: rgba(0, 0, 0, 0.07) !important;
+  color: var(--brick-text) !important;
+  opacity: 0.5;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  z-index: 100;
+}
+.esri-popup__main-container:has(.memories-popup) .custom-close-btn:hover {
+  background: rgba(0, 0, 0, 0.14) !important;
+  opacity: 0.8;
+}
+
+/* ============================================================
+   NAME BLOCK — compact. Hebrew ~25% smaller, English detracked.
+   ============================================================ */
+.memories-popup .memories-he-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--brick-text);
+  margin: 30px 28px 2px;
+  padding: 0;
+  line-height: 1.2;
+  text-align: center;
+  direction: rtl;
+  letter-spacing: 0;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.memories-popup .memories-eng-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--brick-gold);
+  margin: 0 28px 0;
+  padding: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.memories-popup .memories-eng-name-solo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--brick-text);
+  margin: 30px 28px 0;
+  padding: 0;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* ============================================================
+   DATES — tight. Small divider, two quiet lines.
+   ============================================================ */
+.memories-popup .memories-dates-row {
+  padding: 0 28px 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border-bottom: none;
+  background: transparent;
+}
+
+.memories-popup .memories-dates-row::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 1px;
+  /* delicate muted gold, not grey */
+  background: rgba(197, 164, 126, 0.55);
+  margin: 12px auto 10px;
+}
+
+.memories-popup .memories-dates-he {
+  font-family: 'Frank Ruhl Libre', 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  color: rgba(18, 20, 23, 0.5);
+  direction: rtl;
+}
+
+.memories-popup .memories-dates-en {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brick-text);
+  letter-spacing: 0.06em;
+}
+
+.memories-popup .memories-dates-row:not(:has(> *:not(::before))) {
+  display: none;
+  padding: 0;
+}
+
+/* ============================================================
+   BODY — three tiers, compact.
+   connection_type → gold uppercase eyebrow (small)
+   location_label  → serif anchor, SMALLER than before, wraps 2 lines
+   why_this_place  → quiet note, NOT precious italic
+   ============================================================ */
+.memories-popup .memories-body {
+  display: block;
+  /* #8 — unhurried gap between the dates and the category eyebrow */
+  padding: 28px 28px 16px;
+  text-align: center;
+  background: transparent;
+}
+
+/* Connection type eyebrow — clean gold category label. Deliberately
+   small: it's a label, and keeping it small widens the hierarchy gap
+   to the (now larger) place name beneath it. */
+.memories-popup .memories-connection {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--brick-gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+/* Meaningful place — anchor line. Wraps naturally; long names flow to
+   a second line rather than stretching the popup or being truncated.
+   max-width keeps a 3+ word name from going full-bleed edge to edge. */
+.memories-popup .memories-place {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--brick-text);
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  max-width: 240px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* "Why this place" — the personal note. Quiet, sans-family to reduce
+   typographic noise. Smaller and lighter than the place line above it. */
+.memories-popup .memories-why {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 400;
+  font-style: normal;
+  color: rgba(18, 20, 23, 0.42);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+/* Hebrew personal note keeps a serif (Inter has no Hebrew) + RTL */
+.memories-popup .memories-why-he {
+  font-family: 'Frank Ruhl Libre', 'Cormorant Garamond', serif;
+  font-size: 0.78rem;
+  direction: rtl;
+  color: rgba(18, 20, 23, 0.46);
+}
+.memories-popup .memories-why-en {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   ACTIONS — clear hierarchy. Primary obvious, secondary a whisper.
+   ============================================================ */
+.memories-popup .memories-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  margin-top: 16px;
+  /* generous breathing room below the actions */
+  padding-bottom: 32px;
+}
+
+/* Primary — the one real CTA. Gold underline, but thin and given room
+   to breathe so it doesn't read as a separate architectural element. */
+.memories-popup .memories-action-primary {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--brick-text);
+  text-decoration: none;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  /* thin underline, drawn as a background gradient so we control its
+     exact thickness; padding-bottom gives the text room above it */
+  background-image: linear-gradient(var(--brick-gold), var(--brick-gold));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  border-radius: 0;
+  padding: 0 0 6px;
+  transition: opacity 0.2s;
+}
+.memories-popup .memories-action-primary:hover {
+  background-image: linear-gradient(var(--brick-gold), var(--brick-gold));
+  opacity: 0.55;
+}
+
+/* Secondary — clearly secondary, but readable. Smaller than the primary,
+   no underline, but a real text color (not a faint whisper). For
+   page-tier this sits quietly below the primary CTA. (For brick-tier,
+   JS gives the single link the PRIMARY class instead.) */
+.memories-popup .memories-action-secondary {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(18, 20, 23, 0.62);
+  text-decoration: none;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: color 0.2s;
+}
+.memories-popup .memories-action-secondary:hover {
+  color: var(--brick-text);
+  background: transparent;
+}
+
+/* When "See the wall" is the ONLY action (brick tier), it gets the
+   primary treatment instead. Handled in JS via class — the brick-tier
+   single link is given .memories-action-primary directly. */
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Don't touch width/position here — styles.css docks .esri-popup to
+     the bottom full-width, same as the places popup. We only soften the
+     top corners to match a bottom-sheet and tune the typography. */
+  .esri-popup__main-container:has(.memories-popup) {
+    border-radius: 10px 10px 0 0 !important;
+  }
+  .memories-popup .memories-he-name {
+    font-size: 1.3rem;
+    margin: 26px 22px 2px;
+  }
+  .memories-popup .memories-eng-name {
+    margin: 0 22px;
+    font-size: 0.58rem;
+  }
+  .memories-popup .memories-eng-name-solo {
+    font-size: 1.35rem;
+    margin: 26px 22px 0;
+  }
+  .memories-popup .memories-dates-row {
+    padding: 0 22px;
+  }
+  .memories-popup .memories-dates-en {
+    font-size: 1.05rem;
+  }
+  .memories-popup .memories-body {
+    padding: 18px 22px 14px;
+  }
+  .memories-popup .memories-actions {
+    margin-top: 12px;
+  }
+}
