@@ -339,10 +339,20 @@ html, body {
 .esri-popup__button--close                      { display: none !important; }
 .esri-popup:not(.esri-popup--visible)           { pointer-events: none !important; }
 
-/* Hide the "Zoom to" / action bar on all popups (places + memories) */
+/* Hide the "Zoom to" inline-actions bar on all popups (places + memories) */
+.esri-popup__inline-actions-container,
 .esri-popup__action-buttons,
 .esri-popup__actions,
-.esri-popup__navigation { display: none !important; }
+.esri-popup__navigation {
+  display: none !important;
+}
+
+/* Hide the footer wrapper too — it has a border/padding from the rule
+   above, and with no actions inside it'd leave an empty bordered strip. */
+.esri-popup__footer--has-actions,
+.esri-popup__footer:has(.esri-popup__inline-actions-container) {
+  display: none !important;
+}
 
 .esri-popup__header-title {
   font-family: 'Inter', sans-serif !important;
