@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dedicate a Brick</title>
+<title>Dedicate a Brick · Jewish Atlas</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Frank+Ruhl+Libre:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dedicate.css" />
 <script src="dedicate.js" defer></script>
 </head>
@@ -20,85 +20,158 @@
     The Wall
   </a>
 
-  <h1 class="page-title">
-  <a href="index.html" style="display: block; font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #c5a47e; margin-bottom: 14px; text-decoration: none;">Jewish Atlas</a>    Honor a memory.<br>Preserve a legacy.
-  </h1>
-  <p class="support-note">
-    The map marks the places. The wall remembers the people.
-    </p>
-
+  <!-- =========================================
+       PROGRESS INDICATOR
+       (visible from Step 1 onward, hidden on landing)
+  ========================================= -->
+  <div class="wizard-progress" id="wizardProgress" aria-hidden="true">
+    <span class="progress-dash" data-step="1"></span>
+    <span class="progress-dash" data-step="2"></span>
+    <span class="progress-dash" data-step="3"></span>
+    <span class="progress-dash" data-step="4"></span>
+    <span class="progress-dash" data-step="5"></span>
+  </div>
 
   <form id="dedicateForm" class="dedicate-form" enctype="multipart/form-data">
 
-    <!-- TIER BUTTONS -->
-    <div class="tier-buttons">
-      <button type="button" class="tier-btn active" data-tier="brick">
-        <span class="tier-name">Brick</span>
-        <span class="tier-desc">A name on the wall</span>
-        <span class="tier-price">₪180</span>
+    <!-- Hidden tier value, set by landing panel -->
+    <input type="hidden" name="tier" id="tierValue" value="brick">
+
+    <!-- =========================================
+         PANEL: LANDING
+    ========================================= -->
+    <section class="wizard-panel active" id="panelLanding" data-step="0">
+
+      <h1 class="page-title">
+        <a href="index.html" style="display: block; font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #c5a47e; margin-bottom: 14px; text-decoration: none;">Jewish Atlas</a>
+        Honor a memory.<br>Preserve a legacy.
+      </h1>
+
+      <p class="support-note">
+        The map marks the places. The wall remembers the people.
+      </p>
+
+      <div class="tier-buttons">
+        <button type="button" class="tier-btn active" data-tier="brick">
+          <span class="tier-name">Brick</span>
+          <span class="tier-desc">A name on the wall</span>
+          <span class="tier-price">₪180</span>
+        </button>
+        <button type="button" class="tier-btn" data-tier="page">
+          <span class="tier-name">Brick &amp; Page</span>
+          <span class="tier-desc">A fuller memorial with story, photo &amp; place</span>
+          <span class="tier-price">₪360</span>
+        </button>
+      </div>
+
+      <button type="button" class="begin-btn" id="beginBtn">
+        Begin
       </button>
-      <button type="button" class="tier-btn" data-tier="page">
-        <span class="tier-name">Brick + Page</span>
-        <span class="tier-desc">Biography &amp; photo</span>
-        <span class="tier-price">₪360</span>
-      </button>
-      <input type="hidden" name="tier" id="tierValue" value="brick">
-    </div>
 
-    <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; font-weight: 600; color: #111; letter-spacing: 0.02em; margin: 0 0 28px; text-align: center;">Who are you honoring?</p>    <!-- NAMES -->
-    <div class="field-pair">
-      <div class="field">
-        <input type="text" name="he_name" dir="rtl" placeholder=" " id="heName">
-        <label for="heName">שם המונצח/ת</label>
-      </div>
-      <div class="field">
-        <input type="text" name="eng_name" placeholder=" " id="engName">
-        <label for="engName">Honored person’s name</label>
-      </div>
-    </div>
-
-    <!-- DATES -->
-    <div class="field-pair">
-      <div class="field">
-        <input type="date" name="born_date" id="bornDate">
-        <label for="bornDate">Born date</label>
-      </div>
-      <div class="field">
-        <input type="date" name="death_date" id="deathDate">
-        <label for="deathDate">Death date</label>
-      </div>
-    </div>
-
-    <div class="field-pair">
-      <div class="field">
-        <input type="text" name="born_str" dir="rtl" placeholder=" " id="bornStr">
-        <label for="bornStr">תאריך לידה עברי</label>
-      </div>
-      <div class="field">
-        <input type="text" name="death_str" dir="rtl" placeholder=" " id="deathStr">
-        <label for="deathStr">תאריך פטירה עברי</label>
-      </div>
-    </div>
-
-    <!-- ORIGIN + EMAIL -->
-    <div class="field">
-      <input type="text" name="origin" placeholder=" " id="originField">
-      <label for="originField">Origin — city, country</label>
-    </div>
-
-    <div class="field">
-      <input type="email" name="dedicator_email" required placeholder=" " id="emailField">
-      <label for="emailField">Your email</label>
-    </div>
-
-    <!-- PAGE ONLY -->
-    <div id="pageFields" style="display:none;">
-
-      <div class="field">
-        <textarea name="full_bio" rows="5" placeholder="Tell their story…" id="bioField"></textarea>
-        <label for="bioField" class="textarea-label">Biography</label>
+      <div class="contact-section">
+        <p class="contact-text">Questions about your dedication?</p>
+        <a href="mailto:contact@jewishatlas.org" class="contact-link">contact@jewishatlas.org</a>
       </div>
 
+    </section>
+
+    <!-- =========================================
+         PANEL: STEP 1 — Who are you honoring?
+    ========================================= -->
+    <section class="wizard-panel" id="panelStep1" data-step="1">
+
+      <div class="step-header">
+        <h2 class="step-title">Who are you honoring?</h2>
+        <p class="step-subtitle">Their name in Hebrew, in English, or in both. Whichever feels right.</p>
+      </div>
+
+      <div class="field-pair">
+        <div class="field">
+          <input type="text" name="he_name" dir="rtl" placeholder=" " id="heName">
+          <label for="heName">שם בעברית</label>
+        </div>
+        <div class="field">
+          <input type="text" name="eng_name" placeholder=" " id="engName">
+          <label for="engName">Name in English</label>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="back-btn" data-action="back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button type="button" class="next-btn" data-action="next">Continue</button>
+      </div>
+
+    </section>
+
+    <!-- =========================================
+         PANEL: STEP 2 — Their life (historical details)
+    ========================================= -->
+    <section class="wizard-panel" id="panelStep2" data-step="2">
+
+      <div class="step-header step-header-quiet">
+        <p class="step-subtitle">Add what you know. Even a year or an approximate date helps preserve their story.</p>
+      </div>
+
+      <div class="field-pair-static">
+        <div class="field-static">
+          <label class="static-field-label" for="bornDate">Born</label>
+          <input type="text" name="born_date" id="bornDate" autocomplete="off">
+          <small class="field-hint">Full date, just a year, or approximate.</small>
+        </div>
+        <div class="field-static">
+          <label class="static-field-label" for="deathDate">Died</label>
+          <input type="text" name="death_date" id="deathDate" autocomplete="off">
+          <small class="field-hint">Full date, just a year, or approximate.</small>
+        </div>
+      </div>
+
+      <div class="field-pair-static">
+        <div class="field-static">
+          <label class="static-field-label" for="bornStr">Hebrew birth date</label>
+          <input type="text" name="born_str" dir="rtl" id="bornStr">
+          <small class="field-hint">Optional — e.g. ה׳ בתשרי תש״ח</small>
+        </div>
+        <div class="field-static">
+          <label class="static-field-label" for="deathStr">Hebrew passing date</label>
+          <input type="text" name="death_str" dir="rtl" id="deathStr">
+          <small class="field-hint">Optional — e.g. י״ב באייר תשמ״ד</small>
+        </div>
+      </div>
+
+      <div class="field-static">
+        <label class="static-field-label" for="originField">Origin — city, country</label>
+        <input type="text" name="origin" id="originField">
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="back-btn" data-action="back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button type="button" class="next-btn" data-action="next">Continue</button>
+      </div>
+
+    </section>
+
+    <!-- =========================================
+         PANEL: STEP 3 — Their story (premium only)
+    ========================================= -->
+    <section class="wizard-panel" id="panelStep3" data-step="3">
+
+      <div class="step-header">
+        <h2 class="step-title">Tell their story</h2>
+      </div>
+
+      <div class="field-static">
+        <label class="static-field-label" for="bioField">Biography</label>
+        <textarea name="full_bio" rows="6" id="bioField" placeholder="A few lines about their life — where they came from, what they loved, how you'd want them remembered."></textarea>
+        <small class="field-hint">A paragraph is enough. You can edit this later.</small>
+      </div>
+
+      <label class="static-field-label" style="margin-top: 8px;">Photograph</label>
       <div class="upload-zone" id="uploadZone">
         <input type="file" name="image" id="imageInput" accept="image/*">
         <div class="upload-idle" id="uploadIdle">
@@ -119,41 +192,189 @@
         </div>
       </div>
 
-    </div>
+      <div class="step-nav">
+        <button type="button" class="back-btn" data-action="back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button type="button" class="next-btn" data-action="next">Continue</button>
+      </div>
 
-    <!-- TERMS & CONDITIONS -->
-    <label class="terms-label" id="termsLabel">
-      <input type="checkbox" id="termsCheck">
-      <span class="terms-box"></span>
-      <span class="terms-text">
-        I agree to the
-        <button type="button" class="terms-link terms-link-btn" id="openTermsBtn">Terms &amp; Conditions</button>
-        and confirm this dedication is accurate and respectful.
-      </span>
-    </label>
+    </section>
 
-    <!-- SUBMIT -->
-    <button type="submit" class="submit-btn" id="submitBtn">
-      <span class="btn-text">Continue</span>
-      <span class="btn-loading" style="display:none;">
-        <span class="dot-pulse"></span>
-        Submitting
-      </span>
-    </button>
+    <!-- =========================================
+         PANEL: STEP 4 — Their place (map, optional)
+    ========================================= -->
+    <section class="wizard-panel" id="panelStep4" data-step="4">
 
-    <p class="note">Memorials are reviewed before appearing on the wall.</p>
+      <div class="step-header">
+        <span class="optional-badge">Optional</span>
+        <h2 class="step-title">Add this memorial to the map</h2>
+        <p class="step-subtitle">Choose a place that was part of their story — a home, town, school, synagogue, cemetery, or somewhere that mattered.</p>
+      </div>
+
+      <!-- Hidden saved fields from geocoder -->
+      <input type="hidden" name="latitude" id="placeLat">
+      <input type="hidden" name="longitude" id="placeLng">
+      <input type="hidden" name="geocoder_label" id="geocoderLabel">
+      <input type="hidden" name="has_map_place" id="hasMapPlace" value="0">
+      <input type="hidden" name="show_on_map" value="0">
+
+      <div class="field-static geocoder-field">
+        <input type="text" id="placeSearch" autocomplete="off" placeholder="Search for a city, address, or landmark…">
+        <small class="field-hint">Start typing — suggestions will appear below.</small>
+        <div id="geocoderResults" class="geocoder-results" role="listbox"></div>
+      </div>
+
+      <!-- Clean display of the selected place -->
+      <div id="selectedPlaceChip" class="selected-place-chip" hidden>
+        <div class="selected-place-pin">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="selected-place-text">
+          <span class="selected-place-name" id="selectedPlaceName"></span>
+          <span class="selected-place-region" id="selectedPlaceRegion"></span>
+        </div>
+        <button type="button" class="selected-place-clear" id="selectedPlaceClear" aria-label="Clear place">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div id="placeDetails" class="place-details" hidden>
+
+        <div class="field-static">
+          <label class="static-field-label" for="locationLabel">What is this place called?</label>
+          <input type="text" name="location_label" id="locationLabel">
+          <small class="field-hint">Use the name that meant something to them — a home, a school, a street, a synagogue.</small>
+        </div>
+
+        <div class="select-field">
+          <label class="static-label" for="connectionType">What was this place to them?</label>
+          <select name="connection_type" id="connectionType">
+            <option value="">Choose one</option>
+            <option value="Birthplace">Birthplace</option>
+            <option value="Hometown">Hometown</option>
+            <option value="Family origin">Family origin</option>
+            <option value="Home">Home</option>
+            <option value="Resting place">Resting place</option>
+            <option value="Meaningful place">Meaningful place</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="select-field">
+          <label class="static-label" for="locationPrecision">How exact is the location?</label>
+          <select name="location_precision" id="locationPrecision">
+          <option value="" selected>Not sure — show in the general area</option>
+          <option value="Exact">Exact — a specific address or building</option>
+          <option value="Approximate">Approximate — a neighborhood or area</option>
+          <option value="City level">City level — just the city or town</option>
+          </select>
+        </div>
+
+        <div class="field-static">
+          <label class="static-field-label" for="whyThisPlace">Their connection to this place</label>
+          <input type="text" name="why_this_place" id="whyThisPlace" maxlength="200" dir="auto" placeholder="הבית שאהב כל כך">
+          <small class="field-hint">A line or two about why this place mattered to them — in Hebrew or English.</small>
+        </div>
+
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="back-btn" data-action="back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <button type="button" class="next-btn" data-action="next">Continue</button>
+      </div>
+
+      <div class="skip-link-wrap">
+        <button type="button" class="skip-link" id="skipPlaceBtn">Skip this step →</button>
+      </div>
+
+    </section>
+
+    <!-- =========================================
+         PANEL: STEP 5 — Review & confirm
+    ========================================= -->
+    <section class="wizard-panel" id="panelStep5" data-step="5">
+
+      <div class="review-back-wrap">
+        <button type="button" class="back-btn back-btn-inline" data-action="back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+      </div>
+
+      <div class="step-header">
+        <p class="step-kicker">One last look</p>
+        <h2 class="step-title">Review your dedication</h2>
+        <p class="step-subtitle">A quiet moment before you continue to payment.</p>
+      </div>
+
+      <!-- Summary card populated by JS -->
+      <div class="review-card" id="reviewCard">
+        <div class="review-photo-wrap" id="reviewPhotoWrap" style="display:none;">
+          <img id="reviewPhoto" src="" alt="">
+        </div>
+        <div class="review-name" id="reviewNameEng"></div>
+        <div class="review-name-he" id="reviewNameHe"></div>
+        <hr class="review-divider-thin">
+        <div class="review-meta" id="reviewMeta"></div>
+        <div class="review-bio-wrap" id="reviewBioWrap" style="display:none;">
+          <p class="review-bio" id="reviewBio"></p>
+        </div>
+        <div class="review-tier-wrap">
+          <span class="review-tier-badge">
+            <span class="badge-dot"></span>
+            <span id="reviewTierName">Brick</span>
+            <span class="tier-price-final" id="reviewTierPrice">₪180</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="field-static">
+        <label class="static-field-label" for="emailField">Your email</label>
+        <input type="email" name="dedicator_email" required id="emailField" placeholder="you@example.com">
+        <small class="field-hint">We'll send confirmation here.</small>
+      </div>
+
+      <hr class="review-legal-divider">
+
+      <label class="terms-label" id="termsLabel">
+        <input type="checkbox" id="termsCheck">
+        <span class="terms-box"></span>
+        <span class="terms-text">
+          I agree to the
+          <button type="button" class="terms-link terms-link-btn" id="openTermsBtn">Terms &amp; Conditions</button>
+          and confirm this dedication is accurate and respectful.
+        </span>
+      </label>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="btn-text">Continue to Payment →</span>
+        <span class="btn-loading" style="display:none;">
+          <span class="dot-pulse"></span>
+          Submitting
+        </span>
+      </button>
+
+      <p class="note">Final step: secure payment via Meshulam. Memorials are reviewed before appearing on the wall.</p>
+
+      <div class="contact-section">
+        <p class="contact-text">Have a question about your dedication?</p>
+        <a href="mailto:contact@jewishatlas.org" class="contact-link">contact@jewishatlas.org</a>
+      </div>
+
+    </section>
 
   </form>
 
-  <!-- CONTACT -->
-  <div class="contact-section">
-    <p class="contact-text">Have a question about your dedication?</p>
-    <a href="mailto:contact@jewishatlas.org" class="contact-link">contact@jewishatlas.org</a>
-  </div>
-
 </div>
 
-<!-- TERMS MODAL -->
+<!-- =========================================
+     TERMS MODAL
+========================================= -->
 <div id="termsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-box">
     <div class="modal-header">
@@ -195,12 +416,13 @@
       <p class="modal-section-title">9. Privacy</p>
       <p>We collect your name, phone number, and email address solely to process your dedication and communicate with you about it. This information will not be shared with third parties, displayed publicly, or used for marketing without your explicit consent.</p>
       <p>The content you submit for the dedication (name, dates, biography, photo) will be published publicly on the Jewish Atlas as part of the memorial. To request deletion of your personal data, contact us at <a href="mailto:contact@jewishatlas.org">contact@jewishatlas.org</a>.</p>
-      
+
       <p class="modal-section-title">10. Design Changes</p>
       <p>The visual design of bricks and memorial pages — including layout, typography, and styling — may change over time as the Jewish Atlas evolves. The content of your dedication will always be preserved.</p>
 
       <p class="modal-section-title">11. Governing Law</p>
-      <p>These terms are governed by the laws of the State of Israel. Any disputes shall be subject to the exclusive jurisdiction of Israeli courts.</p>    </div>
+      <p>These terms are governed by the laws of the State of Israel. Any disputes shall be subject to the exclusive jurisdiction of Israeli courts.</p>
+    </div>
     <div class="modal-footer">
       <button type="button" class="modal-accept-btn" id="acceptTermsBtn">I Understand &amp; Accept</button>
     </div>

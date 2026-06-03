@@ -1,48 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 
+  <!-- CORE -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="canonical" href="https://jewishatlas.org/">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Jewish Atlas">
+  <meta name="geo.region" content="IL">
+
+  <!-- TITLE -->
+  <title>Jewish Atlas | Global Jewish Heritage Map | אטלס יהודי</title>
+
+  <!-- DESCRIPTION -->
+  <meta name="description" content="Jewish Atlas is an interactive map of synagogues, kosher restaurants, Jewish cemeteries, mikvehs, schools, Holocaust memorials, and communities worldwide. | אטלס יהודי – מפה אינטראקטיבית של בתי כנסת, מסעדות כשרות ומורשת יהודית.">
+
+  <!-- KEYWORDS -->
+  <meta name="keywords" content="jewish atlas, jewish map, jewish heritage, synagogues, kosher restaurants, jewish communities, jewish cemeteries, mikveh, holocaust memorials, jewish schools, אטלס יהודי, מפה יהודית, בתי כנסת, מסעדות כשרות, מורשת יהודית, בתי קברות יהודיים, אתרי שואה">
+
   <!-- FAVICONS -->
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" href="/favicon.ico">
 
-  <!-- META -->
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jewish Atlas | אטלס יהודי - Interactive Map of Jewish Heritage Sites & Communities Worldwide</title>
-
-  <!-- Performance optimization -->
+  <!-- PERFORMANCE -->
   <link rel="preconnect" href="https://js.arcgis.com">
   <link rel="dns-prefetch" href="https://js.arcgis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- English description -->
-  <meta name="description" content="Discover Jewish heritage sites, synagogues, kosher restaurants, Jewish travel routes, and communities worldwide. Interactive Jewish map with thousands of heritage and cultural locations.">
-
-  <!-- Hebrew SEO -->
-  <meta name="description" lang="he" content="מפות אתרים יהודיים, מסלולי טיולים יהודיים, בתי כנסת, מסעדות כשרות וקהילות יהודיות ברחבי העולם. מפה אינטראקטיבית של אתרי מורשת ותרבות יהודית.">
-
-  <meta name="keywords" content="jewish map, jewish maps, jewish atlas, jewish heritage, jewish communities, synagogue finder, kosher restaurants, jewish travel, jewish tours, jewish landmarks, jewish history, judaism map, jewish heritage travel, jewish travel guide">
-
-  <meta name="robots" content="index, follow">
-
-  <!-- Social Media Tags -->
-  <meta property="og:title" content="Jewish Atlas - Interactive Map of Jewish Heritage Sites">
-  <meta property="og:description" content="Explore Jewish heritage sites, synagogues, kosher food, and Jewish travel routes around the world.">
+  <!-- OPEN GRAPH -->
+  <meta property="og:site_name" content="Jewish Atlas">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://jewishatlas.org/">
-<!-- ✔ Add these two lines here -->
+  <meta property="og:title" content="Jewish Atlas | Global Jewish Heritage Map">
+  <meta property="og:description" content="Explore Jewish heritage sites, synagogues, kosher places, cemeteries, schools, Holocaust memorials, and communities worldwide. | מפה אינטראקטיבית של בתי כנסת, מסעדות כשרות ומורשת יהודית.">
   <meta property="og:image" content="https://jewishatlas.org/social-preview.png">
-  <meta name="twitter:image" content="https://jewishatlas.org/social-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="he_IL">
 
-
-
-  <!-- Twitter Tags -->
+  <!-- TWITTER / X -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Jewish Atlas - Interactive Map of Jewish Heritage Sites">
-  <meta name="twitter:description" content="Explore Jewish heritage, kosher food, synagogues, and Jewish travel destinations worldwide.">
+  <meta name="twitter:title" content="Jewish Atlas | Global Jewish Heritage Map">
+  <meta name="twitter:description" content="Interactive map of Jewish heritage, synagogues, kosher places, communities, and Jewish travel worldwide.">
+  <meta name="twitter:image" content="https://jewishatlas.org/social-preview.png">
 
   <!-- STRUCTURED DATA -->
   <script type="application/ld+json">
@@ -50,47 +56,60 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Jewish Atlas",
-    "description": "Interactive map of Jewish heritage sites, Jewish travel routes, synagogues, kosher restaurants, and communities worldwide.",
-    "url": "https://jewishatlas.org",
+    "alternateName": ["אטלס יהודי", "Jewish Maps", "מפות יהודיות"],
+    "url": "https://jewishatlas.org/",
+    "description": "An interactive map of Jewish heritage sites, synagogues, kosher restaurants, schools, mikvehs, cemeteries, JCCs, Holocaust memorials, and Jewish communities worldwide.",
     "applicationCategory": "MapApplication",
     "operatingSystem": "Web Browser",
+    "inLanguage": ["en", "he"],
+    "availableLanguage": [
+      { "@type": "Language", "name": "English", "alternateName": "en" },
+      { "@type": "Language", "name": "Hebrew",  "alternateName": "he" }
+    ],
+    "about": [
+      { "@type": "Thing", "name": "Jewish heritage",    "sameAs": "https://www.wikidata.org/wiki/Q179805"  },
+      { "@type": "Thing", "name": "Synagogue",          "sameAs": "https://www.wikidata.org/wiki/Q34627"   },
+      { "@type": "Thing", "name": "Kosher food",        "sameAs": "https://www.wikidata.org/wiki/Q207538"  },
+      { "@type": "Thing", "name": "Mikveh",             "sameAs": "https://www.wikidata.org/wiki/Q193878"  },
+      { "@type": "Thing", "name": "Jewish cemetery",    "sameAs": "https://www.wikidata.org/wiki/Q1226816" },
+      { "@type": "Thing", "name": "Holocaust memorial", "sameAs": "https://www.wikidata.org/wiki/Q5891220"  },
+      { "@type": "Thing", "name": "Jewish community",   "sameAs": "https://www.wikidata.org/wiki/Q1345471"  },
+      { "@type": "Thing", "name": "Jewish school",      "sameAs": "https://www.wikidata.org/wiki/Q1076796"  }
+    ],
     "keywords": [
-      "jewish map", "jewish atlas", "jewish heritage",
-      "synagogue finder", "kosher restaurants",
-      "jewish travel", "jewish tours", "jewish heritage travel"
+      "jewish atlas", "jewish map", "synagogue", "kosher restaurants",
+      "jewish communities", "jewish schools", "mikveh", "JCC",
+      "holocaust memorials", "jewish cemeteries", "jewish heritage",
+      "אטלס יהודי", "בתי כנסת", "מסעדות כשרות", "קהילות יהודיות",
+      "מקוואות", "בתי קברות יהודיים", "אתרי שואה", "מורשת יהודית"
     ],
-    "featureList": [
-      "Jewish heritage sites",
-      "Synagogue locations",
-      "Kosher restaurant finder",
-      "Jewish community centers",
-      "Jewish travel routes",
-      "Holocaust memorials",
-      "Jewish museums",
-      "Interactive mapping"
-    ],
-    "author": { "@type": "Organization", "name": "Jewish Atlas" },
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Jewish Atlas",
+      "alternateName": "אטלס יהודי",
+      "url": "https://jewishatlas.org/"
+    }
   }
   </script>
 
-  <!-- App config -->
+  <!-- APP CONFIG -->
   <script src="config.js"></script>
 
-  <!-- ArcGIS -->
+  <!-- ARCGIS -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css"/>
   <script src="https://js.arcgis.com/4.26/"></script>
 
-  <!-- Icons -->
+  <!-- ICONS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Frank+Ruhl+Libre:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">  
-   <!-- Styles -->
+  <!-- FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Frank+Ruhl+Libre:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- STYLES -->
   <link rel="stylesheet" href="header.css"/>
   <link rel="stylesheet" href="styles.css"/>
+
 </head>
 
 
@@ -104,5 +123,10 @@
   <!-- App logic -->
   <script src="app.js"></script>
   <script src="memories.js"></script> 
+
+  <footer style="display:none" aria-hidden="true">
+  <p>אטלס יהודי הוא פרויקט למיפוי בתי כנסת, מסעדות כשרות, בתי קברות,
+  מקוואות, בתי ספר יהודיים, קהילות ואתרי שואה ומורשת יהודית ברחבי העולם.</p>
+</footer>
 </body>
 </html>

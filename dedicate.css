@@ -23,11 +23,11 @@ body {
 .dedicate-wrapper {
   max-width: 680px;
   margin: 0 auto;
-  padding: 48px 24px 120px;
+  padding: 20px 24px 120px;
 }
 
 /* =========================================
-   BACK LINK
+   BACK LINK (top of page → /wall.html)
 ========================================= */
 
 .back-link {
@@ -55,7 +55,7 @@ body {
   font-weight: 400;
   font-size: 38px;
   text-align: center;
-  margin: 56px 0 16px;
+  margin: 20px 0 28px;
   letter-spacing: -0.3px;
   color: #111;
   line-height: 1.25;
@@ -65,7 +65,7 @@ body {
   font-size: 16px;
   color: #666;
   text-align: center;
-  margin: 0 0 40px;
+  margin: 0 0 24px;
 }
 
 /* =========================================
@@ -79,21 +79,296 @@ body {
 }
 
 /* =========================================
-   TIER BUTTONS
+   WIZARD — PROGRESS INDICATOR
+========================================= */
+
+.wizard-progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 56px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wizard-progress.visible {
+  opacity: 0.85;
+}
+
+.progress-dash {
+  width: 28px;
+  height: 1.5px;
+  background: #ede8df;
+  transition: background 0.3s ease;
+  border-radius: 1px;
+}
+
+.progress-dash.completed {
+  background: #d4bd9a;
+}
+
+.progress-dash.active {
+  background: #2a2a2a;
+}
+
+/* =========================================
+   WIZARD — STEP PANELS
+========================================= */
+
+.wizard-panel {
+  display: none;
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.wizard-panel.active {
+  display: block;
+  animation: panelIn 0.35s ease forwards;
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   WIZARD — STEP HEADER
+========================================= */
+
+.step-header {
+  text-align: center;
+  margin: 0 0 44px;
+}
+
+.step-header-quiet {
+  margin: 0 0 32px;
+}
+
+.step-kicker {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c5a47e;
+  margin: 0 0 12px;
+}
+
+.step-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 32px;
+  letter-spacing: -0.2px;
+  color: #111;
+  margin: 0 0 12px;
+  line-height: 1.25;
+}
+
+.step-subtitle {
+  font-size: 15px;
+  color: #777;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 460px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================================
+   WIZARD — CHOSEN TIER BADGE (shown on inner steps)
+========================================= */
+
+.chosen-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border: 1px solid #e8e0d2;
+  background: #faf8f4;
+  border-radius: 100px;
+  font-size: 12px;
+  color: #6a5d48;
+  letter-spacing: 0.4px;
+  margin: 0 auto 28px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.chosen-tier-badge:hover {
+  background: #f5efe4;
+  border-color: #c5a47e;
+}
+
+.chosen-tier-badge .badge-dot {
+  width: 6px;
+  height: 6px;
+  background: #c5a47e;
+  border-radius: 50%;
+}
+
+.chosen-tier-badge .badge-price {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  color: #111;
+}
+
+.chosen-tier-badge .badge-change {
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #999;
+  margin-left: 4px;
+  padding-left: 10px;
+  border-left: 1px solid #e0d8c8;
+}
+
+.chosen-tier-badge:hover .badge-change {
+  color: #6a5d48;
+}
+
+.chosen-tier-wrap {
+  text-align: center;
+}
+
+/* =========================================
+   LANDING — HERO TIER CARDS
+========================================= */
+
+.landing-tier-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 0 0 22px;
+}
+
+.landing-tier-card {
+  position: relative;
+  padding: 24px 22px 22px;
+  background: #fff;
+  border: 1.5px solid #e8e0d2;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.landing-tier-card:hover {
+  border-color: #c5a47e;
+  background: #fdfbf7;
+  transform: translateY(-2px);
+}
+
+.landing-tier-card.active {
+  border-color: #111;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.04);
+}
+
+.landing-tier-card.active::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #111;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.landing-tier-card .tier-card-name {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: #111;
+  margin: 0 0 6px;
+  letter-spacing: -0.1px;
+}
+
+.landing-tier-card .tier-card-desc {
+  display: block;
+  font-size: 14px;
+  color: #6f6a62;
+  line-height: 1.55;
+  margin: 0 0 16px;
+}
+
+.landing-tier-card .tier-card-price {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  letter-spacing: 0.2px;
+}
+
+.landing-mission {
+  text-align: center;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  color: #888;
+  margin: 0 auto 22px;
+  max-width: 460px;
+  line-height: 1.5;
+}
+
+.begin-btn {
+  margin-top: 8px;
+  padding: 18px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.25s;
+  width: 100%;
+}
+
+.begin-btn:hover:not(:disabled) {
+  background: #2a2a2a;
+}
+
+.begin-btn:disabled {
+  background: #d6cfc2;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   TIER BUTTONS (legacy — kept hidden in DOM but preserved in CSS)
 ========================================= */
 
 .tier-buttons {
   display: flex;
   gap: 12px;
-  margin-bottom: 52px;
+  margin-bottom: 20px;
 }
 
 .tier-btn {
   flex: 1;
-  padding: 12px 16px 14px;
+  position: relative;
+  padding: 16px 18px 18px;
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1.5px solid #e0d8c8;
+  border-radius: 8px;
   cursor: pointer;
   text-align: center;
   transition: all 0.2s ease;
@@ -101,42 +376,59 @@ body {
 }
 
 .tier-btn:hover {
-  border-color: #aaa;
+  border-color: #c5a47e;
+  background: #fdfbf7;
 }
 
 .tier-btn.active {
-  border-color: #2f2f2f;
-  background: #2f2f2f;
-  color: #fff;
+  border-color: #111;
+  background: #faf8f4;
+  color: #1a1a1a;
+}
+
+.tier-btn.active::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #111;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .tier-btn:not(.active) {
-  border-color: #d0c4b4;
-  background: #faf8f4;
+  border-color: #e0d8c8;
+  background: #fff;
 }
 
 .tier-name {
   display: block;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.1px;
+  color: #111;
 }
 
 .tier-desc {
   display: block;
   font-size: 12px;
-  margin-top: 2px;
-  opacity: 0.5;
+  margin-top: 3px;
+  color: #8a8275;
   font-weight: 400;
+  line-height: 1.4;
 }
 
 .tier-btn.active .tier-desc {
-  opacity: 0.65;
+  color: #6f6a5e;
 }
 
 .tier-price {
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
@@ -144,7 +436,7 @@ body {
 }
 
 .tier-btn.active .tier-price {
-  color: #fff;
+  color: #111;
 }
 
 /* =========================================
@@ -241,6 +533,13 @@ body {
 .field input[dir="rtl"] {
   text-align: right;
   font-size: 19px;
+  font-family: 'Frank Ruhl Libre', 'David Libre', 'DM Sans', system-ui, serif;
+}
+
+.field-static input[dir="rtl"] {
+  text-align: right;
+  font-size: 18px;
+  font-family: 'Frank Ruhl Libre', 'David Libre', 'DM Sans', system-ui, serif;
 }
 
 /* Date inputs — label always floated up */
@@ -259,6 +558,82 @@ body {
 }
 
 /* =========================================
+   STATIC LABEL FIELDS (used from Step 2 onward)
+========================================= */
+
+.field-static {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.field-static .static-field-label {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.label-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: #aaa;
+  letter-spacing: 0.2px;
+  font-style: italic;
+  margin-left: 4px;
+}
+
+.field-static input,
+.field-static textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid #c8bfb4;
+  padding: 10px 0 10px;
+  font-size: 17px;
+  font-family: inherit;
+  font-weight: 400;
+  background: transparent;
+  color: #111;
+  transition: border-color 0.25s;
+  outline: none;
+}
+
+.field-static input::placeholder,
+.field-static textarea::placeholder {
+  color: #c8bfb4;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.field-static input:focus,
+.field-static textarea:focus {
+  border-bottom-color: #111;
+}
+
+.field-static textarea {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 16px;
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+  color: #333;
+}
+
+.field-static textarea:focus {
+  border-color: #111;
+}
+
+.field-static .field-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: #999;
+  line-height: 1.5;
+}
+
+/* =========================================
    FIELD PAIR (side by side)
 ========================================= */
 
@@ -267,6 +642,13 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   margin-bottom: 36px;
+}
+
+.field-pair-static {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 28px;
 }
 
 /* =========================================
@@ -370,11 +752,89 @@ body {
 }
 
 /* =========================================
-   SUBMIT
+   WIZARD — NAVIGATION BAR
+========================================= */
+
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 48px;
+  gap: 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  padding: 12px 4px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #444;
+}
+
+.next-btn {
+  padding: 16px 36px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.25s;
+  min-width: 180px;
+}
+
+.next-btn:hover:not(:disabled) {
+  background: #2a2a2a;
+}
+
+.next-btn:disabled {
+  background: #d6cfc2;
+  cursor: not-allowed;
+}
+
+.skip-link-wrap {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.skip-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: #999;
+  cursor: pointer;
+  padding: 6px 10px;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+
+.skip-link:hover {
+  color: #444;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* =========================================
+   SUBMIT (preserved — used inside step 5)
 ========================================= */
 
 .submit-btn {
-  margin-top: 48px;
+  margin-top: 24px;
   padding: 18px;
   background: #111;
   color: #fff;
@@ -386,6 +846,7 @@ body {
   cursor: pointer;
   border-radius: 4px;
   transition: all 0.25s;
+  width: 100%;
 }
 
 .submit-btn:hover {
@@ -429,8 +890,176 @@ body {
   text-align: center;
   font-size: 13px;
   color: #aaa;
-  margin-top: 18px;
+  margin-top: 14px;
   font-weight: 400;
+}
+
+/* =========================================
+   MICRO-CONFIRMATION (between steps)
+========================================= */
+
+.micro-confirm {
+  text-align: center;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: #a39a8c;
+  margin: 0 0 36px;
+  line-height: 1.5;
+  letter-spacing: 0.1px;
+}
+
+/* =========================================
+   REVIEW SUMMARY CARD (final step)
+========================================= */
+
+.review-back-wrap {
+  margin: 0 0 24px;
+}
+
+.back-btn-inline {
+  padding: 8px 0;
+}
+
+.review-card {
+  background: #faf8f4;
+  border: 1px solid #ece5d8;
+  border-radius: 10px;
+  padding: 32px 28px;
+  margin: 0 0 40px;
+}
+
+.review-photo-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 22px;
+}
+
+.review-photo-wrap img {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.review-bio-wrap {
+  margin: 22px auto 0;
+  padding-top: 18px;
+  border-top: 1px solid #ece5d8;
+  max-width: 480px;
+}
+
+.review-bio {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #5a5346;
+  text-align: center;
+  margin: 0;
+  /* Truncate at 4 lines so the review card doesn't balloon for long bios */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.review-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: #111;
+  text-align: center;
+  margin: 0 0 4px;
+  line-height: 1.3;
+  letter-spacing: -0.1px;
+}
+
+.review-name-he {
+  font-family: 'David Libre', 'Frank Ruhl Libre', 'Times New Roman', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #444;
+  text-align: center;
+  direction: rtl;
+  margin: 0 0 18px;
+  line-height: 1.4;
+}
+
+.review-divider-thin {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: #c5a47e;
+  margin: 14px auto 18px;
+  border: none;
+  opacity: 0.6;
+}
+
+.review-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #6a635a;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.review-meta-empty {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: #a39a8c;
+  letter-spacing: 0.1px;
+}
+
+.review-meta-row {
+  display: inline-block;
+}
+
+.review-meta-row .label {
+  color: #9c9485;
+  margin-right: 6px;
+}
+
+.review-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: #fff;
+  border: 1px solid #e8e0d2;
+  border-radius: 100px;
+  font-size: 13px;
+  color: #6a5d48;
+  margin: 22px auto 0;
+}
+
+.review-tier-badge .badge-dot {
+  width: 6px;
+  height: 6px;
+  background: #c5a47e;
+  border-radius: 50%;
+}
+
+.review-tier-badge .tier-price-final {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  color: #111;
+  letter-spacing: 0.3px;
+}
+
+.review-tier-wrap {
+  text-align: center;
+}
+
+.review-legal-divider {
+  border: none;
+  border-top: 1px solid #ece8e0;
+  margin: 36px 0 28px;
 }
 
 /* =========================================
@@ -440,17 +1069,38 @@ body {
 @media (max-width: 600px) {
 
   .dedicate-wrapper {
-    padding: 32px 18px 100px;
+    padding: 32px 18px 140px;
   }
 
   .page-title {
-    font-size: 34px;
-    margin: 48px 0 12px;
+    font-size: 32px;
+    margin: 32px 0 12px;
   }
 
   .support-note {
-    margin-bottom: 32px;
+    margin-bottom: 28px;
     font-size: 13px;
+  }
+
+  .step-title {
+    font-size: 27px;
+  }
+
+  .step-subtitle {
+    font-size: 14px;
+  }
+
+  .landing-tier-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .landing-tier-card {
+    padding: 22px 20px 22px;
+  }
+
+  .landing-tier-card .tier-card-desc {
+    min-height: 0;
   }
 
   .tier-buttons {
@@ -472,7 +1122,8 @@ body {
     margin-left: 2px;
   }
 
-  .field-pair {
+  .field-pair,
+  .field-pair-static {
     grid-template-columns: 1fr;
     gap: 0;
   }
@@ -485,6 +1136,51 @@ body {
   .submit-btn {
     padding: 16px;
   }
+
+  .progress-dash {
+    width: 24px;
+  }
+
+  .progress-label {
+    margin-left: 8px;
+    font-size: 10.5px;
+  }
+
+  /* Sticky mobile nav for step panels */
+  .step-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
+    border-top: 1px solid #ece5d8;
+    margin: 0;
+    z-index: 50;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.04);
+  }
+
+  .next-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 20px;
+  }
+
+  .back-btn {
+    padding: 12px 0;
+  }
+
+  .skip-link-wrap {
+    margin-bottom: 88px;
+  }
+
+  .review-card {
+    padding: 24px 20px;
+  }
+
+  .review-name {
+    font-size: 24px;
+  }
 }
 
 @media (min-width: 1000px) {
@@ -492,14 +1188,15 @@ body {
     max-width: 620px;
   }
 }
+
 /* =========================================
    CONTACT SECTION
 ========================================= */
 
 .contact-section {
   text-align: center;
-  margin-top: 48px;
-  padding-top: 32px;
+  margin-top: 32px;
+  padding-top: 24px;
   border-top: 1px solid #f0f0f0;
 }
 
@@ -532,7 +1229,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  margin-top: 40px;
+  margin-top: 0;
   cursor: pointer;
   user-select: none;
 }
@@ -756,4 +1453,213 @@ body {
     padding-left: 20px;
     padding-right: 20px;
   }
+}
+
+/* =========================================
+   OPTIONAL PLACE SECTION
+========================================= */
+
+.place-section {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.place-section-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.place-section-header h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 30px;
+  font-weight: 500;
+  margin: 0 0 8px;
+  color: #111;
+}
+
+.place-section-header p {
+  margin: 0;
+  font-size: 15px;
+  color: #777;
+  line-height: 1.6;
+}
+
+.section-kicker {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px !important;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #c5a47e !important;
+  margin-bottom: 8px !important;
+}
+
+.optional-badge {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #a39a8c;
+  background: #f6f2eb;
+  padding: 4px 10px;
+  border-radius: 100px;
+  margin-bottom: 14px;
+}
+
+.field-help {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #999;
+  line-height: 1.45;
+}
+
+/* Geocoder */
+.geocoder-field {
+  position: relative;
+}
+
+.geocoder-results {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #e6e0d8;
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.geocoder-results.active {
+  display: block;
+}
+
+.geocoder-result {
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f0ec;
+  line-height: 1.4;
+}
+
+.geocoder-result:last-child {
+  border-bottom: none;
+}
+
+.geocoder-result:hover,
+.geocoder-result.active {
+  background: #faf8f4;
+}
+
+.place-details {
+  margin-top: 24px;
+}
+
+/* Selected place chip — clean two-line display instead of raw geocoder string */
+.selected-place-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  background: #faf8f4;
+  border: 1px solid #e8e0d2;
+  border-radius: 10px;
+}
+
+.selected-place-pin {
+  flex-shrink: 0;
+  color: #c5a47e;
+  display: flex;
+  align-items: center;
+}
+
+.selected-place-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.selected-place-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.3;
+}
+
+.selected-place-region {
+  font-size: 12.5px;
+  color: #9c9485;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selected-place-clear {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #b5ab9b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.selected-place-clear:hover {
+  color: #6a5d48;
+  background: #f0e9dd;
+}
+
+/* Select fields */
+.select-field {
+  margin-bottom: 28px;
+}
+
+.static-label {
+  position: static !important;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px !important;
+  color: #666 !important;
+  letter-spacing: 0.3px;
+  font-weight: 500 !important;
+  pointer-events: auto !important;
+}
+
+.select-field select {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid #c8bfb4;
+  padding: 12px 0;
+  font-size: 17px;
+  font-family: inherit;
+  background: transparent;
+  color: #111;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23999' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  padding-right: 24px;
+  cursor: pointer;
+}
+
+.select-field select:focus {
+  border-bottom-color: #111;
 }
