@@ -378,7 +378,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeModal();
+    if (e.key === "Escape" && termsModal.classList.contains("active")) closeModal();
   });
 
   acceptTermsBtn.addEventListener("click", function () {
@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
     placeDetails.hidden = true;
     locationLabel.value = "";
     connectionType.value = "";
-    locationPrecision.value = "unknown";
+    locationPrecision.value = "";
     whyThisPlace.value = "";
 
     // Restore the search field, hide the chip
@@ -697,10 +697,7 @@ document.addEventListener("DOMContentLoaded", function () {
           window._dedicationSubmitting();
         }
 
-        const newTab = window.open(url, "_blank");
-        if (!newTab || newTab.closed) {
-          window.location.href = url;
-        }
+        window.location.href = url;
       } else {
         alert("Error: " + (typeof result.error === "string" ? result.error : JSON.stringify(result.error)));
       }
@@ -708,9 +705,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (err) {
       console.error(err);
       alert("Could not reach the server. Please try again.");
-
-    } finally {
-      // Re-enable only if terms are still checked
+      // Only restore button state on error — on success we're navigating away
       submitBtn.disabled = !termsCheck.checked;
       btnText.style.display = "inline";
       btnLoading.style.display = "none";
@@ -738,8 +733,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Don't warn on the landing page or after a successful submission
     if (!hasUserStarted || isSubmittingSuccessfully || wizard.currentStep === 0) return;
     e.preventDefault();
-    e.returnValue = "";
-    return "";
   });
 
   // Expose flag for the submit handler to flip on success
