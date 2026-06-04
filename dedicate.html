@@ -9,6 +9,51 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Frank+Ruhl+Libre:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dedicate.css" />
 <script src="dedicate.js" defer></script>
+  <style>
+    /* ── Gregorian date triplet — matches .field-static exactly ── */
+    .date-triplet-line {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.6fr;
+      gap: 20px;
+      align-items: end;
+      margin-top: 0;
+    }
+    .date-line-part {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .date-line-part input[type="number"] {
+      width: 100%;
+      border: none;
+      border-bottom: 1.5px solid #c8bfb4;
+      background: transparent;
+      font-size: 17px;
+      font-family: inherit;
+      font-weight: 400;
+      color: #111;
+      padding: 10px 0 10px;
+      outline: none;
+      -moz-appearance: textfield;
+      box-sizing: border-box;
+      transition: border-color 0.25s;
+    }
+    .date-line-part input[type="number"]::-webkit-inner-spin-button,
+    .date-line-part input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+    .date-line-part input[type="number"]:focus {
+      border-bottom-color: #111;
+    }
+    .date-line-part label {
+      display: block;
+      font-size: 12px;
+      color: #999;
+      margin-top: 6px;
+      letter-spacing: 0.3px;
+      font-weight: 400;
+    }
+  </style>
 </head>
 
 <body>
@@ -115,28 +160,56 @@
         <p class="step-subtitle">Add what you know. Even a year or an approximate date helps preserve their story.</p>
       </div>
 
+      <!-- Gregorian dates — 3 underline fields, assembled by JS -->
       <div class="field-pair-static">
         <div class="field-static">
-          <label class="static-field-label" for="bornDate">Born</label>
-          <input type="text" name="born_date" id="bornDate" autocomplete="off">
-          <small class="field-hint">Full date, just a year, or approximate.</small>
+          <label class="static-field-label">Born</label>
+          <div class="date-triplet-line">
+            <div class="date-line-part">
+              <input type="number" id="bornDay"   min="1" max="31"  placeholder=" " autocomplete="off">
+              <label>Day</label>
+            </div>
+            <div class="date-line-part">
+              <input type="number" id="bornMonth" min="1" max="12"  placeholder=" " autocomplete="off">
+              <label>Month</label>
+            </div>
+            <div class="date-line-part date-line-year">
+              <input type="number" id="bornYear"  min="1" max="2100" placeholder=" " autocomplete="off">
+              <label>Year</label>
+            </div>
+          </div>
+          <input type="hidden" name="born_date" id="bornDate">
         </div>
         <div class="field-static">
-          <label class="static-field-label" for="deathDate">Died</label>
-          <input type="text" name="death_date" id="deathDate" autocomplete="off">
-          <small class="field-hint">Full date, just a year, or approximate.</small>
+          <label class="static-field-label">Died</label>
+          <div class="date-triplet-line">
+            <div class="date-line-part">
+              <input type="number" id="deathDay"   min="1" max="31"  placeholder=" " autocomplete="off">
+              <label>Day</label>
+            </div>
+            <div class="date-line-part">
+              <input type="number" id="deathMonth" min="1" max="12"  placeholder=" " autocomplete="off">
+              <label>Month</label>
+            </div>
+            <div class="date-line-part date-line-year">
+              <input type="number" id="deathYear"  min="1" max="2100" placeholder=" " autocomplete="off">
+              <label>Year</label>
+            </div>
+          </div>
+          <input type="hidden" name="death_date" id="deathDate">
         </div>
       </div>
 
+      <!-- Hebrew dates — free text, same as original -->
       <div class="field-pair-static">
         <div class="field-static">
           <label class="static-field-label" for="bornStr">Hebrew birth date</label>
-          <input type="text" name="born_str" dir="rtl" id="bornStr">
+          <input type="text" name="born_str" id="bornStr" dir="rtl" autocomplete="off">
           <small class="field-hint">Optional — e.g. ה׳ בתשרי תש״ח</small>
         </div>
         <div class="field-static">
           <label class="static-field-label" for="deathStr">Hebrew passing date</label>
-          <input type="text" name="death_str" dir="rtl" id="deathStr">
+          <input type="text" name="death_str" id="deathStr" dir="rtl" autocomplete="off">
           <small class="field-hint">Optional — e.g. י״ב באייר תשמ״ד</small>
         </div>
       </div>

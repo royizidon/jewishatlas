@@ -266,6 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // POPULATE REVIEW SUMMARY (Step 5)
   // =============================
   function populateReview() {
+    syncDateFields();
     const fd = new FormData(form);
     const he = (fd.get("he_name") || "").trim();
     const en = (fd.get("eng_name") || "").trim();
@@ -428,6 +429,61 @@ document.addEventListener("DOMContentLoaded", function () {
   // =============================
   // OPTIONAL NOMINATIM GEOCODER (no API key, no map)
   // =============================
+  // =============================
+  // DATE ASSEMBLY — Gregorian & Hebrew
+  // Assembles the split input boxes into a single hidden field
+  // before every submission and review render.
+  // =============================
+
+  function padTwo(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function assembleGregorianDate(dayId, monthId, yearId) {
+    const day   = document.getElementById(dayId).value.trim();
+    const month = document.getElementById(monthId).value.trim();
+    const year  = document.getElementById(yearId).value.trim();
+    if (!day && !month && !year) return "";
+    if (day && month && year)  return `${padTwo(day)}/${padTwo(month)}/${year}`;
+    if (month && year)         return `${padTwo(month)}/${year}`;
+    if (year)                  return year;
+    // edge: only day or day+month — still store what we have
+    if (day && month)          return `${padTwo(day)}/${padTwo(month)}`;
+    return day || month || year;
+  }
+
+  function syncDateFields() {
+    document.getElementById("bornDate").value  = assembleGregorianDate("bornDay",  "bornMonth",  "bornYear");
+    document.getElementById("deathDate").value = assembleGregorianDate("deathDay", "deathMonth", "deathYear");
+    // Hebrew dates are free text — no assembly needed
+  }
+
+  // Clamp values to valid ranges on blur
+  const dateClamping = {
+    bornDay:    [1, 31],  deathDay:   [1, 31],
+    bornMonth:  [1, 12],  deathMonth: [1, 12],
+    bornYear:   [1, 2100], deathYear: [1, 2100],
+  };
+  Object.entries(dateClamping).forEach(([id, [min, max]]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("blur", function () {
+      if (this.value === "") return;
+      const v = parseInt(this.value, 10);
+      if (isNaN(v))       { this.value = ""; return; }
+      if (v < min)        this.value = min;
+      else if (v > max)   this.value = max;
+      syncDateFields();
+    });
+  });
+
+  // Wire up live sync on Gregorian date sub-fields only
+  ["bornDay","bornMonth","bornYear","deathDay","deathMonth","deathYear"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", syncDateFields);
+    if (el) el.addEventListener("change", syncDateFields);
+  });
+
   const NOMINATIM_SUGGEST = (q) =>
     `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`;
 
@@ -622,6 +678,9 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    // Sync assembled date hidden fields before reading FormData
+    syncDateFields();
+
     const formData = new FormData(form);
 
     // Name (sanity-check — should already be validated in step 1)
@@ -692,6 +751,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const tier = formData.get("tier");
         const url = paymentLinks[tier] || paymentLinks.brick;
 
+        // Mark as submitted in sessionStorage — survives full page navigations (e.g. back from Morashet)
+        sessionStorage.setItem("dedicationSubmitted", "1");
+
         // Disable beforeunload warning before redirecting to payment
         if (typeof window._dedicationSubmitting === "function") {
           window._dedicationSubmitting();
@@ -739,5 +801,27 @@ document.addEventListener("DOMContentLoaded", function () {
   window._dedicationSubmitting = function () {
     isSubmittingSuccessfully = true;
   };
+
+  // =============================
+  // BACK-BUTTON GUARD
+  // If user presses Back from the payment page, the browser may restore
+  // this page from bfcache with the form fully visible and already submitted.
+  // Detect this and redirect back to payment immediately.
+  // =============================
+  // On page load AND bfcache restore — if already submitted, redirect to payment
+  // sessionStorage handles full navigations (back from Morashet/payment page)
+  // e.persisted handles bfcache restores
+  function checkAlreadySubmitted() {
+    if (sessionStorage.getItem("dedicationSubmitted") === "1") {
+      const tier = (form.querySelector('[name="tier"]') || {}).value || "brick";
+      window.location.replace(paymentLinks[tier] || paymentLinks.brick);
+    }
+  }
+
+  checkAlreadySubmitted(); // runs on fresh page load too
+
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) checkAlreadySubmitted();
+  });
 
 });
