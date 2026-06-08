@@ -8,6 +8,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Frank+Ruhl+Libre:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dedicate.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  #dedicateMap {
+    width: 100%;
+    height: 240px;
+    border-radius: 10px;
+    border: 0.5px solid #e0d8c8;
+    margin: 12px 0 0;
+    z-index: 1;
+    display: none;
+  }
+  #dedicateMap.visible { display: block; }
+  .leaflet-container { font-family: "DM Sans", system-ui, sans-serif; border-radius: 10px; }
+  .leaflet-control-zoom { border: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important; }
+  .leaflet-control-zoom a { color: #444 !important; border-radius: 4px !important; }
+</style>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="dedicate.js" defer></script>
   <style>
     /* ── Gregorian date triplet — matches .field-static exactly ── */
@@ -295,9 +312,11 @@
 
       <div class="field-static geocoder-field">
         <input type="text" id="placeSearch" autocomplete="off" placeholder="Search for a city, address, or landmark…">
-        <small class="field-hint">Start typing — suggestions will appear below.</small>
+        <small class="field-hint">Start typing to search, or tap the map to drop a pin.</small>
         <div id="geocoderResults" class="geocoder-results" role="listbox"></div>
       </div>
+
+      <div id="dedicateMap"></div>
 
       <!-- Clean display of the selected place -->
       <div id="selectedPlaceChip" class="selected-place-chip" hidden>

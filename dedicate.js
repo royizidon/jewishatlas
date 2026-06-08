@@ -484,8 +484,83 @@ document.addEventListener("DOMContentLoaded", function () {
     if (el) el.addEventListener("change", syncDateFields);
   });
 
+  // =============================
+  // LEAFLET MAP + NOMINATIM GEOCODER
+  // =============================
+
   const NOMINATIM_SUGGEST = (q) =>
     `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`;
+
+  const NOMINATIM_REVERSE = (lat, lon) =>
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=${lat}&lon=${lon}`;
+
+  // Init Leaflet map — shown when user reaches the place step
+  let _mapInited = false;
+  let _leafletMap = null;
+  let _leafletMarker = null;
+
+  function initLeafletMap() {
+    if (_mapInited) return;
+    _mapInited = true;
+
+    const mapEl = document.getElementById("dedicateMap");
+    mapEl.classList.add("visible");
+
+    _leafletMap = L.map("dedicateMap", { zoomControl: true }).setView([32, 20], 3);
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: "© OpenStreetMap, © CARTO",
+      subdomains: "abcd",
+      maxZoom: 19
+    }).addTo(_leafletMap);
+
+    // Custom pin icon matching the site's indigo style
+    const pinIcon = L.divIcon({
+      className: "",
+      html: `<div style="width:14px;height:14px;background:#4f46e5;border-radius:50%;border:2.5px solid white;box-shadow:0 2px 6px rgba(79,70,229,0.45);"></div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+
+    _leafletMarker = L.marker([0, 0], { icon: pinIcon, opacity: 0 }).addTo(_leafletMap);
+
+    // Click on map → reverse geocode → activate place
+    _leafletMap.on("click", async function (e) {
+      const { lat, lng } = e.latlng;
+      try {
+        const r = await fetch(NOMINATIM_REVERSE(lat, lng), { headers: { Accept: "application/json" } });
+        const place = await r.json();
+        if (!place || place.error) return;
+        // Normalise to same shape as forward search results
+        place.lat = String(lat);
+        place.lon = String(lng);
+        activateSelectedPlace(place);
+        _leafletMarker.setLatLng([lat, lng]).setOpacity(1);
+      } catch (err) {
+        console.error("Reverse geocode error:", err);
+      }
+    });
+
+    // Fix tile rendering after map becomes visible
+    setTimeout(() => _leafletMap.invalidateSize(), 50);
+  }
+
+  // Call initLeafletMap when the place wizard step becomes active
+  const _origShowStep = typeof showStep === "function" ? showStep : null;
+  // Hook into the wizard step transition — map step is step 3 (0-indexed)
+  // We observe the place panel becoming active instead
+  const _placePanel = document.getElementById("panelStep4");
+
+  if (_placePanel) {
+    const _mapObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.type === "attributes" && m.attributeName === "class") {
+          if (_placePanel.classList.contains("active")) initLeafletMap();
+        }
+      });
+    });
+    _mapObserver.observe(_placePanel, { attributes: true });
+  }
 
   function resetSelectedPlace() {
     selectedGeocoderPlace = null;
@@ -507,6 +582,9 @@ document.addEventListener("DOMContentLoaded", function () {
     selectedPlaceRegion.textContent = "";
     window._selectedPlaceCleanName = "";
     if (placeSearchField) placeSearchField.hidden = false;
+
+    // Hide map marker
+    if (_leafletMarker) _leafletMarker.setOpacity(0);
   }
 
   // Build a clean, human two-part name from Nominatim's structured address
@@ -565,8 +643,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     placeDetails.hidden = false;
 
-    // Prefill "what is this place called" with the clean short name
+    // Prefill location_label with the clean short name
     if (!locationLabel.value) locationLabel.value = display.primary;
+
+    // Move Leaflet marker to the selected place
+    const lat = parseFloat(place.lat);
+    const lon = parseFloat(place.lon);
+    if (_leafletMap && !isNaN(lat) && !isNaN(lon)) {
+      _leafletMarker.setLatLng([lat, lon]).setOpacity(1);
+      _leafletMap.setView([lat, lon], Math.max(_leafletMap.getZoom(), 14), { animate: true });
+    }
   }
 
   async function searchNominatim(query) {
