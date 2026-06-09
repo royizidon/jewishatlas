@@ -1,27 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Core app -->
   <url>
     <loc>https://jewishatlas.org/</loc>
-    <lastmod>2026-06-03</lastmod>
+    <lastmod>2026-06-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
   <url>
     <loc>https://jewishatlas.org/about.html</loc>
-    <lastmod>2026-06-03</lastmod>
+    <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
     <loc>https://jewishatlas.org/upload.html</loc>
-    <lastmod>2026-06-03</lastmod>
+    <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
   <url>
     <loc>https://jewishatlas.org/wall.html</loc>
-    <lastmod>2026-06-03</lastmod>
+    <lastmod>2026-06-09</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
   </url>
+
+  <url>
+    <loc>https://jewishatlas.org/dedicate.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Communities hub: English and Hebrew -->
+  <url>
+    <loc>https://jewishatlas.org/jewish-communities</loc>
+    <xhtml:link rel="alternate" hreflang="en"
+                href="https://jewishatlas.org/jewish-communities"/>
+    <xhtml:link rel="alternate" hreflang="he"
+                href="https://jewishatlas.org/he/jewish-communities"/>
+    <xhtml:link rel="alternate" hreflang="x-default"
+                href="https://jewishatlas.org/jewish-communities"/>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://jewishatlas.org/he/jewish-communities</loc>
+    <xhtml:link rel="alternate" hreflang="en"
+                href="https://jewishatlas.org/jewish-communities"/>
+    <xhtml:link rel="alternate" hreflang="he"
+                href="https://jewishatlas.org/he/jewish-communities"/>
+    <xhtml:link rel="alternate" hreflang="x-default"
+                href="https://jewishatlas.org/jewish-communities"/>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Country pages -->
+  <url>
+    <loc>https://jewishatlas.org/jewish-communities-united-states</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>
+

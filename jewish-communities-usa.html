@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jewish Communities in the United States — Geography, Heritage and Jewish Life</title>
+<meta name="description" content="A geographic portrait of Jewish life in America — 8,449 mapped sites from the dense communities of the Northeast to synagogues in the rural interior, active institutions and the traces history left behind.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="author" content="Jewish Atlas">
+<meta name="theme-color" content="#0c2018">
+<link rel="canonical" href="https://jewishatlas.org/jewish-communities-united-states">
+<link rel="alternate" hreflang="en" href="https://jewishatlas.org/jewish-communities-united-states">
+<link rel="alternate" hreflang="x-default" href="https://jewishatlas.org/jewish-communities-united-states">
+
+<meta property="og:site_name" content="Jewish Atlas">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Jewish Communities in the United States — Geography, Heritage and Jewish Life">
+<meta property="og:description" content="8,449 mapped sites across America — from the dense Northeast to synagogues in the rural interior.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jewishatlas.org/jewish-communities-united-states">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jewish Communities in the United States">
+<meta name="twitter:description" content="8,449 mapped sites across America — from the dense Northeast to synagogues in the rural interior.">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {"@type":"WebSite","@id":"https://jewishatlas.org/#website","name":"Jewish Atlas","url":"https://jewishatlas.org/","inLanguage":"en"},
+    {"@type":"Organization","@id":"https://jewishatlas.org/#org","name":"Jewish Atlas","url":"https://jewishatlas.org/"},
+    {
+      "@type":"Article",
+      "headline":"Jewish Communities in the United States — Geography, Heritage and Jewish Life",
+      "description":"A geographic portrait of Jewish life in America — 8,449 mapped sites from the dense communities of the Northeast to synagogues in the rural interior.",
+      "inLanguage":"en",
+      "isPartOf":{"@id":"https://jewishatlas.org/#website"},
+      "author":{"@id":"https://jewishatlas.org/#org"},
+      "publisher":{"@id":"https://jewishatlas.org/#org"},
+      "datePublished":"2026-06-09",
+      "dateModified":"2026-06-09",
+      "articleSection":"Jewish geography",
+      "keywords":"Jewish communities United States, Jewish communities America, synagogues United States, Jewish cemeteries America, Jewish map USA, Jewish heritage sites United States, Jewish communities New York, Jewish communities Florida, Jewish communities California",
+      "mainEntityOfPage":"https://jewishatlas.org/jewish-communities-united-states"
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Spectral:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --pine:#0c2018;
+  --pine-2:#16382b;
+  --sage:#7f9387;
+  --lichen:#aeb9a8;
+  --sand:#d7c49b;
+  --paper:#f4f3ef;
+  --paper-deep:#e9ebe5;
+  --ink:#14241d;
+  --text:#425048;
+  --muted:#6f7d75;
+  --line:rgba(20,36,29,.11);
+  --glass:rgba(255,255,255,.10);
+  --white:#fff;
+  --serif:'Spectral',Georgia,'Times New Roman',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --radius-xl:42px;
+  --radius-lg:28px;
+  --shadow:0 28px 90px rgba(12,32,24,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  direction:ltr;
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit}
+h1,h2,h3,blockquote{font-family:var(--serif)}
+
+body::after{
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.04;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.js .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.65,.2,1),transform .9s cubic-bezier(.2,.65,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+.js .stagger>*{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.65,.2,1),transform .8s cubic-bezier(.2,.65,.2,1)}
+.js .stagger.in>*{opacity:1;transform:none}
+.js .stagger.in>*:nth-child(2){transition-delay:.08s}
+.js .stagger.in>*:nth-child(3){transition-delay:.16s}
+.js .stagger.in>*:nth-child(4){transition-delay:.24s}
+.js .stagger.in>*:nth-child(5){transition-delay:.32s}
+
+/* hero */
+.hero{position:relative;min-height:100svh;background:var(--pine);overflow:hidden;display:flex;align-items:flex-end}
+#us-map{position:absolute;inset:-2%;z-index:0;filter:saturate(.55) contrast(.92) brightness(.62)}
+.hero-shade{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 72% 22%,rgba(215,196,155,.15),transparent 28rem),
+    radial-gradient(circle at 18% 60%,rgba(121,150,134,.12),transparent 22rem),
+    linear-gradient(180deg,rgba(12,32,24,.06) 0%,rgba(12,32,24,.28) 44%,rgba(12,32,24,.97) 100%);
+}
+.hero-contours{
+  position:absolute;inset:0;z-index:2;opacity:.18;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='280' viewBox='0 0 360 280'%3E%3Cg fill='none' stroke='%23d7c49b' stroke-opacity='.34' stroke-width='.7'%3E%3Cpath d='M-20 50c55-45 102 18 150-24s94-16 145 16 88 4 120-15'/%3E%3Cpath d='M-30 86c62-41 106 18 160-20s92-19 143 9 92 14 129-11'/%3E%3Cpath d='M-25 123c58-35 108 24 164-16s94-15 141 8 90 19 124-4'/%3E%3Cpath d='M-35 163c64-38 112 19 168-14s90-14 142 10 92 18 132-2'/%3E%3Cpath d='M-28 205c57-36 109 17 165-12s92-15 143 7 90 20 126 3'/%3E%3Cpath d='M-20 246c52-31 105 16 161-11s96-13 144 8 86 18 119 6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-inner{
+  position:relative;z-index:4;
+  width:min(1280px,100%);margin:0 auto;
+  padding:11rem 4rem 5.5rem;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.34fr);
+  gap:7rem;align-items:end;
+}
+.eyebrow{display:flex;align-items:center;gap:12px;color:var(--sand);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-bottom:22px}
+.eyebrow::before{content:"";width:40px;height:1px;background:currentColor}
+.eyebrow a{color:inherit;text-decoration:none;opacity:.72;transition:opacity .2s}
+.eyebrow a:hover{opacity:1}
+h1{max-width:980px;color:var(--white);font-size:clamp(50px,7.6vw,108px);line-height:1.0;letter-spacing:-.018em;font-weight:500}
+.hero-lead{max-width:720px;margin-top:30px;color:rgba(255,255,255,.74);font-size:clamp(18px,1.9vw,22px);font-weight:300;line-height:1.8}
+.hero-illus{margin-top:18px;color:rgba(255,255,255,.42);font-size:13px;font-weight:300;max-width:560px}
+.hero-aside{
+  margin-bottom:6px;padding:26px 28px;
+  border:1px solid rgba(255,255,255,.14);border-radius:24px;
+  background:rgba(8,24,17,.46);backdrop-filter:blur(16px);
+  color:rgba(255,255,255,.66);font-size:14px;line-height:1.7;
+}
+.hero-aside strong{display:block;font-family:var(--serif);color:var(--white);font-size:18px;font-weight:500;margin-bottom:8px}
+.scroll-mark{
+  position:absolute;right:38px;bottom:30px;z-index:4;
+  color:rgba(255,255,255,.38);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  writing-mode:vertical-rl;display:flex;align-items:center;gap:12px;
+  animation:floaty 2.6s ease-in-out infinite;
+}
+.scroll-mark::after{content:"";width:1px;height:44px;background:rgba(255,255,255,.28)}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+.leaflet-control-zoom{display:none}.leaflet-control-attribution{font-size:8px!important;opacity:.32;direction:ltr}
+.marker-glow{filter:drop-shadow(0 0 10px rgba(215,196,155,.68))}
+
+.hero-inner .eyebrow,.hero-inner h1,.hero-inner .hero-lead,.hero-inner .hero-aside{opacity:0;transform:translateY(24px);animation:rise .95s cubic-bezier(.2,.65,.2,1) forwards}
+.hero-inner h1{animation-delay:.12s}
+.hero-inner .hero-lead{animation-delay:.26s}
+.hero-inner .hero-aside{animation-delay:.4s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+main{overflow:hidden}
+.shell{width:min(1180px,100%);margin:0 auto;padding:0 32px}
+.section{padding:120px 0;border-bottom:1px solid var(--line)}
+.section:last-child{border-bottom:0}
+.section-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:88px;align-items:start}
+.label{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#70857a;margin-bottom:18px}
+h2{font-size:clamp(36px,4.6vw,64px);line-height:1.08;letter-spacing:-.012em;font-weight:500;max-width:900px}
+.lead{font-size:21px;line-height:1.85;font-weight:300;color:#33453d;max-width:810px;margin-top:24px}
+p{font-size:17px;font-weight:300;color:var(--text);max-width:760px}
+p+p{margin-top:18px}
+
+.quote-panel{
+  position:sticky;top:36px;min-height:390px;
+  border-radius:var(--radius-xl);
+  background:linear-gradient(160deg,#17382b,#0c2018);
+  color:var(--white);padding:44px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;box-shadow:var(--shadow);
+}
+.quote-panel::before{
+  content:"";position:absolute;inset:-15%;opacity:.28;
+  background:
+    radial-gradient(circle at 74% 22%,rgba(215,196,155,.34),transparent 12rem),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23d7c49b' stroke-opacity='.35' stroke-width='.65'%3E%3Cpath d='M-30 34c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 74c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 114c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 154c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 194c48-32 79 30 125-7s76-8 126-36'/%3E%3C/g%3E%3C/svg%3E");
+}
+.quote-panel blockquote{position:relative;z-index:1;font-size:27px;line-height:1.5;font-weight:400;font-style:italic;color:rgba(255,255,255,.92)}
+.quote-panel small{position:relative;z-index:1;margin-top:26px;color:var(--sand);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-family:var(--sans)}
+
+/* centres grid */
+.centres{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:50px}
+.centre{
+  position:relative;padding:30px 30px 26px;border:1px solid var(--line);border-radius:26px;
+  background:rgba(255,255,255,.55);transition:transform .25s ease,box-shadow .25s ease,background .25s ease;
+}
+.centre:hover{transform:translateY(-5px);background:#fff;box-shadow:0 22px 56px rgba(12,32,24,.08)}
+.centre h3{font-size:22px;font-weight:500;margin-bottom:10px;letter-spacing:-.005em}
+.centre p{font-size:15px;color:var(--muted);max-width:none;line-height:1.7}
+.centre-count{font-family:var(--sans);font-size:11px;letter-spacing:.12em;color:var(--sage);margin-bottom:14px;text-transform:uppercase}
+
+/* data snapshot */
+.snapshot{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:50px}
+.snap-stat{padding:28px 24px;border:1px solid var(--line);border-radius:26px;background:rgba(255,255,255,.55)}
+.snap-stat .num{font-family:var(--serif);font-size:clamp(34px,4vw,52px);font-weight:500;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.snap-stat .num-label{margin-top:8px;font-size:13px;color:var(--muted);font-weight:400}
+
+/* metro bars */
+.metro-list{margin-top:44px}
+.metro-row{display:grid;grid-template-columns:170px 1fr 54px;align-items:center;gap:14px;margin-bottom:18px}
+.metro-name{font-size:14px;color:var(--ink);text-align:right;font-weight:400}
+.metro-name.top{font-weight:500}
+.metro-track{height:6px;background:var(--paper-deep);border-radius:3px;overflow:hidden;position:relative}
+.metro-fill{height:100%;border-radius:3px;width:0;transition:width 1.1s cubic-bezier(.2,.65,.2,1)}
+.metro-fill.f1{background:var(--pine)}
+.metro-fill.f2{background:var(--sage)}
+.metro-fill.f3{background:var(--lichen)}
+.metro-sub{grid-column:2;font-size:12px;color:var(--muted);margin-top:-10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.metro-num{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* visual break / spatial panel */
+.visual-break{padding:0 0 120px}
+.spatial-panel{
+  position:relative;min-height:480px;border-radius:var(--radius-xl);overflow:hidden;
+  background:linear-gradient(135deg,#dfe4dc,#c8d2c7 45%,#7f9588);
+  box-shadow:var(--shadow);isolation:isolate;
+}
+.spatial-panel::before{
+  content:"";position:absolute;inset:0;opacity:.72;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='320' viewBox='0 0 420 320'%3E%3Cg fill='none' stroke='%2316382b' stroke-opacity='.22' stroke-width='.8'%3E%3Cpath d='M-25 42c64-46 118 24 177-20s106-24 163 10 101 14 143-14'/%3E%3Cpath d='M-28 82c67-42 120 24 181-15s105-21 160 8 99 20 145-8'/%3E%3Cpath d='M-24 125c63-40 119 22 180-14s102-20 160 10 99 16 145-7'/%3E%3Cpath d='M-28 170c67-39 122 20 181-12s104-20 161 7 97 20 143 0'/%3E%3Cpath d='M-23 218c63-36 118 20 179-10s105-18 161 8 99 17 144 2'/%3E%3Cpath d='M-25 267c64-36 117 18 177-9s108-16 163 8 100 18 142 6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.spatial-panel::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.70),transparent 19rem),linear-gradient(270deg,rgba(12,32,24,.10),transparent 50%);
+}
+.pulse{position:absolute;z-index:2;border-radius:50%;background:#d7c49b;box-shadow:0 0 0 0 rgba(215,196,155,.48);animation:pulse 3.4s infinite}
+.p1{width:13px;height:13px;left:62%;top:38%}
+.p2{width:9px;height:9px;left:26%;top:44%;animation-delay:.8s}
+.p3{width:14px;height:14px;left:76%;top:58%;animation-delay:1.5s}
+.p4{width:8px;height:8px;left:44%;top:62%;animation-delay:2.1s}
+.p5{width:11px;height:11px;left:18%;top:30%;animation-delay:1.1s}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(215,196,155,.48)}70%{box-shadow:0 0 0 26px rgba(215,196,155,0)}100%{box-shadow:0 0 0 0 rgba(215,196,155,0)}}
+.spatial-copy{position:absolute;z-index:3;left:54px;bottom:50px;max-width:580px;padding:34px;border-radius:28px;background:rgba(244,243,239,.82);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.52)}
+.spatial-copy .label{color:#53685d}
+.spatial-copy h3{font-size:clamp(26px,3.2vw,40px);line-height:1.12;font-weight:500;letter-spacing:-.01em}
+.spatial-copy p{margin-top:14px;color:#405047;font-size:16px}
+
+/* Baltimore anecdote */
+.anecdote{
+  position:relative;margin-top:50px;padding:44px;
+  border-radius:var(--radius-xl);overflow:hidden;
+  background:linear-gradient(160deg,#17382b,#0c2018);
+  color:var(--white);box-shadow:var(--shadow);
+}
+.anecdote::before{
+  content:"";position:absolute;inset:-10%;opacity:.22;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23d7c49b' stroke-opacity='.4' stroke-width='.65'%3E%3Cpath d='M-30 34c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 74c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 114c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 154c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 194c48-32 79 30 125-7s76-8 126-36'/%3E%3C/g%3E%3C/svg%3E");
+}
+.anecdote-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.3fr);gap:60px;align-items:center}
+.anecdote .label{color:var(--sand);margin-bottom:16px}
+.anecdote h3{font-family:var(--serif);font-size:clamp(26px,3vw,38px);font-weight:500;line-height:1.15;color:var(--white);margin-bottom:22px}
+.anecdote p{font-size:16px;font-weight:300;color:rgba(255,255,255,.78);line-height:1.8;max-width:none}
+.anecdote p+p{margin-top:16px}
+.anecdote-stat{text-align:center}
+.anecdote-stat .big{font-family:var(--serif);font-size:clamp(56px,7vw,90px);font-weight:500;color:var(--sand);line-height:1}
+.anecdote-stat .big-label{margin-top:10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.52)}
+
+/* edges */
+.edges{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:46px}
+.edge{padding:26px 22px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.55)}
+.edge-dir{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin-bottom:12px}
+.edge h4{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.25}
+.edge .city{font-size:14px;color:var(--muted)}
+.edge .coord{margin-top:8px;font-size:12px;color:var(--lichen);font-variant-numeric:tabular-nums}
+
+/* map invite */
+.map-invite-section{background:linear-gradient(180deg,transparent,rgba(22,56,43,.03))}
+.map-invite{text-align:center;max-width:760px;margin:0 auto}
+.map-invite .label{margin-inline:auto}
+.map-invite h2{margin-inline:auto}
+.map-invite p{margin:18px auto 0;color:#3a4c43}
+.map-link{
+  display:inline-flex;align-items:center;gap:12px;margin-top:34px;
+  font-family:var(--sans);font-size:16px;font-weight:500;color:var(--white);text-decoration:none;
+  padding:16px 30px;border-radius:99px;background:var(--pine);
+  transition:gap .25s ease,background .25s ease,transform .25s ease;
+}
+.map-link .arr{font-size:19px;color:var(--sand);transition:transform .25s ease}
+.map-link:hover{gap:18px;background:var(--pine-2);transform:translateY(-2px)}
+.map-link:hover .arr{transform:translateX(5px)}
+.map-link:focus-visible{outline:2px solid var(--sand);outline-offset:4px}
+
+/* data note */
+.data-note{margin-top:50px;padding:28px 32px;border-left:3px solid var(--sand);background:rgba(215,196,155,.08);border-radius:0 18px 18px 0}
+.data-note p{font-size:14px;color:var(--muted);max-width:none}
+
+/* FAQ */
+.faq{margin-top:46px;max-width:880px}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{
+  list-style:none;cursor:pointer;padding:24px 0;
+  font-family:var(--serif);font-size:clamp(19px,2.2vw,25px);font-weight:500;color:var(--ink);
+  display:flex;align-items:center;justify-content:space-between;gap:20px;letter-spacing:-.005em;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .plus{flex:none;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;position:relative;transition:background .25s ease,border-color .25s ease}
+.faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;background:var(--pine-2);transition:transform .25s ease,opacity .25s ease}
+.faq summary .plus::before{width:12px;height:1.5px}
+.faq summary .plus::after{width:1.5px;height:12px}
+.faq details[open] summary .plus{background:var(--pine);border-color:var(--pine)}
+.faq details[open] summary .plus::before,.faq details[open] summary .plus::after{background:var(--sand)}
+.faq details[open] summary .plus::after{transform:rotate(90deg);opacity:0}
+.faq summary:focus-visible{outline:2px solid var(--sand);outline-offset:4px;border-radius:6px}
+.faq .answer{padding:0 0 26px}
+.faq .answer p{font-size:16px;color:var(--text);line-height:1.75;max-width:820px}
+
+/* closing */
+.closing{padding:120px 0 150px;text-align:center}
+.closing p{font-family:var(--serif);font-size:clamp(22px,2.8vw,33px);line-height:1.5;color:#2f4138;max-width:840px;margin:0 auto;font-weight:400}
+.closing a{text-decoration:underline;text-decoration-color:var(--sand);text-underline-offset:4px}
+
+@media(max-width:920px){
+  .hero-inner,.section-grid,.anecdote-inner{grid-template-columns:1fr}
+  .hero-inner{gap:2rem;padding:9rem 28px 3.5rem}
+  .hero-aside{max-width:520px}
+  .centres,.snapshot,.edges{grid-template-columns:1fr}
+  .quote-panel{position:relative;top:auto}
+  .scroll-mark{display:none}
+  .anecdote{padding:32px}
+  .anecdote-stat{text-align:left;padding-top:0}
+  .metro-row{grid-template-columns:130px 1fr 44px}
+  .metro-name{font-size:12px}
+}
+@media(max-width:620px){
+  .hero{min-height:92svh}.hero-inner{padding:7rem 20px 2.4rem}.hero-aside{display:none}
+  h1{font-size:48px}.hero-lead{font-size:17px}.shell{padding:0 20px}.section{padding:78px 0}
+  h2{font-size:36px}.lead{font-size:18px}
+  .quote-panel{min-height:310px;padding:30px}.quote-panel blockquote{font-size:22px}
+  .visual-break{padding-bottom:78px}.spatial-panel{min-height:440px;border-radius:28px}
+  .spatial-copy{left:20px;right:20px;bottom:20px;padding:26px}
+  .closing{padding:80px 0 110px}
+  .snapshot{grid-template-columns:1fr 1fr}
+  .edges{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .js .reveal,.js .stagger>*{opacity:1!important;transform:none!important}
+  .hero-inner .eyebrow,.hero-inner h1,.hero-inner .hero-lead,.hero-inner .hero-aside{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<article>
+<header class="hero" aria-label="Illustrative map of the United States showing major Jewish centres">
+  <div id="us-map" aria-hidden="true"></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-contours" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow"><a href="https://jewishatlas.org/jewish-communities">Jewish Communities Around the World</a></div>
+      <h1>Jewish Communities in the United States</h1>
+      <p class="hero-lead">From the dense neighbourhoods of the Northeast to a lone synagogue on the Texas plains — 8,449 mapped sites trace Jewish life across America, its layers of immigration, suburbanization and quiet persistence.</p>
+      <p class="hero-illus">The background map is illustrative; the full interactive map is available further down the page.</p>
+    </div>
+    <aside class="hero-aside">
+      <strong>The largest mapped Jewish geography outside Israel</strong>
+      The United States holds more Jewish mapped sites in the Jewish Atlas database than any other country except Israel — 8,449 in total, ranging from the extraordinary density of the New York metro to synagogues in small cities across the rural interior.
+    </aside>
+  </div>
+  <div class="scroll-mark" aria-hidden="true">Explore the map</div>
+</header>
+
+<main>
+
+  <!-- 1. Migration shaped Jewish America -->
+  <section class="section">
+    <div class="shell section-grid">
+      <div class="reveal">
+        <div class="label">How Jewish America was built</div>
+        <h2>Migration shaped every community on the map</h2>
+        <p class="lead">Jewish life in America is not a single story. It is a series of arrivals, each leaving its own geographic footprint.</p>
+        <p>The earliest communities were Sephardi merchants who settled in port cities — Newport, Charleston, Savannah, New York — in the seventeenth and eighteenth centuries. Their synagogues, some still standing, are among the oldest Jewish buildings in the Western hemisphere.</p>
+        <p>The nineteenth century brought Central European immigrants, many of whom moved inland along trade routes, establishing congregations in Cincinnati, St. Louis, Chicago and dozens of smaller Midwestern towns. Their Reform movement built grand temple buildings that remain landmarks in cities where Jewish life has long since contracted.</p>
+        <p>The mass Eastern European immigration of 1880 to 1924 transformed American Jewish geography. Millions settled in dense urban neighbourhoods — the Lower East Side, Chicago's Maxwell Street, Baltimore's East Baltimore Street. The synagogues, landsmanshaftn and cemeteries they built in those decades account for a large share of what the map records today.</p>
+        <p>The postwar decades brought suburbanization — the great dispersal from city centres into Long Island, New Jersey, the North Shore of Chicago, the San Fernando Valley. And from the 1960s onward, a sustained movement toward Florida, California and other Sun Belt states created the second tier of large American Jewish communities visible in the data.</p>
+      </div>
+      <aside class="quote-panel reveal">
+        <blockquote>Each wave of immigration left its own layer on the map — synagogues, cemeteries, schools — some still active, many now only memory.</blockquote>
+        <small>Jewish geography · United States</small>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 2. Major centres -->
+  <section class="section">
+    <div class="shell">
+      <div class="reveal">
+        <div class="label">Major centres of Jewish life</div>
+        <h2>Eight cities, eight different stories</h2>
+        <p class="lead">The largest Jewish communities in America are not simply bigger versions of each other. Each reflects a distinct pattern of settlement, migration and institutional life.</p>
+      </div>
+      <div class="centres stagger reveal">
+        <article class="centre">
+          <div class="centre-count">New York metro · most mapped sites in the database</div>
+          <h3>New York</h3>
+          <p>One of the largest Jewish urban concentrations in the world. The five boroughs and the wider metro — Long Island, Teaneck, Passaic, Monsey, Spring Valley — together account for roughly 31 percent of all US sites in the Jewish Atlas database. Borough Park, Williamsburg and Crown Heights each function as distinct Orthodox communities with their own dense institutional infrastructure.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">South Florida · second by mapped sites</div>
+          <h3>South Florida</h3>
+          <p>Built almost entirely in the postwar decades, South Florida's Jewish community is notable for its density of kosher establishments — 321 of its mapped sites are kosher restaurants or stores, more than any other American metro in the current database. Miami Beach, Hollywood and Boca Raton each have distinct characters shaped by different waves of arrival.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">Los Angeles · largest West Coast community</div>
+          <h3>Los Angeles</h3>
+          <p>Among the largest Jewish communities west of the Mississippi, centred on the Pico-Robertson and Fairfax neighbourhoods but dispersed across a vast metropolitan area. The Valley, the Westside and the beach cities each have their own communities and institutions.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">Chicago · historic Midwest centre</div>
+          <h3>Chicago</h3>
+          <p>One of the great historic centres of American Jewish life. Skokie, Rogers Park, and the North Shore suburbs carry the legacy of a community shaped by Eastern European immigration and the labour movement. The Maxwell Street neighbourhood where it once concentrated has been largely demolished.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">Philadelphia · one of the oldest communities</div>
+          <h3>Philadelphia</h3>
+          <p>Home to one of the oldest continuously active Jewish communities in North America, with a notable concentration of historic cemeteries — 18 in the metro area — reflecting centuries of settlement. The Main Line suburbs and Northeast Philadelphia were the postwar centres of gravity.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">Boston · university presence</div>
+          <h3>Boston</h3>
+          <p>A community shaped strongly by its university presence — Boston has 24 Hillel centers in the database, a high ratio reflecting its density of higher education institutions. Brookline remains the residential and institutional heart; Newton and the North Shore are significant suburban centres.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">Baltimore · highest cemetery ratio in database</div>
+          <h3>Baltimore</h3>
+          <p>An old community with a notably high concentration of Jewish cemeteries — 25 in the metro area, the highest ratio relative to total sites among major cities in the current database. The reasons trace back to the independent structure of nineteenth and early twentieth century immigrant congregations, each of which established its own burial ground.</p>
+        </article>
+        <article class="centre">
+          <div class="centre-count">Washington · growing contemporary community</div>
+          <h3>Washington</h3>
+          <p>A growing contemporary community, with 83 synagogues but a striking gap in kosher establishments in the current database — likely a coverage issue rather than a reflection of the actual community. The Maryland suburbs of Bethesda, Rockville and Silver Spring hold much of the residential population.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Data snapshot -->
+  <section class="section">
+    <div class="shell">
+      <div class="reveal">
+        <div class="label">Jewish Atlas data · United States</div>
+        <h2>What 8,449 sites reveal</h2>
+        <p class="lead">The Jewish Atlas database maps more US sites than any other country except Israel. The figures below are drawn directly from coordinate-verified records.</p>
+      </div>
+      <div class="snapshot stagger reveal">
+        <div class="snap-stat">
+          <div class="num">4,345</div>
+          <div class="num-label">Synagogues — active and historic</div>
+        </div>
+        <div class="snap-stat">
+          <div class="num">1,844</div>
+          <div class="num-label">Kosher restaurants and stores</div>
+        </div>
+        <div class="snap-stat">
+          <div class="num">994</div>
+          <div class="num-label">Jewish schools</div>
+        </div>
+        <div class="snap-stat">
+          <div class="num">868</div>
+          <div class="num-label">Hillel centers on university campuses</div>
+        </div>
+        <div class="snap-stat">
+          <div class="num">398</div>
+          <div class="num-label">Cemeteries — communal and historic</div>
+        </div>
+        <div class="snap-stat">
+          <div class="num">8,449</div>
+          <div class="num-label">Total mapped sites across the country</div>
+        </div>
+      </div>
+      <div class="data-note reveal">
+        <p>Based on the current Jewish Atlas database, using coordinate bounding boxes to identify US entries across all country-name variants. The database is not a complete census of Jewish sites in the United States — coverage varies by region and site type.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. What the map reveals — metro bars -->
+  <section class="section">
+    <div class="shell section-grid">
+      <div class="reveal">
+        <div class="label">What the map reveals</div>
+        <h2>Three geographic patterns</h2>
+        <p class="lead">The data does not simply confirm what is already known about American Jewish geography. It surfaces contrasts that are harder to see without coordinates.</p>
+        <p>The New York concentration is not just large — it is categorically different from any other metro. Sites within the greater New York area account for roughly 31 percent of all US sites in the database, more than the next seven metros combined.</p>
+        <p>In the database as currently mapped, South Florida outranks Los Angeles in total sites (560 vs 403), driven by a high density of kosher establishments — 321 of South Florida's sites are kosher restaurants or stores, compared with 75 in Los Angeles. This likely reflects both a genuinely denser kosher infrastructure and stronger database coverage in that area.</p>
+        <p>The average geographic centre of US cemeteries sits further north than that of synagogues, which may reflect older settlement patterns that preceded the Sun Belt migration — though the database's cemetery coverage is less complete than its synagogue coverage, and this pattern should be treated as preliminary.</p>
+        <p style="margin-top:18px;font-size:14px;color:var(--muted)">Metro totals are counted by coordinate bounding box, not by city name. The same site may be named differently by different contributors; the figures are working aggregations, not authoritative counts.</p>
+      </div>
+      <div class="reveal">
+        <div class="label">Metro areas by mapped sites</div>
+        <div class="metro-list" id="metro-bars" aria-label="Bar chart of Jewish Atlas sites by US metro area"></div>
+        <div style="display:flex;gap:16px;margin-top:18px;font-size:12px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:4px;border-radius:2px;background:var(--pine);display:inline-block"></span>Synagogues</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:4px;border-radius:2px;background:var(--sage);display:inline-block"></span>Kosher</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Baltimore anecdote -->
+  <section class="section">
+    <div class="shell">
+      <div class="reveal">
+        <div class="label">A closer look</div>
+        <h2>Beyond the major cities</h2>
+        <p class="lead">The most historically layered parts of the map are not always the largest. Cemeteries, former synagogues and the records of dissolved congregations carry the geography of an older America.</p>
+        <p>Across the South and Midwest, Jewish communities established in the nineteenth century left institutional traces that often outlast the communities themselves. A synagogue building repurposed as a church, a cemetery maintained by a society with no living members, a Hillel center at a university where Jewish students now number in the dozens — these are the map's historic layer.</p>
+      </div>
+      <div class="anecdote reveal">
+        <div class="anecdote-inner">
+          <div>
+            <div class="label">Baltimore · a case study in Jewish institutional history</div>
+            <h3>Why one city has 25 Jewish cemeteries</h3>
+            <p>Baltimore has a notably high number of Jewish cemeteries relative to its total mapped sites — 25 cemeteries among 119 sites in the database, a ratio higher than any other major city in the current dataset. The historical reasons for this pattern are documented in Baltimore's Jewish communal records, including the Jewish Cemetery Association of Baltimore's published surveys and the history of the city's immigrant congregations.</p>
+            <p>Jewish law requires that Jews be buried among other Jews in consecrated ground. As waves of Eastern European immigrants arrived in Baltimore from the 1880s onward, they did not build a single unified community — they built dozens of independent congregations, landsmanshaftn (hometown societies), and mutual aid organizations, each of which secured its own burial plot as one of its first acts. The Workmen's Circle, the Hebrew Young Men's Sick Relief Association, and scores of individual synagogues each claimed their own ground.</p>
+            <p>At the time, health regulations pushed cemeteries to the city's outer edges. As Baltimore expanded through the twentieth century, those once-rural plots were absorbed into residential neighbourhoods — leaving behind a scattered landscape of small, independent burial grounds that no consolidation ever unified.</p>
+            <p>Today the Jewish Cemetery Association of Baltimore oversees many of these sites. Their continued existence, mapped as 25 separate points in the Jewish Atlas database, records not just deaths but the particular way Jewish immigrant life organised itself in one American city.</p>
+            <p style="font-size:13px;color:rgba(255,255,255,.46);margin-top:20px">The historical account above draws on documented Baltimore Jewish communal history, including records of the Jewish Cemetery Association of Baltimore and published histories of the city's immigrant communities. It is not derived from the Jewish Atlas database itself.</p>
+          </div>
+          <div class="anecdote-stat">
+            <div class="big">25</div>
+            <div class="big-label">Jewish cemeteries<br>in Baltimore metro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Edges and isolation -->
+  <div class="shell visual-break">
+    <section class="spatial-panel reveal" aria-label="Abstract illustration of dispersed Jewish sites across the continental United States">
+      <span class="pulse p1"></span><span class="pulse p2"></span><span class="pulse p3"></span><span class="pulse p4"></span><span class="pulse p5"></span>
+      <div class="spatial-copy">
+        <div class="label">The edges of Jewish America</div>
+        <h3>A synagogue at the end of the map</h3>
+        <p>Congregation Beth Aaron in Billings, Montana. Jackson Hole Jewish Community Center in Wyoming. Temple Mizpah in Abilene, Texas. These places appear as single points on a map of a large country — communities that sustain themselves far from the densities of the Northeast.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="section">
+    <div class="shell">
+      <div class="reveal">
+        <div class="label">Geographic reach</div>
+        <h2>From Key West to Eureka</h2>
+        <p class="lead">Jewish life in America extends to the country's geographic extremities — not as outposts but as communities with their own histories and institutions.</p>
+      </div>
+      <div class="edges stagger reveal">
+        <div class="edge">
+          <div class="edge-dir">Southernmost</div>
+          <h4>B'Nai Zion Synagogue</h4>
+          <div class="city">Key West, Florida</div>
+          <div class="coord">24.55°N · 81.79°W</div>
+        </div>
+        <div class="edge">
+          <div class="edge-dir">Westernmost</div>
+          <h4>Temple Beth El</h4>
+          <div class="city">Eureka, California</div>
+          <div class="coord">40.78°N · 124.15°W</div>
+        </div>
+        <div class="edge">
+          <div class="edge-dir">Easternmost</div>
+          <h4>Hillel · University of Maine</h4>
+          <div class="city">Orono, Maine</div>
+          <div class="coord">44.90°N · 68.67°W</div>
+        </div>
+        <div class="edge">
+          <div class="edge-dir">Northernmost</div>
+          <h4>Congregation Beth Israel Cemetery</h4>
+          <div class="city">Bellingham, Washington</div>
+          <div class="coord">48.75°N · 122.44°W</div>
+        </div>
+      </div>
+
+      <div style="margin-top:56px" class="reveal">
+        <div class="label">The interior</div>
+        <p class="lead" style="margin-top:0">Jewish institutions exist in every part of the country — including cities far from the major concentrations of the Northeast, South Florida and the coasts.</p>
+        <p>Congregation Beth Aaron in Billings, Montana. Jackson Hole Jewish Community Center in Wyoming. Temple Mizpah in Abilene, Texas. Temple B'nai Israel in Amarillo. These are not the remnants of larger communities — many are active institutions serving small but continuous Jewish populations in cities that never made it onto the standard map of American Jewish life.</p>
+        <p>The database records their existence. How distant they are from neighbouring communities, and what that distance means for the people who sustain them, is a question the map invites but cannot answer alone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Mid-page map CTA -->
+  <section class="section map-invite-section">
+    <div class="shell map-invite reveal">
+      <div class="label">The interactive map</div>
+      <h2>Explore Jewish America on the map</h2>
+      <p>Search by city, state or type of site and discover active communities, synagogues, cemeteries, schools, kosher places and heritage sites across the country — from the New York metro to communities across the rural interior.</p>
+      <a class="map-link" href="https://jewishatlas.org/?country=United%20States">Explore the United States map<span class="arr" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <!-- 8. FAQ -->
+  <section class="section">
+    <div class="shell">
+      <div class="reveal">
+        <div class="label">Frequently asked questions</div>
+        <h2>On Jewish communities in America</h2>
+      </div>
+      <div class="faq reveal">
+        <details>
+          <summary>Where are the largest Jewish communities in the United States?<span class="plus" aria-hidden="true"></span></summary>
+          <div class="answer"><p>By number of mapped sites in the Jewish Atlas database, the New York metro area is by far the largest, with sites across the five boroughs, Long Island and the New Jersey suburbs accounting for roughly 31 percent of all US entries. South Florida, Los Angeles, Chicago, Philadelphia and Boston follow. Within New York, Brooklyn — particularly Borough Park, Williamsburg, Midwood and Crown Heights — holds an extraordinary concentration of Jewish institutions.</p></div>
+        </details>
+        <details>
+          <summary>Which cities have the most Jewish institutions?<span class="plus" aria-hidden="true"></span></summary>
+          <div class="answer"><p>New York City has 917 entries under the administrative city name alone in the database, with thousands more under borough and neighbourhood names. Lakewood, New Jersey — a city of around 120,000 — has 302 mapped sites, making it one of the most institutionally dense Jewish communities in the world relative to its size. Los Angeles, Chicago, Miami and Philadelphia follow among the largest centres outside New York.</p></div>
+        </details>
+        <details>
+          <summary>Are there historic Jewish communities in the American South?<span class="plus" aria-hidden="true"></span></summary>
+          <div class="answer"><p>Yes. Some of the oldest Jewish communities in America were established in Southern port cities — Savannah, Charleston and New Orleans had significant Sephardi communities by the eighteenth century. Across the South and Midwest, Jewish merchants and tradespeople established congregations in small cities during the nineteenth century. Many of these communities have contracted or disappeared, but their cemeteries, former synagogue buildings and institutional records often remain — and appear in the Jewish Atlas database as the historic layer of the map.</p></div>
+        </details>
+        <details>
+          <summary>Does the map include former synagogues and cemeteries?<span class="plus" aria-hidden="true"></span></summary>
+          <div class="answer"><p>Yes. The Jewish Atlas database includes active, historic and former sites. A building that functioned as a synagogue and was later converted to another use, or a cemetery established by a congregation that no longer exists, both appear on the map. This is what distinguishes the map from a directory of current Jewish life — it preserves the geographic record of communities that existed, not only those that exist today.</p></div>
+        </details>
+        <details>
+          <summary>Does Jewish Atlas include every Jewish site in the United States?<span class="plus" aria-hidden="true"></span></summary>
+          <div class="answer"><p>No. The database is an ongoing project and coverage varies by region and site type. Active synagogues in large metropolitan areas are well represented; smaller communities, historic sites in rural areas, and certain categories of institution are less complete. The figures on this page reflect the current state of the database and will change as more sites are documented. If you know of a site that should be included, you can add it directly through the map at <a href="https://jewishatlas.org" style="text-decoration:underline;text-decoration-color:var(--sand);text-underline-offset:3px">jewishatlas.org</a>.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Closing -->
+  <section class="closing">
+    <div class="shell reveal">
+      <p>Jewish America is not one place. It is a continent's worth of arrivals, dispersals and quiet continuities — most of them still visible, if you know where to look. <a href="https://jewishatlas.org">Explore the full map.</a></p>
+    </div>
+  </section>
+
+</main>
+</article>
+
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll reveals
+  var items=document.querySelectorAll('.reveal,.stagger');
+  if('IntersectionObserver' in window && !reduce){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+    },{threshold:.16,rootMargin:'0px 0px -8% 0px'});
+    items.forEach(function(el){io.observe(el);});
+  }else{
+    items.forEach(function(el){el.classList.add('in');});
+  }
+
+  // hero US map — illustrative markers on major Jewish centres
+  if(typeof L==='undefined') return;
+  var map=L.map('us-map',{zoomControl:false,attributionControl:true,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,tap:false}).setView([38.5,-97],4.0);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+  var R=5;
+  // NYC, LA, South Florida, Chicago, Philadelphia, Boston, Baltimore, Washington, Houston, Atlanta,
+  // Dallas, Denver, Seattle, Phoenix, Las Vegas, Detroit, Cleveland, St Louis, Minneapolis, San Francisco
+  var cities=[
+    [40.71,-74.00],[34.05,-118.25],[25.77,-80.19],[41.85,-87.65],[39.95,-75.16],
+    [42.36,-71.06],[39.29,-76.61],[38.90,-77.04],[29.76,-95.37],[33.75,-84.39],
+    [32.78,-96.80],[39.74,-104.98],[47.61,-122.33],[33.45,-112.07],[36.17,-115.14],
+    [42.33,-83.05],[41.50,-81.69],[38.63,-90.20],[44.98,-93.27],[37.77,-122.42]
+  ];
+  cities.forEach(function(c,i){
+    var m=L.circleMarker([c[0],c[1]],{radius:reduce?R:0,color:'#d7c49b',weight:1,fillColor:'#e6d6ae',fillOpacity:.72,opacity:.92,className:'marker-glow'}).addTo(map);
+    if(reduce) return;
+    setTimeout(function(){
+      var start=null,dur=600;
+      function grow(ts){
+        if(start===null) start=ts;
+        var t=Math.min((ts-start)/dur,1);
+        var e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+        m.setRadius(R*e);
+        if(t<1) requestAnimationFrame(grow);
+      }
+      requestAnimationFrame(grow);
+    },200+i*60);
+  });
+
+  // metro bars
+  var metros=[
+    {name:'New York metro',  total:2638,syn:1331,kosher:860},
+    {name:'South Florida',   total:560, syn:191, kosher:321},
+    {name:'Los Angeles',     total:403, syn:227, kosher:75},
+    {name:'Chicago',         total:252, syn:140, kosher:47},
+    {name:'Philadelphia',    total:189, syn:88,  kosher:24},
+    {name:'Boston',          total:185, syn:77,  kosher:63},
+    {name:'Baltimore',       total:119, syn:68,  kosher:0},
+    {name:'Washington DC',   total:116, syn:83,  kosher:1},
+  ];
+  var maxT=2638;
+  var container=document.getElementById('metro-bars');
+  if(!container) return;
+  metros.forEach(function(m,i){
+    var row=document.createElement('div');
+    row.className='metro-row';
+
+    var lbl=document.createElement('div');
+    lbl.className='metro-name'+(i===0?' top':'');
+    lbl.textContent=m.name;
+
+    var track=document.createElement('div');
+    track.className='metro-track';
+
+    var fSyn=document.createElement('div');
+    fSyn.className='metro-fill f1';
+    fSyn.style.cssText='position:absolute;left:0;height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.65,.2,1);border-radius:3px 0 0 3px;';
+    fSyn.dataset.w=Math.round(m.syn/maxT*100)+'%';
+
+    var fKos=document.createElement('div');
+    fKos.className='metro-fill f2';
+    fKos.style.cssText='position:absolute;height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.65,.2,1) .08s;border-radius:0;';
+    fKos.dataset.left=Math.round(m.syn/maxT*100)+'%';
+    fKos.dataset.w=Math.round(m.kosher/maxT*100)+'%';
+
+    track.style.position='relative';
+    track.appendChild(fSyn);
+    track.appendChild(fKos);
+
+    var num=document.createElement('div');
+    num.className='metro-num';
+    num.textContent=m.total.toLocaleString();
+
+    row.appendChild(lbl);
+    row.appendChild(track);
+    row.appendChild(num);
+    container.appendChild(row);
+
+    var sub=document.createElement('div');
+    sub.className='metro-sub';
+    sub.textContent=m.syn+' synagogues · '+m.kosher+' kosher';
+    container.appendChild(sub);
+  });
+
+  // animate bars when in view
+  var barsSection=container.closest('.reveal');
+  function animateBars(){
+    document.querySelectorAll('.metro-fill[data-w]').forEach(function(el){
+      el.style.width=el.dataset.w;
+      if(el.dataset.left) el.style.left=el.dataset.left;
+    });
+  }
+  if('IntersectionObserver' in window && !reduce){
+    var bo=new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){animateBars();bo.disconnect();}
+    },{threshold:.2});
+    if(barsSection) bo.observe(barsSection); else animateBars();
+  } else {
+    animateBars();
+  }
+});
+</script>
+</body>
+</html>
