@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jewish Communities in Latin America and the Caribbean — Geography, Heritage and Jewish Life</title>
+<meta name="description" content="A geographic portrait of Jewish life in Latin America and the Caribbean — 585 mapped sites from the dense communities of Buenos Aires and São Paulo to historic congregations, cemeteries and kosher establishments across the region.">
+<meta name="author" content="Jewish Atlas">
+<meta name="theme-color" content="#0c2018">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Spectral:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --pine:#0c2018;
+  --pine-2:#16382b;
+  --sage:#7f9387;
+  --lichen:#aeb9a8;
+  --sand:#d7c49b;
+  --paper:#f4f3ef;
+  --paper-deep:#e9ebe5;
+  --ink:#14241d;
+  --text:#425048;
+  --muted:#6f7d75;
+  --line:rgba(20,36,29,.11);
+  --glass:rgba(255,255,255,.10);
+  --white:#fff;
+  --serif:'Spectral',Georgia,'Times New Roman',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --radius-xl:42px;
+  --radius-lg:28px;
+  --shadow:0 28px 90px rgba(12,32,24,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  direction:ltr;
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit}
+h1,h2,h3,blockquote{font-family:var(--serif)}
+
+body::after{
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.04;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.js .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.65,.2,1),transform .9s cubic-bezier(.2,.65,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+.js .stagger>*{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.65,.2,1),transform .8s cubic-bezier(.2,.65,.2,1)}
+.js .stagger.in>*{opacity:1;transform:none}
+.js .stagger.in>*:nth-child(2){transition-delay:.08s}
+.js .stagger.in>*:nth-child(3){transition-delay:.16s}
+.js .stagger.in>*:nth-child(4){transition-delay:.24s}
+.js .stagger.in>*:nth-child(5){transition-delay:.32s}
+
+/* hero */
+.hero{position:relative;min-height:100svh;background:var(--pine);overflow:hidden;display:flex;align-items:flex-end}
+#sa-map-hero{position:absolute;inset:-2%;z-index:0;filter:saturate(.55) contrast(.92) brightness(.62);width:104%;height:104%}
+.leaflet-control-zoom{display:none}.leaflet-control-attribution{font-size:8px!important;opacity:.32;direction:ltr}
+.marker-glow{filter:drop-shadow(0 0 10px rgba(215,196,155,.68))}
+.hero-shade{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 30% 28%,rgba(215,196,155,.15),transparent 28rem),
+    radial-gradient(circle at 72% 64%,rgba(121,150,134,.12),transparent 22rem),
+    linear-gradient(180deg,rgba(12,32,24,.06) 0%,rgba(12,32,24,.28) 44%,rgba(12,32,24,.97) 100%);
+}
+.hero-contours{
+  position:absolute;inset:0;z-index:2;opacity:.18;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='280' viewBox='0 0 360 280'%3E%3Cg fill='none' stroke='%23d7c49b' stroke-opacity='.34' stroke-width='.7'%3E%3Cpath d='M-20 50c55-45 102 18 150-24s94-16 145 16 88 4 120-15'/%3E%3Cpath d='M-30 86c62-41 106 18 160-20s92-19 143 9 92 14 129-11'/%3E%3Cpath d='M-25 123c58-35 108 24 164-16s94-15 141 8 90 19 124-4'/%3E%3Cpath d='M-35 163c64-38 112 19 168-14s90-14 142 10 92 18 132-2'/%3E%3Cpath d='M-28 205c57-36 109 17 165-12s92-15 143 7 90 20 126 3'/%3E%3Cpath d='M-20 246c52-31 105 16 161-11s96-13 144 8 86 18 119 6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-inner{
+  position:relative;z-index:4;
+  width:min(1280px,100%);margin:0 auto;
+  padding:11rem 4rem 5.5rem;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.32fr);
+  gap:5rem;align-items:end;
+}
+.eyebrow{display:flex;align-items:center;gap:12px;color:var(--sand);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;margin-bottom:22px}
+.eyebrow::before{content:"";width:40px;height:1px;background:currentColor}
+.eyebrow a{color:inherit;text-decoration:none;opacity:.72;transition:opacity .2s}
+.eyebrow a:hover{opacity:1}
+h1{color:var(--white);font-size:clamp(38px,6.2vw,96px);line-height:1.0;letter-spacing:-.018em;font-weight:500}
+.hero-lead{max-width:720px;margin-top:30px;color:rgba(255,255,255,.74);font-size:clamp(18px,1.9vw,22px);font-weight:300;line-height:1.8}
+.hero-illus{margin-top:18px;color:rgba(255,255,255,.42);font-size:13px;font-weight:300;max-width:560px}
+.hero-aside{
+  margin-bottom:6px;padding:26px 28px;
+  border:1px solid rgba(255,255,255,.14);border-radius:24px;
+  background:rgba(8,24,17,.46);backdrop-filter:blur(16px);
+  color:rgba(255,255,255,.66);font-size:14px;line-height:1.7;
+}
+.hero-aside strong{display:block;font-family:var(--serif);color:var(--white);font-size:18px;font-weight:500;margin-bottom:8px}
+.scroll-mark{
+  position:absolute;right:38px;bottom:30px;z-index:4;
+  color:rgba(255,255,255,.38);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  writing-mode:vertical-rl;display:flex;align-items:center;gap:12px;
+  animation:floaty 2.6s ease-in-out infinite;
+}
+.scroll-mark::after{content:"";width:1px;height:44px;background:rgba(255,255,255,.28)}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+.hero-inner .eyebrow,.hero-inner h1,.hero-inner .hero-lead,.hero-inner .hero-aside{opacity:0;transform:translateY(24px);animation:rise .95s cubic-bezier(.2,.65,.2,1) forwards}
+.hero-inner h1{animation-delay:.12s}
+.hero-inner .hero-lead{animation-delay:.26s}
+.hero-inner .hero-aside{animation-delay:.4s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+main{overflow:hidden}
+.shell{width:min(1180px,100%);margin:0 auto;padding:0 32px}
+.section{padding:120px 0;border-bottom:1px solid var(--line)}
+.section:last-child{border-bottom:0}
+.section-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:88px;align-items:start}
+.label{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#70857a;margin-bottom:18px}
+h2{font-size:clamp(36px,4.6vw,64px);line-height:1.08;letter-spacing:-.012em;font-weight:500;max-width:900px}
+.lead{font-size:21px;line-height:1.85;font-weight:300;color:#33453d;max-width:810px;margin-top:24px}
+p{font-size:17px;font-weight:300;color:var(--text);max-width:760px}
+p+p{margin-top:18px}
+
+.quote-panel{
+  position:sticky;top:36px;min-height:390px;
+  border-radius:var(--radius-xl);
+  background:linear-gradient(160deg,#17382b,#0c2018);
+  color:var(--white);padding:44px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;box-shadow:var(--shadow);
+}
+.quote-panel::before{
+  content:"";position:absolute;inset:-15%;opacity:.28;
+  background:
+    radial-gradient(circle at 74% 22%,rgba(215,196,155,.34),transparent 12rem),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23d7c49b' stroke-opacity='.35' stroke-width='.65'%3E%3Cpath d='M-30 34c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 74c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 114c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 154c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 194c48-32 79 30 125-7s76-8 126-36'/%3E%3C/g%3E%3C/svg%3E");
+}
+.quote-panel blockquote{position:relative;z-index:1;font-size:27px;line-height:1.5;font-weight:400;font-style:italic;color:rgba(255,255,255,.92)}
+.quote-panel small{position:relative;z-index:1;margin-top:26px;color:var(--sand);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-family:var(--sans)}
+
+/* centres grid */
+.centres{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:50px}
+.centre{
+  position:relative;padding:30px 30px 26px;border:1px solid var(--line);border-radius:26px;
+  background:rgba(255,255,255,.55);transition:transform .25s ease,box-shadow .25s ease,background .25s ease;
+}
+.centre:hover{transform:translateY(-5px);background:#fff;box-shadow:0 22px 56px rgba(12,32,24,.08)}
+.centre h3{font-size:22px;font-weight:500;margin-bottom:10px;letter-spacing:-.005em}
+.centre p{font-size:15px;color:var(--muted);max-width:none;line-height:1.7}
+.centre-count{font-family:var(--sans);font-size:11px;letter-spacing:.12em;color:var(--sage);margin-bottom:14px;text-transform:uppercase}
+
+/* data snapshot */
+.snapshot{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:50px}
+.snap-stat{padding:28px 24px;border:1px solid var(--line);border-radius:26px;background:rgba(255,255,255,.55)}
+.snap-stat .num{font-family:var(--serif);font-size:clamp(34px,4vw,52px);font-weight:500;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.snap-stat .num-label{margin-top:8px;font-size:13px;color:var(--muted);font-weight:400}
+
+/* country bars */
+.metro-list{margin-top:44px}
+.metro-row{display:grid;grid-template-columns:170px 1fr 54px;align-items:center;gap:14px;margin-bottom:18px}
+.metro-name{font-size:14px;color:var(--ink);text-align:right;font-weight:400}
+.metro-name.top{font-weight:500}
+.metro-track{height:6px;background:var(--paper-deep);border-radius:3px;overflow:hidden;position:relative}
+.metro-fill{height:100%;border-radius:3px;width:0;transition:width 1.1s cubic-bezier(.2,.65,.2,1)}
+.metro-fill.f1{background:var(--pine)}
+.metro-fill.f2{background:var(--sage)}
+.metro-fill.f3{background:var(--lichen)}
+.metro-sub{grid-column:2;font-size:12px;color:var(--muted);margin-top:-10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.metro-num{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* visual break / spatial panel */
+.visual-break{padding:0 0 120px}
+.spatial-panel{
+  position:relative;min-height:480px;border-radius:var(--radius-xl);overflow:hidden;
+  background:linear-gradient(135deg,#dfe4dc,#c8d2c7 45%,#7f9588);
+  box-shadow:var(--shadow);isolation:isolate;
+}
+.spatial-panel::before{
+  content:"";position:absolute;inset:0;opacity:.72;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='320' viewBox='0 0 420 320'%3E%3Cg fill='none' stroke='%2316382b' stroke-opacity='.22' stroke-width='.8'%3E%3Cpath d='M-25 42c64-46 118 24 177-20s106-24 163 10 101 14 143-14'/%3E%3Cpath d='M-28 82c67-42 120 24 181-15s105-21 160 8 99 20 145-8'/%3E%3Cpath d='M-24 125c63-40 119 22 180-14s102-20 160 10 99 16 145-7'/%3E%3Cpath d='M-28 170c67-39 122 20 181-12s104-20 161 7 97 20 143 0'/%3E%3Cpath d='M-23 218c63-36 118 20 179-10s105-18 161 8 99 17 144 2'/%3E%3Cpath d='M-25 267c64-36 117 18 177-9s108-16 163 8 100 18 142 6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.spatial-panel::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.70),transparent 19rem),linear-gradient(270deg,rgba(12,32,24,.10),transparent 50%);
+}
+.pulse{position:absolute;z-index:2;border-radius:50%;background:#d7c49b;box-shadow:0 0 0 0 rgba(215,196,155,.48);animation:pulse 3.4s infinite}
+.p1{width:13px;height:13px;left:52%;top:52%}
+.p2{width:9px;height:9px;left:46%;top:38%;animation-delay:.8s}
+.p3{width:14px;height:14px;left:58%;top:44%;animation-delay:1.5s}
+.p4{width:8px;height:8px;left:40%;top:58%;animation-delay:2.1s}
+.p5{width:11px;height:11px;left:35%;top:48%;animation-delay:1.1s}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(215,196,155,.48)}70%{box-shadow:0 0 0 26px rgba(215,196,155,0)}100%{box-shadow:0 0 0 0 rgba(215,196,155,0)}}
+.spatial-copy{position:absolute;z-index:3;left:54px;bottom:50px;max-width:580px;padding:34px;border-radius:28px;background:rgba(244,243,239,.82);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.52)}
+.spatial-copy .label{color:#53685d}
+.spatial-copy h3{font-size:clamp(26px,3.2vw,40px);line-height:1.12;font-weight:500;letter-spacing:-.01em}
+.spatial-copy p{margin-top:14px;color:#405047;font-size:16px}
+
+/* anecdote */
+.anecdote{
+  position:relative;margin-top:56px;padding:52px 56px;
+  border-radius:var(--radius-xl);overflow:hidden;
+  background:linear-gradient(160deg,#17382b,#0c2018);
+  color:var(--white);box-shadow:var(--shadow);
+}
+.anecdote::before{
+  content:"";position:absolute;inset:-10%;opacity:.22;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23d7c49b' stroke-opacity='.4' stroke-width='.65'%3E%3Cpath d='M-30 34c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 74c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 114c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 154c48-32 79 30 125-7s76-8 126-36'/%3E%3Cpath d='M-30 194c48-32 79 30 125-7s76-8 126-36'/%3E%3C/g%3E%3C/svg%3E");
+}
+.anecdote-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:60px;align-items:center}
+.anecdote .label{color:var(--sand);margin-bottom:16px}
+.anecdote h3{font-family:var(--serif);font-size:clamp(26px,2.8vw,36px);font-weight:500;line-height:1.15;color:var(--white);margin-bottom:22px}
+.anecdote p{font-size:16px;font-weight:300;color:rgba(255,255,255,.78);line-height:1.8;max-width:none}
+.anecdote p+p{margin-top:16px}
+.anecdote-stat{text-align:center}
+.anecdote-stat .big{font-family:var(--serif);font-size:clamp(56px,6vw,82px);font-weight:500;color:var(--sand);line-height:1}
+.anecdote-stat .big-label{margin-top:10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.52)}
+
+/* edges */
+.edges{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:46px}
+.edge{padding:26px 22px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.55)}
+.edge-dir{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin-bottom:12px}
+.edge h4{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.25}
+.edge .city{font-size:14px;color:var(--muted)}
+.edge .coord{margin-top:8px;font-size:12px;color:var(--lichen);font-variant-numeric:tabular-nums}
+
+/* map invite */
+.map-invite{text-align:center;max-width:760px;margin:0 auto}
+.map-invite .label{margin-inline:auto}
+.map-invite h2{margin-inline:auto}
+.map-invite p{margin:18px auto 0;color:#3a4c43}
+.map-link{
+  display:inline-flex;align-items:center;gap:12px;margin-top:34px;
+  font-family:var(--sans);font-size:16px;font-weight:500;color:var(--white);text-decoration:none;
+  padding:16px 30px;border-radius:99px;background:var(--pine);
+  transition:gap .25s ease,background .25s ease,transform .25s ease;
+}
+.map-link .arr{font-size:19px;color:var(--sand);transition:transform .25s ease}
+.map-link:hover{gap:18px;background:var(--pine-2);transform:translateY(-2px)}
+.map-link:hover .arr{transform:translateX(5px)}
+
+/* data note */
+.data-note{margin-top:50px;padding:28px 32px;border-left:3px solid var(--sand);background:rgba(215,196,155,.08);border-radius:0 18px 18px 0}
+.data-note p{font-size:14px;color:var(--muted);max-width:none}
+
+/* FAQ */
+.faq{margin-top:46px;max-width:880px}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{
+  list-style:none;cursor:pointer;padding:24px 0;
+  font-family:var(--serif);font-size:clamp(19px,2.2vw,25px);font-weight:500;color:var(--ink);
+  display:flex;align-items:center;justify-content:space-between;gap:20px;letter-spacing:-.005em;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .plus{flex:none;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;position:relative;transition:background .25s ease,border-color .25s ease}
+.faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;background:var(--pine-2);transition:transform .25s ease,opacity .25s ease}
+.faq summary .plus::before{width:12px;height:1.5px}
+.faq summary .plus::after{width:1.5px;height:12px}
+.faq details[open] summary .plus{background:var(--pine);border-color:var(--pine)}
+.faq details[open] summary .plus::before,.faq details[open] summary .plus::after{background:var(--sand)}
+.faq details[open] summary .plus::after{transform:rotate(90deg);opacity:0}
+.faq .answer{padding:0 0 26px}
+.faq .answer p{font-size:16px;color:var(--text);line-height:1.75;max-width:820px}
+
+/* closing */
+.closing{padding:120px 0 150px;text-align:center}
+.closing p{font-family:var(--serif);font-size:clamp(22px,2.8vw,33px);line-height:1.5;color:#2f4138;max-width:840px;margin:0 auto;font-weight:400}
+.closing a{text-decoration:underline;text-decoration-color:var(--sand);text-underline-offset:4px}
+
+
+@media(max-width:920px){
+  .hero-inner,.section-grid{grid-template-columns:1fr}
+  .anecdote-inner{grid-template-columns:1fr;gap:32px}
+  .hero-inner{gap:2rem;padding:9rem 28px 3.5rem}
+  .hero-aside{max-width:520px}
+  .centres,.snapshot,.edges{grid-template-columns:1fr}
+  .quote-panel{position:relative;top:auto}
+  .scroll-mark{display:none}
+  .anecdote{padding:36px 32px}
+  .anecdote-stat{text-align:left;padding-top:0;border-top:1px solid rgba(255,255,255,.12);padding-top:28px}
+  .metro-row{grid-template-columns:130px 1fr 44px}
+  .metro-name{font-size:12px}
+}
+@media(max-width:620px){
+  .hero{min-height:92svh}.hero-inner{padding:7rem 20px 2.4rem}.hero-aside{display:none}
+  h1{font-size:48px}.hero-lead{font-size:17px}.shell{padding:0 20px}.section{padding:78px 0}
+  h2{font-size:36px}.lead{font-size:18px}
+  .quote-panel{min-height:310px;padding:30px}.quote-panel blockquote{font-size:22px}
+  .visual-break{padding-bottom:78px}.spatial-panel{min-height:440px;border-radius:28px}
+  .spatial-copy{left:20px;right:20px;bottom:20px;padding:26px}
+  .closing{padding:80px 0 110px}
+  .snapshot{grid-template-columns:1fr 1fr}
+  .edges{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .js .reveal,.js .stagger>*{opacity:1!important;transform:none!important}
+  .hero-inner .eyebrow,.hero-inner h1,.hero-inner .hero-lead,.hero-inner .hero-aside{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div id="sa-map-hero"></div>
+  <div class="hero-shade"></div>
+  <div class="hero-contours"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow"><a href="https://jewishatlas.org">Jewish Communities Around the World</a></div>
+      <h1>Jewish Communities in Latin America and the Caribbean</h1>
+      <p class="hero-lead">From the dense Jewish institutional landscapes of Buenos Aires and São Paulo to historic congregations, cemeteries and kosher establishments across Latin America and the Caribbean — 585 mapped sites trace a region shaped by migration, refuge and persistence.</p>
+      <p class="hero-illus">The background map is illustrative; the full interactive map is available further down the page.</p>
+    </div>
+    <div class="hero-aside">
+      <strong>The region’s largest Jewish population centres</strong>
+      Argentina and Brazil together account for about 60% of the mapped records in this regional dataset. Argentina has the largest Jewish population in Latin America, while Brazil has the region’s second-largest community.
+    </div>
+  </div>
+  <div class="scroll-mark">Scroll</div>
+</header>
+
+<main>
+
+<!-- MIGRATION HISTORY -->
+<section class="section">
+  <div class="shell">
+    <div class="section-grid">
+      <div>
+        <div class="label reveal">How Jewish Latin America and the Caribbean was built</div>
+        <h2 class="reveal">Migration shaped every community on the map</h2>
+        <p class="lead reveal">Jewish life in Latin America and the Caribbean is not a single story. It is a series of arrivals, each leaving its own geographic footprint — and a region that absorbed them all.</p>
+        <p class="reveal">Conversos and New Christians reached Spanish and Portuguese America during the sixteenth century, although openly organized Jewish communities generally developed later, especially in territories under Dutch or English rule. Suriname and the Caribbean island of Curaçao developed some of the oldest organized Jewish communities in the Western Hemisphere during the seventeenth century. A Sephardi settlement was established near Cassipora Creek in the 1650s. Its cemetery contains gravestones dating from 1666. Documentary evidence indicates that the Cassipora community maintained a synagogue, although its precise location has not been conclusively identified archaeologically. In the 1680s, part of the community moved to Jodensavanne on the Suriname River, where the brick synagogue Beraha VeSalom was consecrated in 1685. Cassipora Creek Cemetery is among the oldest surviving Jewish burial grounds in the Americas and forms part of the UNESCO-listed Jodensavanne Archaeological Site.</p>
+        <p class="reveal">The great transformation came between 1880 and 1930, when mass immigration from Eastern Europe — driven by pogroms, legal discrimination, economic hardship and political instability — reshaped the region's Jewish geography. Argentina received the largest share, including a remarkable agricultural experiment: the Jewish Colonization Association, founded by Baron Maurice de Hirsch, established rural colonies across the Argentine provinces of Entre Ríos, Santa Fe, Buenos Aires and La Pampa, settling Jewish immigrant families on agricultural land. Their synagogues and cemeteries, scattered across agricultural towns far from any urban centre, still appear on the map.</p>
+        <p class="reveal">Brazil's Jewish community grew more gradually, concentrated in São Paulo and Rio de Janeiro but also extending into smaller cities in Minas Gerais, Rio Grande do Sul and the interior. Chile developed a smaller community, concentrated primarily in Santiago, with smaller historical communities elsewhere. The current Jewish Atlas dataset contains several records in southern Chile, including Temuco and Concepción, although this pattern should not be interpreted as a measure of present-day Jewish population.</p>
+        <p class="reveal">The 1930s and 1940s brought a different kind of arrival: refugees from Nazi Europe, including communities of German-speaking Jews who established distinct congregations across the region. Some congregations founded or expanded by Central European refugees incorporated architectural and liturgical influences associated with their communities of origin.</p>
+      </div>
+      <div>
+        <div class="quote-panel reveal">
+          <blockquote>The colonies were conceived not simply as places of refuge, but as permanent agricultural communities.</blockquote>
+          <small>Jewish agricultural settlement in Argentina</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA SECTION -->
+<section class="section">
+  <div class="shell">
+    <div class="label reveal">Jewish Atlas data · Latin America and the Caribbean</div>
+    <h2 class="reveal">What 585 sites reveal</h2>
+    <p class="lead reveal">The Jewish Atlas database maps Jewish institutions across Latin America and the Caribbean — active and historic synagogues, cemeteries and kosher establishments. The figures below are drawn from coordinate-verified records.</p>
+
+    <div class="snapshot stagger">
+      <div class="snap-stat">
+        <div class="num">438</div>
+        <div class="num-label">Synagogues mapped in dataset</div>
+      </div>
+      <div class="snap-stat">
+        <div class="num">81</div>
+        <div class="num-label">Kosher establishments in dataset</div>
+      </div>
+      <div class="snap-stat">
+        <div class="num">66</div>
+        <div class="num-label">Cemeteries mapped in dataset</div>
+      </div>
+      <div class="snap-stat">
+        <div class="num">585</div>
+        <div class="num-label">Total mapped sites in dataset</div>
+      </div>
+      <div class="snap-stat">
+        <div class="num">15</div>
+        <div class="num-label">Countries and territories represented</div>
+      </div>
+      <div class="snap-stat">
+        <div class="num">19</div>
+        <div class="num-label">Sites with no other Jewish site within 100 km</div>
+      </div>
+    </div>
+
+    <div class="data-note reveal" style="margin-top:36px">
+      <p>Counts are based on Jewish Atlas records extracted on June 9, 2026. They represent documented map records rather than a complete census. Active, former and historic sites are included where identified. Coverage varies by country and site type, and smaller countries are less completely represented. Panama and Caribbean territories are included in the regional total. Variant place names and possible duplicate records were reviewed during aggregation, but totals remain working counts rather than authoritative population or institutional censuses.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MAJOR CENTRES -->
+<section class="section">
+  <div class="shell">
+    <div class="section-grid">
+      <div>
+        <div class="label reveal">Major centres of Jewish life</div>
+        <h2 class="reveal">Six centres, six different stories</h2>
+        <p class="lead reveal">The largest Jewish communities in Latin America and the Caribbean are not simply bigger versions of each other. Each reflects a distinct pattern of settlement, migration and institutional character.</p>
+
+        <div class="centres stagger">
+          <div class="centre">
+            <div class="centre-count">Argentina · 197 sites</div>
+            <h3>Buenos Aires</h3>
+            <p>The largest Jewish community in Latin America, and one of the largest in the world. The current Jewish Atlas dataset contains 84 records in the metropolitan area, including 27 records classified as synagogues and 23 as kosher establishments. Once and Villa Crespo are among the historic centres of Argentine Jewish life. Balvanera, the old immigrant neighbourhood, still bears the institutional density of the great immigration era.</p>
+          </div>
+          <div class="centre">
+            <div class="centre-count">Brazil · 165+ sites</div>
+            <h3>São Paulo</h3>
+            <p>The largest Jewish community in Brazil, with 56 mapped sites in the city and 83 in the metro area. São Paulo's Jewish geography developed through several neighbourhoods. Early Eastern European immigrant life was particularly associated with Bom Retiro, while Higienópolis later became a major residential and institutional centre; subsequent growth extended toward districts such as Jardins, Moema and Brooklin. The community sustains a rich network of synagogues across Reform, Conservative and Orthodox streams.</p>
+          </div>
+          <div class="centre">
+            <div class="centre-count">Uruguay · 31 sites</div>
+            <h3>Montevideo</h3>
+            <p>The great majority of Uruguay's Jewish population lives in its capital. Montevideo's 18 mapped synagogues reflect a community that has preserved significant religious infrastructure even as its population contracted through emigration. Beyond synagogues, the community's institutional footprint has historically included cemeteries, the Comunidad Israelita del Uruguay, and Jewish schools — the database's current coverage reflects the synagogue layer most fully.</p>
+          </div>
+          <div class="centre">
+            <div class="centre-count">Chile · 47 sites</div>
+            <h3>Santiago and southern Chile</h3>
+            <p>Chilean Jewish life is concentrated predominantly in Santiago, which is home to the community's major institutions. The database shows relatively high site counts for some southern cities; this may partly reflect how contributor data was entered, though southern Chile did have genuine early-twentieth-century Jewish settlement. Real-world Jewish community life in Chile is overwhelmingly centred on the capital today. The south did see early twentieth-century settlement by Sephardi immigrants, most notably from Monastir (North Macedonia), who built congregations in cities like Temuco.</p>
+          </div>
+          <div class="centre">
+            <div class="centre-count">Panama · 52 sites — Central America</div>
+            <h3>Panama City</h3>
+            <p>Panama is geographically in Central America and is included here as part of the wider Latin American regional scope. Panama is home to the largest Jewish community in Central America and maintains an extensive network of synagogues, schools and kosher services. Panama City is home to major congregations including Shevet Ahim, Beth El and Kol Shearith Israel.</p>
+          </div>
+          <div class="centre">
+            <div class="centre-count">Brazil · Rio de Janeiro</div>
+            <h3>Rio de Janeiro</h3>
+            <p>The second city of Brazilian Jewish life, with 16 mapped sites including 14 synagogues and 2 cemeteries in the city, and 23 in the metro area. The community today has important concentrations in the South Zone, including Ipanema and Leblon, as well as in Barra da Tijuca in the West Zone, following earlier settlement in neighbourhoods of the North Zone and Centro. The city has several long-established Jewish congregations and cultural institutions.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="metro-list reveal">
+          <div class="label" style="margin-bottom:24px">Sites by country</div>
+          <div class="metro-row">
+            <div class="metro-name top">Argentina</div>
+            <div class="metro-track"><div class="metro-fill f1" data-pct="100"></div></div>
+            <div class="metro-num">197</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name top">Brazil</div>
+            <div class="metro-track"><div class="metro-fill f1" data-pct="84"></div></div>
+            <div class="metro-num">165</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Panama <span style="font-size:10px;color:var(--lichen)">(C. America)</span></div>
+            <div class="metro-track"><div class="metro-fill f2" data-pct="26"></div></div>
+            <div class="metro-num">52</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Chile</div>
+            <div class="metro-track"><div class="metro-fill f2" data-pct="24"></div></div>
+            <div class="metro-num">47</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Uruguay</div>
+            <div class="metro-track"><div class="metro-fill f2" data-pct="16"></div></div>
+            <div class="metro-num">31</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Colombia</div>
+            <div class="metro-track"><div class="metro-fill f3" data-pct="8"></div></div>
+            <div class="metro-num">16</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Bolivia</div>
+            <div class="metro-track"><div class="metro-fill f3" data-pct="6"></div></div>
+            <div class="metro-num">11</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Venezuela</div>
+            <div class="metro-track"><div class="metro-fill f3" data-pct="6"></div></div>
+            <div class="metro-num">11</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Perú</div>
+            <div class="metro-track"><div class="metro-fill f3" data-pct="3"></div></div>
+            <div class="metro-num">5</div>
+          </div>
+          <div class="metro-row">
+            <div class="metro-name">Ecuador</div>
+            <div class="metro-track"><div class="metro-fill f3" data-pct="3"></div></div>
+            <div class="metro-num">5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPATIAL BREAK -->
+<div class="visual-break">
+  <div class="shell">
+    <div class="spatial-panel reveal">
+      <div class="pulse p1"></div>
+      <div class="pulse p2"></div>
+      <div class="pulse p3"></div>
+      <div class="pulse p4"></div>
+      <div class="pulse p5"></div>
+      <div class="spatial-copy">
+        <div class="label">Three geographic patterns</div>
+        <h3>What the map reveals</h3>
+        <p>Argentina and Brazil together account for about 60% of the mapped records in this regional dataset. The database also includes Panama, home to the largest Jewish community in Central America and an extensive kosher infrastructure relative to the size of its population. Chile's Jewish life is concentrated overwhelmingly in Santiago, while the database reflects early-twentieth-century Sephardi settlement in southern cities like Temuco.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANECDOTE 1: JODENSAVANNE -->
+<section class="section">
+  <div class="shell">
+    <div class="label reveal">A case study in Jewish antiquity</div>
+        <h2 class="reveal">One of the oldest surviving Jewish landscapes in the Americas</h2>
+        <p class="lead reveal">Suriname's four mapped sites belie the extraordinary depth of their history. The Jewish community of Suriname is among the oldest in the Americas — and one of its most singular.</p>
+        <p class="reveal">Sephardi Jews began settling Suriname in the mid-seventeenth century, many of them merchants from the Netherlands with roots in the Iberian Peninsula. Some settlers had previously lived in Dutch Brazil or belonged to Sephardi networks connecting Amsterdam, the Caribbean and the Guianas. A Sephardi settlement developed near Cassipora Creek in the 1650s. Its cemetery contains gravestones dating from 1666, and historical evidence indicates that the community also maintained a synagogue in the area. In the 1680s the community moved to a hilltop overlooking the Suriname River, founding the agricultural settlement of Jodensavanne. In 1685 they consecrated a brick synagogue there — Beraha VeSalom ("Blessing and Peace") — which became one of the earliest synagogues of major architectural significance in the Americas. The settlement's plantation economy depended on the labour of enslaved Africans; Jodensavanne was both a place of Jewish communal life and a plantation society built on slavery.</p>
+        <p class="reveal">Today the synagogue at Jodensavanne is a ruin, reclaimed by the jungle. Cassipora Creek Cemetery — one of the oldest surviving Jewish burial grounds in the Americas — forms part of the serial UNESCO World Heritage property “Jodensavanne Archaeological Site: Jodensavanne Settlement and Cassipora Creek Cemetery,” inscribed in 2023. The active synagogue in Suriname today, Neve Shalom in Paramaribo, occupies a building completed in 1842 on a site first used for Jewish worship in the 1720s. The Jewish Atlas records four mapped sites in Suriname; together they represent different stages in more than 350 years of Surinamese Jewish history.</p>
+
+    <div class="anecdote reveal">
+          <div class="anecdote-inner">
+            <div>
+              <div class="label">Suriname · Jewish antiquity</div>
+              <h3>Jodensavanne: a synagogue in the jungle</h3>
+              <p>A Sephardi settlement developed near Cassipora Creek in Suriname in the 1650s. Historical evidence indicates that the community maintained a synagogue there, while the surviving cemetery contains gravestones dating from 1666. Two decades later, after moving to a hilltop on the Suriname River, they consecrated a grand brick synagogue at Jodensavanne in 1685. The brick synagogue at Jodensavanne survives as an archaeological ruin. The Jodensavanne settlement operated as a plantation community; its agricultural economy depended on the labour of enslaved Africans, and this context is part of the site's history. At Cassipora, the cemetery remains visible, while the precise location and remains of the earlier settlement and synagogue are still under investigation. A Jewish congregation continues to meet in Paramaribo today.</p>
+              <p>The four mapped Jewish sites in Suriname represent different stages in more than 350 years of Jewish history. The Jodensavanne settlement and Cassipora Creek Cemetery were inscribed together as a serial UNESCO World Heritage property in 2023.</p>
+            </div>
+            <div class="anecdote-stat">
+              <div class="big">1650s</div>
+              <div class="big-label">Cassipora settlement established</div>
+            </div>
+          </div>
+        </div>
+  </div>
+</section>
+
+<!-- ANECDOTE 2: JEWISH COLONIES -->
+<section class="section">
+  <div class="shell">
+    <div class="label reveal">A case study in agricultural settlement</div>
+        <h2 class="reveal">The Jewish farmers of the Argentine pampa</h2>
+        <p class="lead reveal">The map of Entre Ríos province contains dozens of synagogues in small agricultural towns — the surviving geography of one of the most significant organized Jewish agricultural-settlement projects of the modern period.</p>
+        <p class="reveal">Beginning in 1891 and expanding particularly during the early twentieth century, the Jewish Colonization Association (JCA), founded by the European Jewish philanthropist Baron Maurice de Hirsch, purchased large tracts of Argentine land and settled Eastern European Jewish immigrants on agricultural colonies across the provinces of Entre Ríos, Santa Fe, Buenos Aires and La Pampa. The project’s advocates sought to replace a contemporary stereotype of the economically precarious urban “Luftmensch” with an ideal of the self-sufficient agricultural settler.</p>
+        <p class="reveal">The colonies bore names associated with Jewish history and the Hirsch family, including Moisés Ville, Clara, Lucienville and Mauricio. Many established synagogues, cemeteries, cooperatives and Jewish schools, often with instruction or cultural activity in Yiddish. At their peak in the 1920s, the JCA colonies held tens of thousands of people who spoke Yiddish, read Yiddish newspapers, and sent their children to Jewish schools in the middle of the Argentine countryside.</p>
+        <p class="reveal">During the twentieth century, many descendants moved to Buenos Aires and other Argentine cities, while some emigrated abroad, including to Israel. The synagogues and cemeteries remain — many now maintained by descendants' societies with no resident Jewish population — and they appear on the Jewish Atlas map as the most dispersed layer of Argentine Jewish geography.</p>
+
+    <div class="anecdote reveal">
+          <div class="anecdote-inner">
+            <div>
+              <div class="label">Santa Fe, Argentina · agricultural colonies</div>
+              <h3>Moisés Ville: a foundational Jewish agricultural colony</h3>
+              <p>Founded in 1889, Moisés Ville in Santa Fe province became the first enduring Jewish agricultural colony in Argentina. It was settled by around 130 families from the Podolia region of the Russian Empire, now part of Ukraine, who arrived aboard the SS Weser and discovered that the land contracted for them was not being made available under the agreed terms. Stranded without adequate housing or food, they endured disease, hunger and severe deprivation, which caused the deaths of many children during the settlers’ first months. Those who stayed built a community that at its height held thousands of people, with a synagogue, a school, a library and a Yiddish theatre.</p>
+              <p>Today Moisés Ville preserves a Jewish museum, historic synagogues and a maintained cemetery. In Argentine Jewish memory, it has often been described as a “Jerusalem of the pampa.”</p>
+            </div>
+            <div class="anecdote-stat">
+              <div class="big">1891</div>
+              <div class="big-label">Jewish Colonization Association founded</div>
+            </div>
+          </div>
+        </div>
+  </div>
+</section>
+
+<!-- EDGES OF JEWISH LATIN AMERICA AND THE CARIBBEAN -->
+<section class="section">
+  <div class="shell">
+    <div class="label reveal">Geographic reach</div>
+    <h2 class="reveal">From the Caribbean to Patagonia</h2>
+    <p class="lead reveal">Jewish life across Latin America and the Caribbean extends from island communities in the north to Patagonia in the south. The sites below mark the geographic extremes of the current Jewish Atlas dataset.</p>
+
+    <div class="edges stagger">
+      <div class="edge">
+        <div class="edge-dir">Northernmost record in dataset</div>
+        <h4>Chabad Aruba</h4>
+        <div class="city">Noord, Aruba</div>
+        <div class="coord">12.55°N · 70.01°W</div>
+      </div>
+      <div class="edge">
+        <div class="edge-dir">Southernmost record in dataset</div>
+        <h4>Jabad Bariloche</h4>
+        <div class="city">San Carlos de Bariloche, Argentina</div>
+        <div class="coord">41.14°S · 71.31°W</div>
+      </div>
+      <div class="edge">
+        <div class="edge-dir">Westernmost record in dataset</div>
+        <h4>Pita-Pan</h4>
+        <div class="city">Rodeo Viejo, Panama</div>
+        <div class="coord">8.07°N · 81.30°W</div>
+      </div>
+      <div class="edge">
+        <div class="edge-dir">Easternmost record in dataset</div>
+        <h4>Sinagoga Kahal-Zur-Israel</h4>
+        <div class="city">Recife, Brazil</div>
+        <div class="coord">8.06°S · 34.87°W</div>
+      </div>
+    </div>
+
+    <p class="reveal" style="margin-top:44px">Kahal Zur Israel in Recife, the easternmost record in the current dataset, is itself a landmark of American Jewish history. Established in Dutch-controlled Recife by about 1636, it is widely recognized as the first formally established synagogue in the Americas. When the Dutch were expelled by the Portuguese in 1654, its members sailed north — and the arrival of 23 Jewish refugees in New Amsterdam that year became a foundational moment in the establishment of organized Jewish communal life in what is now the United States.</p>
+  </div>
+</section>
+
+<!-- ANECDOTE 3: KAHAL ZUR ISRAEL -->
+<section class="section">
+  <div class="shell">
+    <div class="section-grid">
+      <div>
+        <div class="label reveal">Recife, Brazil · c. 1636</div>
+        <h2 class="reveal">Recife and the beginnings of organized Jewish life in the Americas</h2>
+        <p class="lead reveal">The easternmost point in the Jewish Atlas Latin America and the Caribbean database is also the most historically resonant site in the region.</p>
+        <p class="reveal">Kahal Zur Israel — "Rock of Israel" — was established in Recife by about 1636, when the city was under Dutch colonial rule. It was the first synagogue in the Americas, serving a community of Sephardi Jews attracted by Dutch religious tolerance, many of whom came from families shaped by forced conversion and persecution under the Spanish and Portuguese Inquisitions.</p>
+        <p class="reveal">In 1654, the Portuguese reconquered Recife. The Jewish community was required to depart following the Portuguese reconquest. Members of the community dispersed to Amsterdam, Dutch Caribbean colonies and other destinations. A group of 23 Jewish refugees from the former Dutch Brazilian colony arrived in New Amsterdam in 1654. Their settlement became foundational to the history of Congregation Shearith Israel, the oldest Jewish congregation in the United States.</p>
+        <p class="reveal">The building in Recife was later used as a warehouse and for other purposes. Archaeological work around 2000 identified elements of the historic synagogue complex, including a mikveh, helping to confirm the site. A cultural centre and museum interpreting the site opened in the reconstructed building in 2001. Today it operates as a museum of Sephardi Jewish history in Brazil. The Jewish Atlas records it as a single mapped point — but the thread it pulls runs from the Inquisition through the Dutch empire to every Jewish community on the North American map.</p>
+      </div>
+      <div>
+        <div class="quote-panel reveal">
+          <blockquote>In 1654, a group of 23 Jewish refugees from the former Dutch Brazilian colony arrived in New Amsterdam. Their settlement became foundational to the history of Congregation Shearith Israel.</blockquote>
+          <small>Recife and New Amsterdam · 1654</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FAQ -->
+<section class="section">
+  <div class="shell">
+    <div class="label reveal">Frequently asked questions</div>
+    <h2 class="reveal">On Jewish communities in Latin America and the Caribbean</h2>
+
+    <div class="faq reveal">
+      <details>
+        <summary>Where are the largest Jewish communities in Latin America and the Caribbean? <span class="plus"></span></summary>
+        <div class="answer">
+          <p>By number of mapped sites in the Jewish Atlas database, Argentina has the most records in this dataset, with 197 mapped sites, followed by Brazil with 165. These are dataset counts, not population or institutional censuses. Within Argentina, the Buenos Aires metro holds 84 mapped sites — synagogues, cemeteries and kosher establishments — making it the largest single metropolitan concentration in this dataset. São Paulo follows, with 83 metro-area sites. Other important Jewish institutional centres include Montevideo, Santiago, Rio de Janeiro, Rosario and Panama City.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Are there historic Jewish communities in Latin America and the Caribbean predating the mass immigration? <span class="plus"></span></summary>
+        <div class="answer">
+          <p>Yes. Suriname and Curaçao have Sephardi Jewish communities dating to the seventeenth century, established by merchants from the Netherlands and the Iberian Peninsula. A Sephardi settlement developed near Cassipora Creek in the 1650s; its cemetery contains gravestones dating from 1666 and is one of the oldest Jewish burial grounds in the Americas. Historical sources indicate the community also maintained a synagogue in the area. The settlement of Jodensavanne was established in the 1680s, and its brick synagogue was consecrated in 1685. In 2023, Jodensavanne and Cassipora Creek Cemetery were inscribed together as a serial UNESCO World Heritage property. Brazil's Kahal Zur Israel congregation in Recife was established around 1636 and is recognised as the first formally documented synagogue in the Americas. These communities predate the mass Eastern European immigration of the 1880s–1930s by two centuries.</p>
+        </div>
+      </details>
+      <details>
+        <summary>What were the Jewish agricultural colonies in Argentina? <span class="plus"></span></summary>
+        <div class="answer">
+          <p>Beginning in 1891 and expanding particularly during the early twentieth century, the Jewish Colonization Association (JCA), founded by Baron Maurice de Hirsch, purchased land in the Argentine provinces of Entre Ríos, Santa Fe, Buenos Aires and La Pampa and settled Eastern European Jewish immigrants on agricultural colonies. The colonists established synagogues, cemeteries and Yiddish-language schools in rural towns across the pampa. By around 1920, Argentina’s Jewish population had grown to approximately 150,000. The agricultural colonies represented an influential but minority component of this much larger, increasingly urban population. During the twentieth century, many colonists and their descendants relocated to Argentine cities, while others emigrated abroad, including to Israel. Many synagogues and cemeteries remain and appear in the Jewish Atlas database as the most dispersed layer of Argentine Jewish geography.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Why does Chile have so many synagogues in cities far from Santiago? <span class="plus"></span></summary>
+        <div class="answer">
+          <p>The real-world answer is that it largely does not — Chile's Jewish population and major institutions have long been concentrated predominantly in Santiago, which holds the community's main institutions, schools and synagogues. The database shows higher site counts for some southern cities than the population distribution might suggest. This may partly reflect how contributor data was entered, but it also reflects genuine historical settlement: Sephardi immigrants — notably from Monastir in North Macedonia — did establish communities in southern Chilean cities like Temuco in the early twentieth century. The <em>Estrella de Israel</em> synagogue in Temuco is a genuine piece of that heritage. The relative site counts for southern cities should be read cautiously and should not be taken as a precise measure of current or historical community size.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Does the map include former synagogues and historic cemeteries? <span class="plus"></span></summary>
+        <div class="answer">
+          <p>Yes. The Jewish Atlas database includes active, historic and former sites. A building that functioned as a synagogue and was later converted to another use, or a cemetery established by a congregation that no longer exists, both appear on the map. Some of the cemeteries mapped in Argentina — particularly in rural Entre Ríos and the former agricultural colonies — are associated with communities whose resident Jewish populations have greatly diminished or disappeared. This is what distinguishes the map from a directory of current Jewish life: it preserves the geographic record of communities that existed, not only those that exist today.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<div class="closing">
+  <div class="shell">
+    <p class="reveal">Jewish life across Latin America and the Caribbean is not one story. It is the ruins of a Sephardi synagogue within Suriname’s complex colonial and plantation history, a pampa cemetery preserved after the community that created it has largely dispersed, and a Chabad house at the edge of the Andes. Much of this history remains visible in synagogues, cemeteries, neighbourhoods and archival traces, although substantial parts have also disappeared or remain undocumented. <a href="https://jewishatlas.org">Explore the full map.</a></p>
+  </div>
+</div>
+
+</main>
+
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll reveals
+  if('IntersectionObserver' in window && !reduce){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+    },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.reveal,.stagger').forEach(function(el){io.observe(el);});
+  } else {
+    document.querySelectorAll('.reveal,.stagger').forEach(function(el){el.classList.add('in');});
+  }
+
+  // bar charts
+  if('IntersectionObserver' in window){
+    var barIo=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.querySelectorAll('.metro-fill').forEach(function(fill){fill.style.width=fill.dataset.pct+'%';});
+          barIo.unobserve(e.target);
+        }
+      });
+    },{threshold:0.3});
+    document.querySelectorAll('.metro-list').forEach(function(el){barIo.observe(el);});
+  }
+
+  // hero South America map
+  if(typeof L==='undefined') return;
+  var map=L.map('sa-map-hero',{
+    zoomControl:false,attributionControl:true,
+    dragging:false,scrollWheelZoom:false,doubleClickZoom:false,
+    boxZoom:false,keyboard:false,tap:false
+  }).setView([-18,-58],3.4);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{
+    attribution:'&copy; OpenStreetMap &copy; CARTO',
+    subdomains:'abcd',maxZoom:19
+  }).addTo(map);
+  var R=5;
+  // Major Jewish centres across Latin America & Caribbean
+  var cities=[
+    [-34.61,-58.38],[-23.55,-46.63],[-22.91,-43.17],[-34.90,-56.19],
+    [-33.46,-70.65],[8.99,-79.52],[4.71,-74.07],[-12.05,-77.04],
+    [10.49,-66.88],[-8.06,-34.87],[-30.03,-51.23],
+    [-32.95,-60.64],[12.11,-68.93],[5.86,-55.17],[19.43,-99.13]
+  ];
+  cities.forEach(function(c,i){
+    var m=L.circleMarker([c[0],c[1]],{
+      radius:reduce?R:0,color:'#d7c49b',weight:1,
+      fillColor:'#e6d6ae',fillOpacity:.72,opacity:.92,
+      className:'marker-glow'
+    }).addTo(map);
+    if(reduce) return;
+    setTimeout(function(){
+      var start=null,dur=600;
+      function grow(ts){
+        if(start===null) start=ts;
+        var t=Math.min((ts-start)/dur,1);
+        var e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+        m.setRadius(R*e);
+        if(t<1) requestAnimationFrame(grow);
+      }
+      requestAnimationFrame(grow);
+    },200+i*60);
+  });
+})();
+</script>
+</body>
+</html>
