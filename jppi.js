@@ -1,80 +1,76 @@
 require([
   "esri/Map", "esri/views/MapView",
-  "esri/layers/FeatureLayer", "esri/layers/GraphicsLayer", "esri/renderers/UniqueValueRenderer",
-  "esri/widgets/Search", "esri/widgets/Locate", "esri/widgets/Home", "esri/widgets/Zoom",
-  "esri/Graphic", "esri/geometry/Point", "esri/PopupTemplate", "esri/geometry/projection", "esri/geometry/SpatialReference"
+  "esri/layers/FeatureLayer",
+  "esri/renderers/UniqueValueRenderer",
+  "esri/widgets/Search", "esri/widgets/Home", "esri/widgets/Zoom",
+  "esri/PopupTemplate"
 ], (
   Map, MapView,
-  FeatureLayer, GraphicsLayer, UniqueValueRenderer,
-  Search, Locate, Home, Zoom,
-  Graphic, Point, PopupTemplate, projection, SpatialReference
+  FeatureLayer,
+  UniqueValueRenderer,
+  Search, Home, Zoom,
+  PopupTemplate
 ) => {
 
-  console.log("*** REQUIRE BLOCK STARTED ***");
-  console.log("Map inside require:", typeof Map);
-  console.log("MapView inside require:", typeof MapView);
-
-  // DEFINE createPopupTemplate FUNCTION - MOBILE COMPATIBLE
   const createPopupTemplate = () => {
     return {
       title: "{eng_name}",
       outFields: ["id", "main_category", "eng_name"],
       content: (feature) => {
-  const attrs = feature.graphic.attributes || {};
-  const id = attrs.id || attrs.OBJECTID || "";
-  const category = attrs.main_category || "";
+        const attrs = feature.graphic.attributes || {};
+        const id = attrs.id || attrs.OBJECTID || "";
+        const category = attrs.main_category || "";
 
-  const container = document.createElement("div");
-  container.style.cssText = "background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);border-radius:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;padding:16px;width:100%;box-sizing:border-box;";
-  container.innerHTML = `<div style="padding:24px;text-align:center;color:#888;">Loading...</div>`;
+        const container = document.createElement("div");
+        container.style.cssText = "background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);border-radius:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;padding:16px;width:100%;box-sizing:border-box;";
+        container.innerHTML = `<div style="padding:24px;text-align:center;color:#888;">Loading...</div>`;
 
-  fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
-    .then(r => r.json())
-    .then(full => {
-      const engName = full.name || full.eng_name || "Unknown";
-      const address = full.address || "";
-      const city = full.city || "";
-      const country = full.country || "";
-      const cat = full.main_category || category;
+        fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
+          .then(r => r.json())
+          .then(full => {
+            const engName = full.name || full.eng_name || "Unknown";
+            const address = full.address || "";
+            const city = full.city || "";
+            const country = full.country || "";
+            const cat = full.main_category || category;
 
-      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent([engName, address, city, country].filter(Boolean).join(" "))}`;
+            const googleUrl = `https://www.google.com/search?q=${encodeURIComponent([engName, address, city, country].filter(Boolean).join(" "))}`;
 
-      function normalizeUrl(u) {
-        if (!u) return "";
-        const s = String(u).trim();
-        return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+            function normalizeUrl(u) {
+              if (!u) return "";
+              const s = String(u).trim();
+              return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+            }
+            const siteUrl = normalizeUrl(full.website || full.Website || full.link || "");
+
+            container.innerHTML = `
+              <div style="color:#667eea;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">
+                <i class="fas fa-tag" style="font-size:11px;opacity:0.8;margin-right:6px;"></i>${cat}
+              </div>
+              <div style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid rgba(0,0,0,0.05);">
+                ${address ? `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;line-height:1.4;">
+                  <i class="fas fa-map-marker-alt" style="font-size:13px;color:#667eea;margin-top:2px;"></i><span>${address}</span></div>` : ""}
+                ${city ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;">
+                  <i class="fas fa-city" style="font-size:13px;color:#667eea;"></i><span>${city}</span></div>` : ""}
+                ${country ? `<div style="display:flex;align-items:center;gap:8px;color:#374151;font-size:13px;">
+                  <i class="fas fa-globe" style="font-size:13px;color:#667eea;"></i><span>${country}</span></div>` : ""}
+              </div>
+              <a href="${googleUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4285f4 0%,#34a853 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;">
+                <i class="fas fa-search" style="font-size:13px;margin-right:8px;"></i>Search on Google
+              </a>
+              ${siteUrl ? `<a href="${siteUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;margin-top:10px;">
+                <i class="fas fa-globe" style="font-size:13px;margin-right:8px;"></i>Visit Website
+              </a>` : ""}
+            `;
+          })
+          .catch(() => {
+            container.innerHTML = `<div style="padding:24px;text-align:center;color:#c00;">Could not load details. Please try again.</div>`;
+          });
+
+        return container;
       }
-      const siteUrl = normalizeUrl(full.website || full.Website || full.link || "");
-
-      container.innerHTML = `
-        <div style="color:#667eea;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">
-          <i class="fas fa-tag" style="font-size:11px;opacity:0.8;margin-right:6px;"></i>${cat}
-        </div>
-        <div style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid rgba(0,0,0,0.05);">
-          ${address ? `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;line-height:1.4;">
-            <i class="fas fa-map-marker-alt" style="font-size:13px;color:#667eea;margin-top:2px;"></i><span>${address}</span></div>` : ""}
-          ${city ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;">
-            <i class="fas fa-city" style="font-size:13px;color:#667eea;"></i><span>${city}</span></div>` : ""}
-          ${country ? `<div style="display:flex;align-items:center;gap:8px;color:#374151;font-size:13px;">
-            <i class="fas fa-globe" style="font-size:13px;color:#667eea;"></i><span>${country}</span></div>` : ""}
-        </div>
-        <a href="${googleUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4285f4 0%,#34a853 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;">
-          <i class="fas fa-search" style="font-size:13px;margin-right:8px;"></i>Search on Google
-        </a>
-        ${siteUrl ? `<a href="${siteUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;margin-top:10px;">
-          <i class="fas fa-globe" style="font-size:13px;margin-right:8px;"></i>Visit Website
-        </a>` : ""}
-      `;
-    })
-    .catch(() => {
-      container.innerHTML = `<div style="padding:24px;text-align:center;color:#c00;">Could not load details. Please try again.</div>`;
-    });
-
-  return container;
-  }
-    }
-  };  
-  
+    };
+  };
 
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
@@ -84,22 +80,16 @@ require([
     zoom: 4,
     ui: { components: [] },
     popup: {
-  dockEnabled: false,
-  collapseEnabled: false
-}
-
-  
+      dockEnabled: false,
+      collapseEnabled: false
+    }
   });
-  
-  console.log("*** MAP AND VIEW CREATED ***");
-  console.log("View object:", view);
-  
-  view.ui.add(new Zoom({ view }),   { position: "bottom-right" });
-  view.ui.add(new Home({ view }),   { position: "bottom-right" });
 
-  // Create and configure the Search widget
+  view.ui.add(new Zoom({ view }), { position: "bottom-right" });
+  view.ui.add(new Home({ view }), { position: "bottom-right" });
+
   const search = new Search({
-    view: view,
+    view,
     allPlaceholder: "Search landmarks or places...",
     includeDefaultSources: true,
     locationEnabled: false,
@@ -107,231 +97,56 @@ require([
     resultGraphicEnabled: true,
     sources: []
   });
-
-  // Add the search widget to the top-right of the view
-  view.ui.add(search, {
-    position: "top-right",
-    index: 0
-  });
+  view.ui.add(search, { position: "top-right", index: 0 });
 
   const filterDiv = document.getElementById("filterContainer");
   const categories = [
     { name: "All",         cat: "" },
-    { name: "Highlight",    cat: "Highlights" },
+    { name: "Highlight",   cat: "Highlights" },
     { name: "Synagogues",  cat: "Synagogue" },
     { name: "Heritage",    cat: "Heritage" },
     { name: "Kosher Food", cat: "Kosher Restaurant" },
     { name: "Community",   cat: "Community" }
   ];
-  categories.forEach((o,i) => {
+  categories.forEach((o, i) => {
     const btn = document.createElement("button");
     btn.textContent = o.name;
-    btn.dataset.cat   = o.cat;
-    btn.className     = "filterBtn" + (i===0 ? " active" : "");
+    btn.dataset.cat = o.cat;
+    btn.className = "filterBtn" + (i === 0 ? " active" : "");
     filterDiv.appendChild(btn);
   });
 
   const globalRenderer = new UniqueValueRenderer({
     field: "main_category",
-    defaultSymbol: {
-      type: "simple-marker", style: "circle", size: 10,
-      color: "#888", outline: { color: "#fff", width: 1 }
-    },
+    defaultSymbol: { type: "simple-marker", style: "circle", size: 10, color: "#888", outline: { color: "#fff", width: 1 } },
     uniqueValueInfos: [
-      { value: "Highlight", symbol: { type:"simple-marker", style:"circle", size:10, color:"#f39c12", outline:{color:"#fff",width:1} } },
-      { value: "Synagogue", symbol: { type:"simple-marker", style:"circle", size:10, color:"#5DADE2", outline:{color:"#fff",width:1} } },
-      { value: "Heritage", symbol: { type:"simple-marker", style:"circle", size:10, color:"#EC7063", outline:{color:"#fff",width:1} } },
-      { value: "Kosher Restaurant", symbol: { type:"simple-marker", style:"circle", size:10, color:"#58D68D", outline:{color:"#fff",width:1} } },
-      { value: "Community", symbol: { type:"simple-marker", style:"circle", size:10, color:"#8b5cf6", outline:{color:"#fff",width:1} } }
+      { value: "Highlight",        symbol: { type: "simple-marker", style: "circle", size: 10, color: "#f39c12", outline: { color: "#fff", width: 1 } } },
+      { value: "Synagogue",        symbol: { type: "simple-marker", style: "circle", size: 10, color: "#5DADE2", outline: { color: "#fff", width: 1 } } },
+      { value: "Heritage",         symbol: { type: "simple-marker", style: "circle", size: 10, color: "#EC7063", outline: { color: "#fff", width: 1 } } },
+      { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", size: 10, color: "#58D68D", outline: { color: "#fff", width: 1 } } },
+      { value: "Community",        symbol: { type: "simple-marker", style: "circle", size: 10, color: "#8b5cf6", outline: { color: "#fff", width: 1 } } }
     ]
   });
 
-  const ZOOM_THRESHOLD = 7;
-  let dynamicLayer = null;
   let currentFilter = "";
-  
+
   const globalLayer = new FeatureLayer({
-    url: window.LANDMARKS_PUBLIC_VIEW_URL,
+    url: window.LANDMARKS_SERVICE_URL,
     outFields: ["id", "main_category", "eng_name"],
     popupTemplate: createPopupTemplate(),
     renderer: globalRenderer
   });
-  
   map.add(globalLayer);
 
-  async function loadDynamicPoints() {
-  try {
-    const extent = view.extent;
-    const wgs84Extent = projection.project(extent, new SpatialReference({ wkid: 4326 }));
-    const geometryObj = {
-      xmin: wgs84Extent.xmin, ymin: wgs84Extent.ymin,
-      xmax: wgs84Extent.xmax, ymax: wgs84Extent.ymax,
-      spatialReference: { wkid: 4326 }
-    };
-
-    const requestBody = new URLSearchParams({
-      f: "json",
-      where: "1=1",
-      outFields: "id,main_category,eng_name",
-      geometry: JSON.stringify(geometryObj),
-      geometryType: "esriGeometryEnvelope",
-      spatialRel: "esriSpatialRelIntersects",
-      returnGeometry: "true",
-      maxRecordCount: 500
-    });
-
-    const response = await fetch(window.LANDMARKS_PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: requestBody
-    });
-
-    if (!response.ok) throw new Error("HTTP " + response.status);
-
-    const data = await response.json();
-    return data.features || [];
-
-  } catch (err) {
-    console.error("Error loading dynamic points:", err);
-    return [];
-  }
-}
-
-  // Helper function to get symbol based on category (same as global layer)
-  function getSymbolForCategory(category) {
-    const symbolMap = {
-      "Highlight": { type:"simple-marker", style:"circle", size:12, color:"#f39c12", outline:{color:"#fff",width:1} },
-      "Synagogue": { type:"simple-marker", style:"circle", size:12, color:"#5DADE2", outline:{color:"#fff",width:1} },
-      "Heritage": { type:"simple-marker", style:"circle", size:12, color:"#EC7063", outline:{color:"#fff",width:1} },
-      "Kosher Restaurant": { type:"simple-marker", style:"circle", size:12, color:"#58D68D", outline:{color:"#fff",width:1} },
-      "Community": { type:"simple-marker", style:"circle", size:12, color:"#8b5cf6", outline:{color:"#fff",width:1} }
-    };
-    
-    return symbolMap[category] || { type:"simple-marker", style:"circle", size:12, color:"#888", outline:{color:"#fff",width:1} };
-  }
-
-  async function createDynamicLayer(features) {
-    if (dynamicLayer) {
-      map.remove(dynamicLayer);
-      dynamicLayer = null;
-    }
-
-    if (features.length === 0) return;
-
-    console.log("Creating dynamic layer with", features.length, "features");
-
-    dynamicLayer = new GraphicsLayer({
-      title: "Dynamic Landmarks"
-    });
-
-    const graphics = features.map(feature => {
-      const a = feature.attributes || {};
-
-      // Normalize keys (handles different casings/aliases from the proxy)
-    const attrs = {
-        id:            a.id ?? "",
-        eng_name:      a.eng_name ?? a.ENG_NAME ?? a.name ?? "",
-        main_category: a.main_category ?? a.category ?? a.CATEGORY ?? "",
-      };
-
-      const point = new Point({
-        x: feature.geometry.x,
-        y: feature.geometry.y,
-        spatialReference: view.spatialReference
-      });
-
-      return new Graphic({
-        geometry: point,
-        attributes: attrs,
-        symbol: getSymbolForCategory(attrs.main_category),
-        popupTemplate: createPopupTemplate()
-      });
-    });
-
-    dynamicLayer.addMany(graphics);
-
-    if (currentFilter) {
-      applyFilterToGraphicsLayer(dynamicLayer, currentFilter);
-    }
-
-    map.add(dynamicLayer);
-    console.log("Dynamic layer added to map with", graphics.length, "graphics");
-    
-    // Log first graphic to verify all attributes are present
-    if (graphics.length > 0) {
-      console.log("First graphic coordinates:", graphics[0].geometry.x, graphics[0].geometry.y);
-      console.log("First graphic category:", graphics[0].attributes.main_category);
-      console.log("First graphic all attributes:", graphics[0].attributes);
-    }
-  }
-
-  function applyFilterToGraphicsLayer(layer, category) {
-    if (!layer || !layer.graphics) return;
-    
-    layer.graphics.forEach(graphic => {
-      const shouldShow = !category || graphic.attributes.main_category === category;
-      graphic.visible = shouldShow;
-    });
-  }
-
-  let loadingDynamic = false;
-
-  view.watch("zoom", async (newZoom) => {
-    if (newZoom > ZOOM_THRESHOLD && !loadingDynamic) {
-      loadingDynamic = true;
-      console.log("Loading dynamic points...");
-      
-      try {
-        const center = view.center;
-        const features = await loadDynamicPoints(center);
-        await createDynamicLayer(features);
-        console.log("Loaded " + features.length + " dynamic points");
-      } catch (error) {
-        console.error("Error loading dynamic points:", error);
-      } finally {
-        loadingDynamic = false;
-      }
-    } else if (newZoom <= ZOOM_THRESHOLD && dynamicLayer) {
-      map.remove(dynamicLayer);
-      dynamicLayer = null;
-      console.log("Removed dynamic layer");
-    }
-  });
-
-  // Click/Touch handler for popups - works on both desktop and mobile
   view.on("click", async event => {
     try {
-      // Prevent default behavior
-      event.stopPropagation();
-      
-      const response = await view.hitTest(event, {
-        include: [globalLayer, dynamicLayer].filter(l => l !== null)
-      });
-      
-      if (!response.results.length) {
-        return;
-      }
-      
-      // Check if dynamicLayer exists before comparing
-      if (dynamicLayer) {
-        const hit = response.results.find(r => r.graphic && r.graphic.layer === dynamicLayer);
-        if (hit) {
-          view.popup.open({
-            features: [hit.graphic],
-            location: hit.mapPoint || event.mapPoint,
-            updateLocationEnabled: true
-          });
-          return; // Exit early to prevent checking other layers
-        }
-      }
-      
-      // If no dynamic layer hit, check global layer
-      const globalHit = response.results.find(r => r.graphic && r.graphic.layer === globalLayer);
-      if (globalHit) {
+      const response = await view.hitTest(event, { include: [globalLayer] });
+      if (!response.results.length) return;
+      const hit = response.results.find(r => r.graphic?.layer === globalLayer);
+      if (hit) {
         view.popup.open({
-          features: [globalHit.graphic],
-          location: globalHit.mapPoint || event.mapPoint,
-          updateLocationEnabled: true
+          features: [hit.graphic],
+          location: hit.mapPoint || event.mapPoint
         });
       }
     } catch (error) {
@@ -340,12 +155,9 @@ require([
   });
 
   globalLayer.when(() => {
-    //view.goTo(globalLayer.fullExtent).catch(console.error);
-    
-    // Add the landmarks layer as a search source
     const landmarksSource = {
       layer: globalLayer,
-      searchFields: ["eng_name", "Address", "city"],
+      searchFields: ["eng_name"],
       displayField: "eng_name",
       exactMatch: false,
       outFields: ["id", "main_category", "eng_name"],
@@ -356,25 +168,17 @@ require([
       suggestionsEnabled: true,
       minSuggestCharacters: 2
     };
-    
     search.sources.unshift(landmarksSource);
-    console.log("Search widget configured with landmarks layer");
   });
 
   filterDiv.querySelectorAll(".filterBtn").forEach(btn => {
     btn.addEventListener("click", () => {
       const cat = btn.dataset.cat;
       currentFilter = cat;
-      
-      globalLayer.definitionExpression = cat ? "main_category='" + cat + "'" : "";
-      
-      if (dynamicLayer) {
-        applyFilterToGraphicsLayer(dynamicLayer, cat);
-      }
-      
-      filterDiv.classList.toggle("filtered", !!cat);
+      globalLayer.definitionExpression = cat ? `main_category='${cat}'` : "";
       filterDiv.querySelectorAll(".filterBtn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
     });
   });
+
 });
