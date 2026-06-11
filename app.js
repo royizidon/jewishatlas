@@ -838,7 +838,7 @@ search.when(() => {
   let currentFilter = "";
 
   const globalLayer = new FeatureLayer({
-    url: window.LANDMARKS_PUBLIC_VIEW_URL,
+    url: window.LANDMARKS_SERVICE_URL,
     outFields: ["id", "main_category"],
     popupTemplate: createPopupTemplate(),
     renderer: globalRenderer,
