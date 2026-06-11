@@ -248,137 +248,12 @@ const createPopupTemplate = () => ({
   title: null,
   content: function (feature) {
     const isMobile = DeviceInfo.isMobile();
-
-    function buildNavLinks(graphic, attrs) {
-      const pt = GeoUtils.getPointFromGeometry(graphic.geometry);
-      const [lat, lon] = GeoUtils.toLatLon(pt);
-      const hasCoords = Number.isFinite(lat) && Number.isFinite(lon);
-
-      const label = GeoUtils.buildLabel([
-        attrs.name,
-        attrs.Address || attrs.address,
-        attrs.city
-      ]) || "Destination";
-
-      const encLabel = encodeURIComponent(label);
-
-      const gmaps = hasCoords
-        ? `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${lat.toFixed(6)},${lon.toFixed(6)}&travelmode=driving`
-        : `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${encLabel}&travelmode=driving`;
-
-      const waze = hasCoords
-        ? `https://waze.com/ul?ll=${lat.toFixed(6)},${lon.toFixed(6)}&navigate=yes&z=16`
-        : `https://waze.com/ul?q=${encLabel}&navigate=yes&z=16`;
-
-      return { gmaps, waze };
-    }
-
     const a = feature.graphic.attributes || {};
-    const name = a.name || "Location";
-    const category = a.category || a.main_category || "Place";
-    const address = a.address || "";
-    const city = a.city || "";
-    const fullAddress =
-      (address && city && address.includes(city))
-        ? address
-        : [address, city].filter(Boolean).join(", ") || "Not available";
-
-    const description = a.description || "";
-    const hours = a.fees_opening_hours || "";
-    const photo = a.photo || "";
     const id = a.id || a.OBJECTID || "";
-
-    function normalizeUrl(u){
-      if (!u) return "";
-      const s = String(u).trim();
-      return /^https?:\/\//i.test(s) ? s : `https://${s}`;
-    }
-    const siteUrl = normalizeUrl(a.website || a.Website || a.link || "");
-
-    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent([name, category, fullAddress].filter(Boolean).join(" "))}`;
-    const feedbackUrl = `https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895=${encodeURIComponent(id)}`;
+    const category = a.main_category || "Place";
 
     const container = document.createElement("div");
     container.className = "enhanced-popup-container";
-
-    let html = ``;
-
-    if (photo && photo.trim()) {
-      html += `
-        <div class="popup-image"
-          style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>
-      `;
-    }
-
-    html += `<h2 class="popup-title">${name}</h2>`;
-
-    html += `
-      <div class="popup-category">
-        <span class="category-badge">${category}</span>
-      </div>
-
-      <div class="popup-tabs">
-        <button class="tab-button active" data-tab="info">Info</button>
-        <button class="tab-button" data-tab="navigate">Navigate</button>
-        <button class="tab-button" data-tab="feedback">Feedback</button>
-      </div>
-
-      <div class="popup-content-wrapper">
-        <div class="tab-content active" data-content="info">
-          <div class="info-section">
-            <div class="info-label">Address</div>
-            <div class="info-value">${fullAddress}</div>
-          </div>
-
-          ${description?.trim() ? `
-          <div class="info-section">
-            <div class="info-label">About</div>
-            <div class="info-value clamp-4">${description}</div>
-          </div>` : ""}
-
-          ${hours?.trim() ? `
-          <div class="info-section">
-            <div class="info-label">Hours & Fees</div>
-            <div class="info-value clamp-4">${hours}</div>
-          </div>` : ""}
-
-          <a href="${googleSearchUrl}" class="primary-button">
-            Search for More Details
-          </a>
-
-        ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">Visit website</a>` : ""}        </div>
-
-        <div class="tab-content" data-content="navigate">
-          <div class="nav-info-top">Get directions from your current location:</div>
-          <a class="nav-button google-maps" target="_blank" rel="noopener">
-            Directions via Google Maps
-          </a>
-          <a class="nav-button waze" target="_blank" rel="noopener">
-            Directions via Waze
-          </a>
-          <div class="nav-info">Opens your preferred navigation app</div>
-        </div>
-
-        <div class="tab-content" data-content="feedback">
-          <div class="feedback-block">
-            <h3 class="feedback-title">Help us improve</h3>
-            <p class="feedback-text">Found an issue or have updates to share?</p>
-            <a href="${feedbackUrl}" target="_blank" rel="noopener" class="primary-button feedback-submit">
-              Submit Feedback
-            </a>
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = html;
-
-    // Prevent popup UI clicks from triggering map clicks
-    ["click", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
-      container.addEventListener(evt, (e) => {
-        e.stopPropagation();
-      }, { passive: false });
-    });
 
     // Close button
     const closeBtn = document.createElement("button");
@@ -393,44 +268,132 @@ const createPopupTemplate = () => ({
     });
     container.appendChild(closeBtn);
 
-    // Build nav links
-    const { gmaps, waze } = buildNavLinks(feature.graphic, a);
-    container.querySelector(".nav-button.google-maps")?.setAttribute("href", gmaps);
-    container.querySelector(".nav-button.waze")?.setAttribute("href", waze);
+    // Loading state
+    container.innerHTML += `
+      <div class="popup-loading" style="padding: 24px; text-align: center; color: #888;">
+        Loading...
+      </div>
+    `;
 
-    // Open same tab on mobile, new tab on desktop
-    const links = [
-      container.querySelector(".nav-button.google-maps"),
-      container.querySelector(".nav-button.waze"),
-      container.querySelector('.primary-button[href*="google.com/search"]'),
-      container.querySelector('.primary-button[href*="docs.google.com/forms"]'),
-      container.querySelector('.site-link')
-    ].filter(Boolean);
+    // Fetch full record from Render API
+    fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
+      .then(r => r.json())
+      .then(full => {
+        const name = full.name || "Location";
+        const cat = full.main_category || category;
+        const address = full.address || "";
+        const city = full.city || "";
+        const fullAddress = (address && city && address.includes(city))
+          ? address
+          : [address, city].filter(Boolean).join(", ") || "Not available";
+        const description = full.description || "";
+        const hours = full.fees_opening_hours || "";
+        const photo = full.photo || "";
 
-    links.forEach((a) => {
-      if (isMobile) {
-        a.setAttribute("target", "_self");
-        a.removeAttribute("rel");
-      } else {
-        a.setAttribute("target", "_blank");
-        a.setAttribute("rel", "noopener");
-      }
-    });
+        function normalizeUrl(u) {
+          if (!u) return "";
+          const s = String(u).trim();
+          return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+        }
+        const siteUrl = normalizeUrl(full.website || full.Website || full.link || "");
 
-    // Tabs
-    const tabButtons = container.querySelectorAll(".tab-button");
-    const tabContents = container.querySelectorAll(".tab-content");
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const tab = btn.dataset.tab;
-        tabButtons.forEach(b => b.classList.toggle("active", b === btn));
-        tabContents.forEach(c => c.classList.toggle("active", c.dataset.content === tab));
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent([name, cat, fullAddress].filter(Boolean).join(" "))}`;
+        const feedbackUrl = `https://docs.google.com/forms/d/e/1FAIpQLSeVWy9b_hWAk2qjTvabxsuQl-Lr1ewUY4CRVT6kTQGt7egSag/viewform?usp=pp_url&entry.1424782895=${encodeURIComponent(id)}`;
+
+        // Build nav links
+        const pt = GeoUtils.getPointFromGeometry(feature.graphic.geometry);
+        const [lat, lon] = GeoUtils.toLatLon(pt);
+        const hasCoords = Number.isFinite(lat) && Number.isFinite(lon);
+        const label = GeoUtils.buildLabel([name, address, city]) || "Destination";
+        const encLabel = encodeURIComponent(label);
+        const gmaps = hasCoords
+          ? `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${lat.toFixed(6)},${lon.toFixed(6)}&travelmode=driving`
+          : `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${encLabel}&travelmode=driving`;
+        const waze = hasCoords
+          ? `https://waze.com/ul?ll=${lat.toFixed(6)},${lon.toFixed(6)}&navigate=yes&z=16`
+          : `https://waze.com/ul?q=${encLabel}&navigate=yes&z=16`;
+
+        let html = "";
+
+        if (photo?.trim()) {
+          html += `<div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>`;
+        }
+
+        html += `<h2 class="popup-title">${name}</h2>`;
+        html += `
+          <div class="popup-category">
+            <span class="category-badge">${cat}</span>
+          </div>
+          <div class="popup-tabs">
+            <button class="tab-button active" data-tab="info">Info</button>
+            <button class="tab-button" data-tab="navigate">Navigate</button>
+            <button class="tab-button" data-tab="feedback">Feedback</button>
+          </div>
+          <div class="popup-content-wrapper">
+            <div class="tab-content active" data-content="info">
+              <div class="info-section">
+                <div class="info-label">Address</div>
+                <div class="info-value">${fullAddress}</div>
+              </div>
+              ${description?.trim() ? `
+              <div class="info-section">
+                <div class="info-label">About</div>
+                <div class="info-value clamp-4">${description}</div>
+              </div>` : ""}
+              ${hours?.trim() ? `
+              <div class="info-section">
+                <div class="info-label">Hours & Fees</div>
+                <div class="info-value clamp-4">${hours}</div>
+              </div>` : ""}
+              <a href="${googleSearchUrl}" class="primary-button">Search for More Details</a>
+              ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">Visit website</a>` : ""}
+            </div>
+            <div class="tab-content" data-content="navigate">
+              <div class="nav-info-top">Get directions from your current location:</div>
+              <a href="${gmaps}" class="nav-button google-maps" ${isMobile ? '' : 'target="_blank" rel="noopener"'}>Directions via Google Maps</a>
+              <a href="${waze}" class="nav-button waze" ${isMobile ? '' : 'target="_blank" rel="noopener"'}>Directions via Waze</a>
+              <div class="nav-info">Opens your preferred navigation app</div>
+            </div>
+            <div class="tab-content" data-content="feedback">
+              <div class="feedback-block">
+                <h3 class="feedback-title">Help us improve</h3>
+                <p class="feedback-text">Found an issue or have updates to share?</p>
+                <a href="${feedbackUrl}" ${isMobile ? '' : 'target="_blank" rel="noopener"'} class="primary-button feedback-submit">Submit Feedback</a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Replace loading with full content (keep close button)
+        container.querySelector(".popup-loading").outerHTML = html;
+
+        // Re-attach close button (it was wiped by innerHTML replacement)
+        container.appendChild(closeBtn);
+
+        // Tabs
+        const tabButtons = container.querySelectorAll(".tab-button");
+        const tabContents = container.querySelectorAll(".tab-content");
+        tabButtons.forEach(btn => {
+          btn.addEventListener("click", () => {
+            const tab = btn.dataset.tab;
+            tabButtons.forEach(b => b.classList.toggle("active", b === btn));
+            tabContents.forEach(c => c.classList.toggle("active", c.dataset.content === tab));
+          });
+        });
+
+        // Prevent popup clicks triggering map clicks
+        ["click", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
+          container.addEventListener(evt, e => e.stopPropagation(), { passive: false });
+        });
+      })
+      .catch(() => {
+        container.querySelector(".popup-loading").innerHTML =
+          `<div style="padding:24px;text-align:center;color:#c00;">Could not load details. Please try again.</div>`;
       });
-    });
 
     return container;
   },
-  outFields: ["*"]
+  outFields: ["id", "main_category"]
 });
 
 
@@ -875,7 +838,7 @@ search.when(() => {
   let currentFilter = "";
 
   const globalLayer = new FeatureLayer({
-    url: window.LANDMARKS_SERVICE_URL,
+    url: window.LANDMARKS_PUBLIC_VIEW_URL,
     outFields: ["id", "main_category"],
     popupTemplate: createPopupTemplate(),
     renderer: globalRenderer,
