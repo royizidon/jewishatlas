@@ -18,144 +18,63 @@ require([
   const createPopupTemplate = () => {
     return {
       title: "{eng_name}",
-      outFields: ["*"],
+      outFields: ["id", "main_category", "eng_name"],
       content: (feature) => {
-        const attrs = feature.graphic.attributes;
-        const engName = attrs.eng_name || attrs.ENG_NAME || "Unknown";
-        const address = attrs.Address || attrs.address || attrs.ADDRESS || "";
-        const city = attrs.city || attrs.City || attrs.CITY || "";
-        const country = attrs.country || attrs.Country || attrs.COUNTRY || "";
-        const category = attrs.main_category || attrs.category || attrs.CATEGORY || "";
-        
-        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(engName + " " + address + " " + city + " " + country)}`;
-        // after: const googleUrl = `https://www.google.com/search?...`
-const normalizeUrl = (u) => {
-  if (!u) return "";
-  const s = String(u).trim();
-  return /^https?:\/\//i.test(s) ? s : `https://${s}`;
-};
-// try common field names
-const rawSite = attrs.website || attrs.Website || attrs.link || attrs.Link || "";
-const siteUrl  = normalizeUrl(rawSite);
+  const attrs = feature.graphic.attributes || {};
+  const id = attrs.id || attrs.OBJECTID || "";
+  const category = attrs.main_category || "";
 
-        return `
-          <div style="
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 12px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            padding: 16px;
-            margin: 0;
-            width: 100%;
-            box-sizing: border-box;
-          ">
-            
-            <!-- Category Label -->
-            <div style="
-              text-align: left;
-              margin-bottom: 16px;
-              color: #667eea;
-              font-size: 12px;
-              font-weight: 600;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            ">
-              <i class="fas fa-tag" style="font-size: 11px; opacity: 0.8; margin-right: 6px;"></i>
-              ${category}
-            </div>
+  const container = document.createElement("div");
+  container.style.cssText = "background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);border-radius:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;padding:16px;width:100%;box-sizing:border-box;";
+  container.innerHTML = `<div style="padding:24px;text-align:center;color:#888;">Loading...</div>`;
 
-            <!-- Location Information -->
-            <div style="
-              margin-bottom: 16px;
-              padding: 12px;
-              background: rgba(255, 255, 255, 0.7);
-              border-radius: 8px;
-              border: 1px solid rgba(0, 0, 0, 0.05);
-            ">
-              ${address ? `<div style="
-                display: flex;
-                align-items: flex-start;
-                gap: 8px;
-                margin-bottom: 8px;
-                color: #374151;
-                font-size: 13px;
-                line-height: 1.4;
-              ">
-                <i class="fas fa-map-marker-alt" style="font-size: 13px; color: #667eea; margin-top: 2px;"></i>
-                <span>${address}</span>
-              </div>` : ''}
-              
-              ${city ? `<div style="
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                margin-bottom: 8px;
-                color: #374151;
-                font-size: 13px;
-              ">
-                <i class="fas fa-city" style="font-size: 13px; color: #667eea;"></i>
-                <span>${city}</span>
-              </div>` : ''}
-              
-              ${country ? `<div style="
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                color: #374151;
-                font-size: 13px;
-              ">
-                <i class="fas fa-globe" style="font-size: 13px; color: #667eea;"></i>
-                <span>${country}</span>
-              </div>` : ''}
-            </div>
+  fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
+    .then(r => r.json())
+    .then(full => {
+      const engName = full.name || full.eng_name || "Unknown";
+      const address = full.address || "";
+      const city = full.city || "";
+      const country = full.country || "";
+      const cat = full.main_category || category;
 
-            <!-- Google Search Button -->
-            <a href="${googleUrl}" target="_blank" rel="noopener" style="
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
-              color: white;
-              text-decoration: none;
-              padding: 12px 20px;
-              border-radius: 8px;
-              text-align: center;
-              font-weight: 600;
-              font-size: 13px;
-              box-shadow: 0 4px 12px rgba(66, 133, 244, 0.25);
-              width: 100%;
-              box-sizing: border-box;
-            ">
-              <i class="fas fa-search" style="font-size: 13px; margin-right: 8px;"></i>
-              Search on Google
-            </a>
-  ${siteUrl ? `
-      <!-- Visit Website Button -->
-      <a href="${siteUrl}" target="_blank" rel="noopener" style="
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-        color: white;
-        text-decoration: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 13px;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 10px;
-      ">
-        <i class="fas fa-globe" style="font-size: 13px; margin-right: 8px;"></i>
-        Visit Website
-      </a>
-    ` : ``}
-       </div>
-        `;
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent([engName, address, city, country].filter(Boolean).join(" "))}`;
+
+      function normalizeUrl(u) {
+        if (!u) return "";
+        const s = String(u).trim();
+        return /^https?:\/\//i.test(s) ? s : `https://${s}`;
       }
-    };
-  };
+      const siteUrl = normalizeUrl(full.website || full.Website || full.link || "");
+
+      container.innerHTML = `
+        <div style="color:#667eea;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">
+          <i class="fas fa-tag" style="font-size:11px;opacity:0.8;margin-right:6px;"></i>${cat}
+        </div>
+        <div style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid rgba(0,0,0,0.05);">
+          ${address ? `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;line-height:1.4;">
+            <i class="fas fa-map-marker-alt" style="font-size:13px;color:#667eea;margin-top:2px;"></i><span>${address}</span></div>` : ""}
+          ${city ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;">
+            <i class="fas fa-city" style="font-size:13px;color:#667eea;"></i><span>${city}</span></div>` : ""}
+          ${country ? `<div style="display:flex;align-items:center;gap:8px;color:#374151;font-size:13px;">
+            <i class="fas fa-globe" style="font-size:13px;color:#667eea;"></i><span>${country}</span></div>` : ""}
+        </div>
+        <a href="${googleUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4285f4 0%,#34a853 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;">
+          <i class="fas fa-search" style="font-size:13px;margin-right:8px;"></i>Search on Google
+        </a>
+        ${siteUrl ? `<a href="${siteUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;margin-top:10px;">
+          <i class="fas fa-globe" style="font-size:13px;margin-right:8px;"></i>Visit Website
+        </a>` : ""}
+      `;
+    })
+    .catch(() => {
+      container.innerHTML = `<div style="padding:24px;text-align:center;color:#c00;">Could not load details. Please try again.</div>`;
+    });
+
+  return container;
+  }
+    }
+  };  
+  
 
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
@@ -232,8 +151,8 @@ const siteUrl  = normalizeUrl(rawSite);
   let currentFilter = "";
   
   const globalLayer = new FeatureLayer({
-    url: window.LANDMARKS_SERVICE_URL,
-    outFields: ["*"],
+    url: window.LANDMARKS_PUBLIC_VIEW_URL,
+    outFields: ["id", "main_category", "eng_name"],
     popupTemplate: createPopupTemplate(),
     renderer: globalRenderer
   });
@@ -253,7 +172,7 @@ const siteUrl  = normalizeUrl(rawSite);
     const requestBody = new URLSearchParams({
       f: "json",
       where: "1=1",
-      outFields: "*",
+      outFields: "id,main_category,eng_name",
       geometry: JSON.stringify(geometryObj),
       geometryType: "esriGeometryEnvelope",
       spatialRel: "esriSpatialRelIntersects",
@@ -309,13 +228,10 @@ const siteUrl  = normalizeUrl(rawSite);
       const a = feature.attributes || {};
 
       // Normalize keys (handles different casings/aliases from the proxy)
-      const attrs = {
+    const attrs = {
+        id:            a.id ?? "",
         eng_name:      a.eng_name ?? a.ENG_NAME ?? a.name ?? "",
-        Address:       a.Address  ?? a.address  ?? a.ADDRESS ?? "",
-        city:          a.city     ?? a.City     ?? a.CITY    ?? "",
-        country:       a.country  ?? a.Country  ?? a.COUNTRY ?? "",
         main_category: a.main_category ?? a.category ?? a.CATEGORY ?? "",
-        website:       a.website ?? a.Website ?? a.link ?? a.Link ?? ""
       };
 
       const point = new Point({
@@ -432,7 +348,7 @@ const siteUrl  = normalizeUrl(rawSite);
       searchFields: ["eng_name", "Address", "city"],
       displayField: "eng_name",
       exactMatch: false,
-      outFields: ["*"],
+      outFields: ["id", "main_category", "eng_name"],
       name: "Jewish Landmarks",
       placeholder: "e.g., Rabbi Itzhak Huri Synagogue",
       maxResults: 6,
