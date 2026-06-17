@@ -31,7 +31,7 @@
   var platformNav = [
     { href: 'index.html',   label: 'Map',      key: 'map'    },
     { href: 'wall.html',    label: 'The Wall', key: 'wall'   },
-    { href: 'upload.html',  label: 'Upload',   key: 'upload' },
+    { href: 'upload.html',  label: 'Add Site',   key: 'upload' },
     { href: 'about.html',   label: 'About',    key: 'about'  }
   ];
 
