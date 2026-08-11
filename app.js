@@ -200,6 +200,11 @@ require([
 ) {
   console.log("*** REQUIRE BLOCK STARTED ***");
 
+  // Links coming from the Hebrew landing page
+  const pageParams = new URLSearchParams(window.location.search);
+  const cameFromGuide = pageParams.get("from") === "he-guide";
+  const deepLinkPlace = (pageParams.get("place") || "").trim();
+
 // Initialize device detection
 DeviceInfo.init();
 
@@ -711,7 +716,12 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // Auto-start on mobile – immediately center on user location
+// Auto-start on mobile – immediately center on user location
 view.when(() => {
+
+  // If a city was requested, stay on that city
+  if (deepLinkPlace) return;
+
   if (!DeviceInfo.isMobile() || !("geolocation" in navigator)) return;
 
   const kickoff = () => {
@@ -804,12 +814,29 @@ view.when(() => {
 search.resultGraphicEnabled = false;
 search.when(() => {
   if (search.sources && search.sources.length > 0) {
-    search.sources.getItemAt(0).placeholder = "Search a city, country or place…";
+    search.sources.getItemAt(0).placeholder =
+      "Search a city, country or place…";
   }
+
   setTimeout(() => {
-    const input = document.querySelector("#searchContainer .esri-search__input");
-    if (input) input.placeholder = "Search a city, country or place…";
+    const input =
+      document.querySelector("#searchContainer .esri-search__input");
+
+    if (input) {
+      input.placeholder = "Search a city, country or place…";
+    }
   }, 500);
+
+  // If the URL contains a city, open the map there
+  if (deepLinkPlace) {
+    search.search(deepLinkPlace).catch((err) => {
+      console.warn(
+        "Could not open deep-linked place:",
+        deepLinkPlace,
+        err
+      );
+    });
+  }
 });
 
 
@@ -898,9 +925,17 @@ search.when(() => {
 // WELCOME POPUP
 // ========================================
 view.when(() => {
-  const _cameFromInternal = sessionStorage.getItem("ja_from_internal") === "1";
+  const _cameFromInternal =
+    sessionStorage.getItem("ja_from_internal") === "1";
+
   sessionStorage.removeItem("ja_from_internal");
-  if (localStorage.getItem("ja_welcome_v2") === "1" || _cameFromInternal) return;
+
+  if (
+    cameFromGuide ||
+    deepLinkPlace ||
+    localStorage.getItem("ja_welcome_v2") === "1" ||
+    _cameFromInternal
+  ) return;
 
   const isMobile = window.matchMedia("(max-width: 640px)").matches;
 
