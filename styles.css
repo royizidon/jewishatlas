@@ -225,6 +225,7 @@ html, body {
   width: 420px !important;
   max-width: 92vw !important;
   max-height: calc(100vh - var(--header-h) - 30px) !important;
+  max-height: calc(100dvh - var(--header-h) - 30px) !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -238,6 +239,7 @@ html, body {
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   max-height: calc(100vh - var(--header-h) - 120px) !important;
+  max-height: calc(100dvh - var(--header-h) - 120px) !important;
 }
 
 .esri-popup__footer {
@@ -250,6 +252,7 @@ html, body {
     width: 92vw !important;
     max-width: 92vw !important;
     max-height: calc(100vh - var(--header-h) - 20px) !important;
+    max-height: calc(100dvh - var(--header-h) - 20px) !important;
     border-radius: 16px !important;
   }
 }

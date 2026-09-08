@@ -260,9 +260,13 @@ const createPopupTemplate = () => ({
     const container = document.createElement("div");
     container.className = "enhanced-popup-container";
 
-    // Close button
+    // Close button. Appended to the container as a normal child. It stays
+    // at the top-right when the popup opens; if the content is scrolled all
+    // the way down it may scroll up with it, but tapping the map also closes
+    // the popup, so there's always a way out.
     const closeBtn = document.createElement("button");
     closeBtn.className = "custom-close-btn";
+    closeBtn.type = "button";
     closeBtn.textContent = "✕";
     closeBtn.addEventListener("click", (event) => {
       event.preventDefault();
@@ -285,6 +289,13 @@ const createPopupTemplate = () => ({
     fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
       .then(r => r.json())
       .then(full => {
+        // Escape text before it goes into innerHTML (prevents HTML/script
+        // injection from API data). Raw values below are kept unescaped so
+        // URL-building (encodeURIComponent) stays correct.
+        const escapeHtml = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
+
         const name = full.name || "Location";
         const cat = full.main_category || category;
         const address = full.address || "";
@@ -299,6 +310,9 @@ const createPopupTemplate = () => ({
         function normalizeUrl(u) {
           if (!u) return "";
           const s = String(u).trim();
+          // Reject anything that carries an explicit non-http(s) scheme
+          // (e.g. javascript:, data:) to prevent href-based injection.
+          if (/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^https?:\/\//i.test(s)) return "";
           return /^https?:\/\//i.test(s) ? s : `https://${s}`;
         }
         const siteUrl = normalizeUrl(full.website || full.Website || full.link || "");
@@ -324,13 +338,13 @@ const createPopupTemplate = () => ({
         let html = `<div class="popup-scroll-body">`;
 
         if (photo?.trim()) {
-          html += `<div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>`;
+          html += `<div class="popup-image" style="background-image:url('${escapeHtml(photo.trim())}')"></div>`;
         }
 
-        html += `<h2 class="popup-title">${name}</h2>`;
+        html += `<h2 class="popup-title">${escapeHtml(name)}</h2>`;
         html += `
           <div class="popup-category">
-            <span class="category-badge">${cat}</span>
+            <span class="category-badge">${escapeHtml(cat)}</span>
           </div>
           <div class="popup-tabs">
             <button class="tab-button active" data-tab="info">Info</button>
@@ -341,20 +355,20 @@ const createPopupTemplate = () => ({
             <div class="tab-content active" data-content="info">
               <div class="info-section">
                 <div class="info-label">Address</div>
-                <div class="info-value">${fullAddress}</div>
+                <div class="info-value">${escapeHtml(fullAddress)}</div>
               </div>
               ${description?.trim() ? `
               <div class="info-section">
                 <div class="info-label">About</div>
-                <div class="info-value clamp-4">${description}</div>
+                <div class="info-value clamp-4">${escapeHtml(description)}</div>
               </div>` : ""}
               ${hours?.trim() ? `
               <div class="info-section">
                 <div class="info-label">Hours & Fees</div>
-                <div class="info-value clamp-4">${hours}</div>
+                <div class="info-value clamp-4">${escapeHtml(hours)}</div>
               </div>` : ""}
               <a href="${googleSearchUrl}" class="primary-button">Search for More Details</a>
-              ${siteUrl ? `<a href="${siteUrl}" class="primary-button site-link">Visit website</a>` : ""}
+              ${siteUrl ? `<a href="${escapeHtml(siteUrl)}" class="primary-button site-link">Visit website</a>` : ""}
             </div>
             <div class="tab-content" data-content="navigate">
               <div class="nav-info-top">Get directions from your current location:</div>
@@ -373,11 +387,10 @@ const createPopupTemplate = () => ({
         `;
         html += `</div>`; // close .popup-scroll-body
 
-        // Replace loading with full content (keep close button)
+        // Replace loading with full content. The close button is a sibling
+        // of the loading element, so replacing the loading node leaves it
+        // intact.
         container.querySelector(".popup-loading").outerHTML = html;
-
-        // Re-attach close button (it was wiped by innerHTML replacement)
-        container.appendChild(closeBtn);
 
         // Tabs
         const tabButtons = container.querySelectorAll(".tab-button");
