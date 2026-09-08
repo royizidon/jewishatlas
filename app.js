@@ -273,12 +273,13 @@ const createPopupTemplate = () => ({
     });
     container.appendChild(closeBtn);
 
-    // Loading state
-    container.innerHTML += `
-      <div class="popup-loading" style="padding: 24px; text-align: center; color: #888;">
-        Loading...
-      </div>
-    `;
+    // Loading state — append as a node so we DON'T re-parse the container
+    // via innerHTML, which would wipe the close button's click listener.
+    const loadingEl = document.createElement("div");
+    loadingEl.className = "popup-loading";
+    loadingEl.style.cssText = "padding: 24px; text-align: center; color: #888;";
+    loadingEl.textContent = "Loading...";
+    container.appendChild(loadingEl);
 
     // Fetch full record from Render API
     fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
@@ -318,7 +319,9 @@ const createPopupTemplate = () => ({
           ? `https://waze.com/ul?ll=${lat.toFixed(6)},${lon.toFixed(6)}&navigate=yes&z=16`
           : `https://waze.com/ul?q=${encLabel}&navigate=yes&z=16`;
 
-        let html = "";
+        // Everything here goes inside the scrollable body, kept separate
+        // from the close button so the button never scrolls with it.
+        let html = `<div class="popup-scroll-body">`;
 
         if (photo?.trim()) {
           html += `<div class="popup-image" style="background-image:url('${photo.replace(/'/g, "&#39;")}')"></div>`;
@@ -368,6 +371,7 @@ const createPopupTemplate = () => ({
             </div>
           </div>
         `;
+        html += `</div>`; // close .popup-scroll-body
 
         // Replace loading with full content (keep close button)
         container.querySelector(".popup-loading").outerHTML = html;
@@ -841,23 +845,35 @@ search.when(() => {
 
 
   // -------- Renderer --------
-  const globalRenderer = new UniqueValueRenderer({
-    field: "main_category",
-    defaultSymbol: { type: "simple-marker", style: "circle", size: 7, color: "#888", outline: { color: "#fff", width: 1 } },
-    visualVariables: [{
-      type: "size",
-      valueExpression: "$view.scale",
-      stops: [
+  // Points render noticeably bigger on mobile — small circles are hard to
+  // see and hard to tap accurately on a touch screen.
+  const isMobileRenderer = DeviceInfo.isMobile();
+  const pointOutlineWidth = isMobileRenderer ? 1.5 : 1;
+  const pointSizeStops = isMobileRenderer
+    ? [
+        { scale: 591657527, size: 6 },
+        { scale: 144447,    size: 9 },
+        { scale: 18055,     size: 13 }
+      ]
+    : [
         { scale: 591657527, size: 3 },
         { scale: 144447,    size: 5 },
         { scale: 18055,     size: 8 }
-      ]
+      ];
+
+  const globalRenderer = new UniqueValueRenderer({
+    field: "main_category",
+    defaultSymbol: { type: "simple-marker", style: "circle", size: isMobileRenderer ? 10 : 7, color: "#888", outline: { color: "#fff", width: pointOutlineWidth } },
+    visualVariables: [{
+      type: "size",
+      valueExpression: "$view.scale",
+      stops: pointSizeStops
     }],
     uniqueValueInfos: [
-      { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", color: "#5DADE2", outline: { color: "#fff", width: 1 } } },
-      { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", color: "#EC7063", outline: { color: "#fff", width: 1 } } },
-      { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", color: "#58D68D", outline: { color: "#fff", width: 1 } } },
-      { value: "Community",         symbol: { type: "simple-marker", style: "circle", color: "#8b5cf6", outline: { color: "#fff", width: 1 } } }
+      { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", color: "#5DADE2", outline: { color: "#fff", width: pointOutlineWidth } } },
+      { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", color: "#EC7063", outline: { color: "#fff", width: pointOutlineWidth } } },
+      { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", color: "#58D68D", outline: { color: "#fff", width: pointOutlineWidth } } },
+      { value: "Community",         symbol: { type: "simple-marker", style: "circle", color: "#8b5cf6", outline: { color: "#fff", width: pointOutlineWidth } } }
     ]
   });
 

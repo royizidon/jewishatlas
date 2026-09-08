@@ -263,6 +263,31 @@ html, body {
    ============================================================ */
 .enhanced-popup-container { position: relative; padding: 0; margin: 0; }
 
+/* Keep the ✕ pinned to the popup's outer box at all times. Only the
+   inner body (.popup-scroll-body) scrolls; the close button lives
+   outside it, so its `top/right` offsets never move. Scoped away from
+   the memories popup, which already handles this differently. */
+.esri-popup__main-container:not(:has(.memories-popup)) .esri-popup__content {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+.esri-popup__main-container:not(:has(.memories-popup)) .enhanced-popup-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.popup-scroll-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .popup-image {
   width: 100%; height: 180px;
   background-size: cover; background-position: center;
