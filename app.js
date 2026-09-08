@@ -1191,6 +1191,18 @@ view.when(() => {
         return layer === globalLayer ||
                (window.__memoriesIsLayer && window.__memoriesIsLayer(layer));
       });
+
+      // ---- Tap on empty map: dismiss an open popup ----
+      if (!hit?.graphic) {
+        if (view.popup.visible) {
+          view.popup.close();
+          view.popup.clear();
+          view.popup.visible = false;
+          lastPopupId = null;
+        }
+        return;
+      }
+
       if (hit?.graphic) {
         const hitGraphic = hit.graphic;
 
