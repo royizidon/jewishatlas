@@ -3,6 +3,20 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>
+  // Legacy link support: this page used to be the only way to view a
+  // memorial (memory.html?slug=X, filled in by JS after the fact).
+  // Real content now lives at a pre-rendered /memory/<slug>/ page for
+  // SEO reasons. Anyone arriving here via an old bookmark or shared
+  // link gets forwarded there immediately, before anything else loads.
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get("slug");
+    if (slug) {
+      window.location.replace("/memory/" + encodeURIComponent(slug) + "/");
+    }
+  })();
+</script>
 <link rel="stylesheet" href="memory.css" /><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
 <title>Memorial · Jewish Atlas</title>

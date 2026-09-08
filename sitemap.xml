@@ -80,5 +80,24 @@
   <lastmod>2026-08-11</lastmod>
 </url>
 
+  <url>
+    <loc>https://jewishatlas.org/memory/asher-zidon-mls7txom/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jewishatlas.org/memory/yuval-shoam-mlyvhxp3/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jewishatlas.org/memory/memorial-19d5afb2464/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jewishatlas.org/memory/elisabeth-goldschmidt-19d9ac942bf/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
-
