@@ -471,6 +471,16 @@ function toYear(val) {
   return String(val).substring(0, 4);
 }
 
+// If origin holds two places joined by a spaced dash ("London - Tel Aviv"),
+// return just the first for the place-search fallback — a compound string
+// won't geocode. Split ONLY on " - " (spaces both sides) so we never break
+// legitimately hyphenated single names like "Tel Aviv-Yafo" or "Wilkes-Barre".
+// The full origin text is still what the visitor sees; only the map target
+// uses this trimmed value.
+function firstPlace(text) {
+  return String(text || "").split(/\s+-\s+/)[0].trim();
+}
+
 function openModal(p) {
   document.getElementById("modalHe").textContent = p.he_name || "";
   document.getElementById("modalEn").textContent = p.eng_name || "";
@@ -489,13 +499,19 @@ function openModal(p) {
   // click. Precise point (via slug) when available, always paired with the
   // place-text fallback so memories.js can fall back to a place search if
   // this person has no matching point in the Memories layer.
+  //
+  // For the place fallback we use firstPlace(): a compound origin like
+  // "London - Tel Aviv" won't geocode as one string, so we send just the
+  // first town. The slug path is unaffected — it targets an exact point by
+  // slug, not by text — and the visible link text still shows the full origin.
   let mapHref = "";
   if (originText) {
+    const placeParam = firstPlace(originText);
     if (p.slug) {
       mapHref = "index.html?memory=" + encodeURIComponent(p.slug) +
-                "&place=" + encodeURIComponent(originText);
+                "&place=" + encodeURIComponent(placeParam);
     } else {
-      mapHref = "index.html?place=" + encodeURIComponent(originText);
+      mapHref = "index.html?place=" + encodeURIComponent(placeParam);
     }
   }
 
