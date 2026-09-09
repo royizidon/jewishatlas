@@ -844,15 +844,51 @@ search.when(() => {
     }
   }, 500);
 
-  // If the URL contains a city, open the map there
+  // If the URL contains a city, open the map there.
+  //
+  // Coordination with the ?memory=<slug> deep link (handled in
+  // memories.js): when a memory slug is present, we do NOT immediately
+  // run the place search, because memories.js may fly to that person's
+  // exact point instead — and two independent view.goTo() calls would
+  // race, with unpredictable results. Instead we wait briefly. If
+  // memories.js resolves the slug to a real point, it sets
+  // window.__memoryDeepLinkClaimed = true and we skip the place search
+  // entirely. If it doesn't (the slug has no map point), the timer
+  // fires and we fall back to the place search as before.
   if (deepLinkPlace) {
-    search.search(deepLinkPlace).catch((err) => {
-      console.warn(
-        "Could not open deep-linked place:",
-        deepLinkPlace,
-        err
-      );
-    });
+    const runPlaceSearch = () => {
+      search.search(deepLinkPlace).catch((err) => {
+        console.warn(
+          "Could not open deep-linked place:",
+          deepLinkPlace,
+          err
+        );
+      });
+    };
+
+    const memorySlugPresent =
+      new URLSearchParams(window.location.search).get("memory");
+
+    if (memorySlugPresent) {
+      // Give memories.js up to 4s to claim the deep link. If it already
+      // has by the time we check, skip entirely; otherwise poll briefly.
+      let waited = 0;
+      const step = 200;
+      const maxWait = 4000;
+      const poll = setInterval(() => {
+        if (window.__memoryDeepLinkClaimed) {
+          clearInterval(poll);        // memories.js won — do nothing
+          return;
+        }
+        waited += step;
+        if (waited >= maxWait) {
+          clearInterval(poll);
+          if (!window.__memoryDeepLinkClaimed) runPlaceSearch();
+        }
+      }, step);
+    } else {
+      runPlaceSearch();
+    }
   }
 });
 

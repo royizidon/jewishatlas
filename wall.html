@@ -6,8 +6,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Frank+Ruhl+Libre:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --page-bg: #0f1216;
-  --mortar: #1e1a16;
+  --page-bg: #110e0b;
+  --header-bg: rgba(17, 14, 11, 0.96);
+  --mortar: #241e18;
   --stone: #f2e7d6;
   --stone-dark: #e4d3bd;
   --gold: #c5a47e;
@@ -18,7 +19,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: radial-gradient(circle at 50% 0%, #1c1713 0%, #110e0b 60%, #0d0b09 100%);
+  background: radial-gradient(circle at 50% 0%, #1c1713 0%, #110e0b 55%, #0d0b09 100%);
   font-family: 'Inter', sans-serif;
   color: white;
   min-height: 100vh;
@@ -28,10 +29,10 @@ body {
 .site-header {
   position: sticky;
   top: 0;
-  background: rgba(15,18,22,0.96);
+  background: var(--header-bg);
   backdrop-filter: blur(12px);
   padding: 1.4rem 0 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(197, 164, 126, 0.10);
   z-index: 100;
 }
 .nav-links {
@@ -68,8 +69,8 @@ body {
 }
 .search-box input {
   width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(242, 231, 214, 0.035);
+  border: 1px solid rgba(197, 164, 126, 0.14);
   padding: 12px;
   color: white;
   text-align: center;
@@ -108,18 +109,31 @@ body {
 @media (max-width: 420px)  { .wall-grid { grid-template-columns: repeat(2, 1fr); } }
 
 .brick {
+  --stone-base: #f2e7d6;
+  --stone-edge: #dfcdb5;
+  --tilt: 0deg;
   background:
-    linear-gradient(160deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 60%),
-    linear-gradient(to bottom, var(--stone) 0%, var(--stone-dark) 100%);
+    radial-gradient(circle at 18% 30%,
+      rgba(255,255,255,0.25) 0 2%,
+      transparent 18%),
+    radial-gradient(circle at 75% 65%,
+      rgba(93,62,31,0.06) 0 3%,
+      transparent 24%),
+    linear-gradient(160deg,
+      rgba(255,255,255,0.2),
+      transparent 55%),
+    linear-gradient(to bottom,
+      var(--stone-base),
+      var(--stone-edge));
   box-shadow:
     /* Top highlight edge */
-    inset 0 2px 0 rgba(255,255,255,0.75),
+    inset 0 2px 0 rgba(255,255,255,0.65),
     /* Left highlight edge */
-    inset 2px 0 0 rgba(255,255,255,0.4),
+    inset 2px 0 0 rgba(255,255,255,0.3),
     /* Bottom dark edge — main thickness illusion */
-    inset 0 -5px 0 rgba(50,30,8,0.35),
+    inset 0 -4px 0 rgba(50,30,8,0.28),
     /* Right dark edge */
-    inset -3px 0 0 rgba(50,30,8,0.2),
+    inset -2px 0 0 rgba(50,30,8,0.16),
     /* Outer drop shadow — brick sitting proud of mortar */
     0 4px 8px rgba(0,0,0,0.35);
 
@@ -130,34 +144,64 @@ body {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  transform: rotate(var(--tilt));
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
+/* Stable variation: the wall does not change every time it loads.
+   Prime-number cycle (7n) so the pattern does NOT line up with the
+   column count (6/5/4/3/2 across breakpoints) — avoids vertical banding.
+   Each variant also gets its own subtle color, tilt, and grain offset so
+   no two neighbouring stones look stamped from the same mould. */
+.brick:nth-child(7n + 1) { --stone-base: #f3e8d8; --stone-edge: #dfcbb1; --tilt: -0.10deg; }
+.brick:nth-child(7n + 2) { --stone-base: #eadcc8; --stone-edge: #d9c3a7; --tilt:  0.08deg; }
+.brick:nth-child(7n + 3) { --stone-base: #f4eadb; --stone-edge: #e2d1ba; --tilt: -0.06deg; }
+.brick:nth-child(7n + 4) { --stone-base: #eee0cc; --stone-edge: #dbc6aa; --tilt:  0.11deg; }
+.brick:nth-child(7n + 5) { --stone-base: #f5ebdc; --stone-edge: #e3d2bb; --tilt: -0.08deg; }
+.brick:nth-child(7n + 6) { --stone-base: #ecdec9; --stone-edge: #d7c1a5; --tilt:  0.07deg; }
+.brick:nth-child(7n)     { --stone-base: #f1e5d3; --stone-edge: #ddc9ad; --tilt: -0.05deg; }
+
 .brick:hover {
-  filter: brightness(1.06);
-  transform: translateY(-3px);
+  filter: brightness(1.05);
+  transform: translateY(-3px) rotate(var(--tilt));
   box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.75),
-    inset 2px 0 0 rgba(255,255,255,0.4),
-    inset 0 -5px 0 rgba(50,30,8,0.35),
-    inset -3px 0 0 rgba(50,30,8,0.2),
-    0 8px 16px rgba(0,0,0,0.4);
+    inset 0 2px 0 rgba(255,255,255,0.65),
+    inset 2px 0 0 rgba(255,255,255,0.3),
+    inset 0 -4px 0 rgba(50,30,8,0.28),
+    inset -2px 0 0 rgba(50,30,8,0.16),
+    0 8px 16px rgba(0,0,0,0.42);
 }
-/* Stone grain */
+
+/* Fine stone grain — three sparse speckle gradients */
 .brick::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    92deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.012) 3px,
-    rgba(0,0,0,0.012) 4px
-  );
+  opacity: 0.32;
   pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 25%,
+      rgba(65,42,20,0.10) 0 0.6px,
+      transparent 1px),
+    radial-gradient(circle at 68% 72%,
+      rgba(255,255,255,0.30) 0 0.7px,
+      transparent 1.2px),
+    radial-gradient(circle at 84% 18%,
+      rgba(65,42,20,0.08) 0 0.5px,
+      transparent 1px);
+  background-size: 19px 17px, 23px 21px, 29px 25px;
 }
+/* Shift the grain per variant so the speckle isn't identical stone-to-stone */
+.brick:nth-child(7n + 1)::after { background-position: 0 0, 4px 8px, 11px 3px; }
+.brick:nth-child(7n + 2)::after { background-position: 7px 3px, 1px 12px, 16px 7px; }
+.brick:nth-child(7n + 3)::after { background-position: 3px 9px, 9px 2px, 5px 14px; }
+.brick:nth-child(7n + 4)::after { background-position: 11px 5px, 3px 15px, 18px 1px; }
+.brick:nth-child(7n + 5)::after { background-position: 5px 13px, 14px 6px, 2px 9px; }
+.brick:nth-child(7n + 6)::after { background-position: 13px 7px, 6px 1px, 9px 17px; }
+.brick:nth-child(7n)::after     { background-position: 9px 2px, 17px 10px, 4px 5px; }
 .brick-name {
+  position: relative;
+  z-index: 1;
   font-family: 'Frank Ruhl Libre', 'Playfair Display', serif;
   font-weight: 700;
   font-size: 1.05rem;
@@ -258,6 +302,17 @@ body {
   margin-bottom: 36px;
   opacity: 0.6;
   direction: rtl;
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+.modal-origin-link {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.modal-origin-link:hover {
+  opacity: 0.9;
+  text-decoration: underline;
 }
 .modal-link {
   font-size: 0.75rem;
@@ -284,7 +339,7 @@ body {
   <div class="nav-links">
     <a href="index.html" class="header-link">← The Map</a>
     <a href="index.html" class="nav-logo" style="text-decoration: none;">Jewish Atlas</a>
-    <a href="dedicate.html" class="header-link">Dedicate</a>
+    <a href="dedicate.html" class="header-link">Add a Name</a>
   </div>
   <div class="search-section">
     <div class="search-box">
@@ -309,7 +364,7 @@ body {
     <div class="modal-divider"></div>
     <div class="modal-dates-he" id="modalDatesHe"></div>
     <div class="modal-dates-en" id="modalDatesEn"></div>
-    <div class="modal-origin"   id="modalOrigin"></div>
+    <a class="modal-origin"   id="modalOrigin"></a>
     <div id="modalLinkContainer"></div>
   </div>
 </div>
@@ -426,11 +481,45 @@ function openModal(p) {
   const datesEn = [toYear(p.born_display), toYear(p.death_display)].filter(Boolean).join(" – ");
   document.getElementById("modalDatesEn").textContent = datesEn;
 
-  document.getElementById("modalOrigin").textContent = p.origin || "";
+  const originEl = document.getElementById("modalOrigin");
+  const originText = (p.origin || "").trim();
+  originEl.textContent = originText;
+
+  // Link the origin to the map — only when there's visible origin text to
+  // click. Precise point (via slug) when available, always paired with the
+  // place-text fallback so memories.js can fall back to a place search if
+  // this person has no matching point in the Memories layer.
+  let mapHref = "";
+  if (originText) {
+    if (p.slug) {
+      mapHref = "index.html?memory=" + encodeURIComponent(p.slug) +
+                "&place=" + encodeURIComponent(originText);
+    } else {
+      mapHref = "index.html?place=" + encodeURIComponent(originText);
+    }
+  }
+
+  if (mapHref) {
+    originEl.href = mapHref;
+    originEl.classList.add("modal-origin-link");
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (isMobile) {
+      originEl.setAttribute("target", "_self");
+      originEl.removeAttribute("rel");
+    } else {
+      originEl.setAttribute("target", "_blank");
+      originEl.setAttribute("rel", "noopener");
+    }
+  } else {
+    originEl.removeAttribute("href");
+    originEl.classList.remove("modal-origin-link");
+    originEl.removeAttribute("target");
+    originEl.removeAttribute("rel");
+  }
 
   document.getElementById("modalLinkContainer").innerHTML =
     (p.tier === "page" && p.slug)
-      ? `<a class="modal-link" href="memory.html?slug=${encodeURIComponent(p.slug)}">VIEW FULL MEMORIAL PAGE</a>`
+      ? `<a class="modal-link" href="/memory/${encodeURIComponent(p.slug)}/">VIEW FULL MEMORIAL PAGE</a>`
       : "";
 
   backdrop.classList.add("open");

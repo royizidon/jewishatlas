@@ -26,7 +26,7 @@
     "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/" +
     "JewishAtlas_Memories_Public_20260513_v5/FeatureServer/0";
 
-  const STORY_BASE_URL = "https://jewishatlas.org/memory.html?slug=";
+  const STORY_BASE_URL = "https://jewishatlas.org/memory/";
 
   const CHIP_LABEL = "Memories";
   const CHIP_CAT   = "Memories";              // data-cat value
@@ -90,7 +90,7 @@
         const datesEn = formatDatePair(bornEn, deathEn);
 
         const showStoryLink = tier === "page" && slug;
-        const storyUrl = showStoryLink ? STORY_BASE_URL + encodeURIComponent(slug) : "";
+        const storyUrl = showStoryLink ? STORY_BASE_URL + encodeURIComponent(slug) + "/" : "";
         const wallUrl = "https://jewishatlas.org/wall.html";
 
         const container = document.createElement("div");
@@ -383,6 +383,72 @@
 
     // Helper for popup hover/highlight
     window.__memoriesIsActive = () => memoriesLayer.visible;
+
+    // ------------------------------------------------------------------
+    // Deep link: ?memory=<slug> — jump straight to one person's exact
+    // point on the map (from a Wall brick or a memorial page), instead
+    // of a generic place-name search.
+    //
+    // Placed at the END of init on purpose: it references `chip` and
+    // `activateMemoriesMode`, which are declared above. Running it earlier
+    // risked a temporal-dead-zone ReferenceError if the async layer query
+    // ever resolved before those declarations executed.
+    //
+    // Deliberately does NOT replace the existing ?place=<text> deep link
+    // in app.js — the two are meant to be passed together. If this slug
+    // has no matching point in the Memories layer (not every dedication
+    // has one), this does nothing further, and app.js's ?place= fallback
+    // takes over. Coordination happens via window.__memoryDeepLinkClaimed.
+    // ------------------------------------------------------------------
+    const deepLinkParams = new URLSearchParams(window.location.search);
+    const deepLinkSlug = (deepLinkParams.get("memory") || "").trim();
+
+    if (deepLinkSlug) {
+      memoriesLayer.when(() => {
+        const escapedSlug = deepLinkSlug.replace(/'/g, "''");
+        memoriesLayer.queryFeatures({
+          where: `slug = '${escapedSlug}'`,
+          outFields: ["*"],
+          returnGeometry: true
+        }).then((result) => {
+          const graphic = result.features && result.features[0];
+          if (!graphic || !graphic.geometry) {
+            // No matching point (not every dedication has one). Leave the
+            // flag unset so app.js's ?place= fallback takes over.
+            console.log("[memories] deep-link slug has no map point:", deepLinkSlug);
+            return;
+          }
+
+          // Claim the deep link NOW, before the async fly-to, so app.js's
+          // coordination poll sees it immediately and skips the competing
+          // place search. Setting it after goTo() would leave a window
+          // where both could fire.
+          window.__memoryDeepLinkClaimed = true;
+
+          activateMemoriesMode();
+          // Reflect the mode switch in the chip UI, matching a manual click
+          const dlButtons = filterContainer.querySelectorAll(".filterBtn");
+          dlButtons.forEach(b => b.classList.remove("active"));
+          chip.classList.add("active");
+          filterContainer.classList.add("filtered");
+
+          // Disable clustering before flying in, so the target point is a
+          // real individual graphic (not swallowed into a cluster) by the
+          // time we open its popup.
+          memoriesLayer.featureReduction = null;
+
+          view.goTo(
+            { target: graphic.geometry, zoom: 15 },
+            { duration: 800, easing: "ease-in-out" }
+          ).then(() => {
+            view.popup.open({ features: [graphic], location: graphic.geometry });
+            setTimeout(() => { view.popup.visible = true; }, 20);
+          }).catch(() => {});
+        }).catch((err) => {
+          console.warn("[memories] deep-link query failed:", err);
+        });
+      });
+    }
 
     console.log("[memories] initialised");
   };
