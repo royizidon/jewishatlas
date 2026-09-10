@@ -81,12 +81,17 @@
 </url>
 
   <url>
-    <loc>https://jewishatlas.org/memory/asher-zidon-mls7txom/</loc>
+    <loc>https://jewishatlas.org/memory/memorial-1a08aa692d3/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jewishatlas.org/memory/yuval-shoam-mlyvhxp3/</loc>
+    <loc>https://jewishatlas.org/memory/memorial-19e8ed207d8/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jewishatlas.org/memory/elisabeth-goldschmidt-19d9ac942bf/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -96,7 +101,17 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jewishatlas.org/memory/elisabeth-goldschmidt-19d9ac942bf/</loc>
+    <loc>https://jewishatlas.org/memory/hanan-drori-mlz1bkcs/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jewishatlas.org/memory/yuval-shoam-mlyvhxp3/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jewishatlas.org/memory/asher-zidon-mls7txom/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

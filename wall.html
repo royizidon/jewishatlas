@@ -466,9 +466,40 @@ function renderBricks(data) {
   });
 }
 
-function toYear(val) {
+function formatGregorianDate(val) {
   if (!val) return "";
-  return String(val).substring(0, 4);
+
+  const text = String(val).trim();
+
+  // A year-only value should remain a year.
+  if (/^\d{4}$/.test(text)) return text;
+
+  // ISO: YYYY-MM-DD -> DD/MM/YYYY
+  let match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\D|$)/);
+  if (match) {
+    const [, year, month, day] = match;
+    return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+  }
+
+  // European formats: DD/MM/YYYY or DD.MM.YYYY -> DD/MM/YYYY
+  match = text.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})(?:\D|$)/);
+  if (match) {
+    const [, day, month, year] = match;
+    return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+  }
+
+  // ArcGIS date fields may occasionally arrive as millisecond timestamps.
+  if (/^\d{12,13}$/.test(text)) {
+    const date = new Date(Number(text));
+    if (!Number.isNaN(date.getTime())) {
+      const day = String(date.getUTCDate()).padStart(2, "0");
+      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      return `${day}/${month}/${date.getUTCFullYear()}`;
+    }
+  }
+
+  // Preserve unexpected values rather than displaying a misleading fragment.
+  return text;
 }
 
 // If origin holds two places joined by a spaced dash ("London - Tel Aviv"),
@@ -488,7 +519,7 @@ function openModal(p) {
   const datesHe = [p.born_str, p.death_str].filter(Boolean).join(" – ");
   document.getElementById("modalDatesHe").textContent = datesHe;
 
-  const datesEn = [toYear(p.born_display), toYear(p.death_display)].filter(Boolean).join(" – ");
+  const datesEn = [formatGregorianDate(p.born_display), formatGregorianDate(p.death_display)].filter(Boolean).join(" – ");
   document.getElementById("modalDatesEn").textContent = datesEn;
 
   const originEl = document.getElementById("modalOrigin");
