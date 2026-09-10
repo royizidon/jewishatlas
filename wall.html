@@ -504,31 +504,16 @@ function formatGregorianDate(val) {
   return text;
 }
 
-// If origin holds two places joined by a spaced dash ("London - Tel Aviv"),
-// return just the first for the place-search fallback — a compound string
-// won't geocode. Split ONLY on " - " (spaces both sides) so we never break
-// legitimately hyphenated single names like "Tel Aviv-Yafo" or "Wilkes-Barre".
-// The full origin text is still what the visitor sees; only the map target
-// uses this trimmed value.
-function firstPlace(text) {
-  return String(text || "").split(/\s+-\s+/)[0].trim();
-}
-
-function setModalOrigin(p, originText) {
+function setModalOrigin(p, originText, hasExactLocation = false) {
   const originEl = document.getElementById("modalOrigin");
   originText = String(originText || "").trim();
   originEl.textContent = originText;
 
-  let mapHref = "";
-  if (originText) {
-    const placeParam = firstPlace(originText);
-    if (p.slug) {
-      mapHref = "index.html?memory=" + encodeURIComponent(p.slug) +
-                "&place=" + encodeURIComponent(placeParam);
-    } else {
-      mapHref = "index.html?place=" + encodeURIComponent(placeParam);
-    }
-  }
+  // Origin text alone is not an exact point. Make it clickable only when
+  // this slug has a visible feature in the public Memories point layer.
+  const mapHref = originText && hasExactLocation && p.slug
+    ? "index.html?memory=" + encodeURIComponent(p.slug)
+    : "";
 
   if (mapHref) {
     originEl.href = mapHref;
@@ -562,7 +547,7 @@ async function openModal(p) {
 
   // `origin` belongs to the Wall/Dedications layer. Exact location belongs
   // to the Memories layer, so it cannot be read from this wall record.
-  setModalOrigin(p, p.origin);
+  setModalOrigin(p, p.origin, false);
 
   document.getElementById("modalLinkContainer").innerHTML =
     (p.tier === "page" && p.slug)
@@ -572,14 +557,14 @@ async function openModal(p) {
   backdrop.classList.add("open");
   document.body.style.overflow = "hidden";
 
-  // Join the Wall and public Memories layers by slug only when the
-  // dedication has no origin. Geometry is not needed here because the
-  // Memories layer already stores the human-readable location_label.
-  if (!String(p.origin || "").trim() && p.slug) {
+  // Check every slug against the public point layer. A matching visible
+  // feature makes the displayed origin/location an exact map link. Without
+  // that feature, origin remains useful plain text and is not clickable.
+  if (p.slug) {
     try {
       const params = new URLSearchParams({
-        where: "slug='" + String(p.slug).replace(/'/g, "''") + "'",
-        outFields: "location_label",
+        where: "slug='" + String(p.slug).replace(/'/g, "''") + "' AND show_on_map = 1",
+        outFields: "location_label,show_on_map",
         returnGeometry: "false",
         f: "json"
       });
@@ -591,7 +576,9 @@ async function openModal(p) {
 
       // Ignore a late response if another brick was opened or the modal closed.
       if (requestId !== modalRequestId || !backdrop.classList.contains("open")) return;
-      if (locationText) setModalOrigin(p, locationText);
+      if (data.features?.length) {
+        setModalOrigin(p, p.origin || locationText, true);
+      }
     } catch (err) {
       console.error("Memory location lookup failed:", err);
     }
