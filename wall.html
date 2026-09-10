@@ -509,11 +509,14 @@ function setModalOrigin(p, originText, hasExactLocation = false) {
   originText = String(originText || "").trim();
   originEl.textContent = originText;
 
-  // Origin text alone is not an exact point. Make it clickable only when
-  // this slug has a visible feature in the public Memories point layer.
-  const mapHref = originText && hasExactLocation && p.slug
-    ? "index.html?memory=" + encodeURIComponent(p.slug)
-    : "";
+  // Prefer the exact Memories point. If there is no point, app.js can still
+  // open the map by searching the displayed origin via the `place` parameter.
+  let mapHref = "";
+  if (originText) {
+    mapHref = hasExactLocation && p.slug
+      ? "index.html?memory=" + encodeURIComponent(p.slug)
+      : "index.html?place=" + encodeURIComponent(originText);
+  }
 
   if (mapHref) {
     originEl.href = mapHref;
@@ -558,8 +561,7 @@ async function openModal(p) {
   document.body.style.overflow = "hidden";
 
   // Check every slug against the public point layer. A matching visible
-  // feature makes the displayed origin/location an exact map link. Without
-  // that feature, origin remains useful plain text and is not clickable.
+  // feature upgrades the origin-search link to an exact memory-point link.
   if (p.slug) {
     try {
       const params = new URLSearchParams({
