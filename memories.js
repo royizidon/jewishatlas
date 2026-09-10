@@ -75,8 +75,8 @@
         const engName   = (a.eng_name   || "").trim();
         const bornHe    = (a.born_str   || "").trim();
         const deathHe   = (a.death_str  || "").trim();
-        const bornEn    = toYear(a.born_display);
-        const deathEn   = toYear(a.death_display);
+        const bornEn    = formatGregorianDate(a.born_display);
+        const deathEn   = formatGregorianDate(a.death_display);
         const location  = cleanLocation(a.location_label || a.origin || "");
         const why       = (a.why_this_place || "").trim();
         const connRaw   = String(a.connection_type || "").trim();
@@ -86,7 +86,8 @@
 
         // Dates: Hebrew line + Gregorian line, each shown independently
         // Format mirrors wall.html modal: "born – death"
-        const datesHe = formatDatePair(bornHe, deathHe);
+        // Do not add English "b."/"d." prefixes to a Hebrew-only date.
+        const datesHe = [bornHe, deathHe].filter(Boolean).join(" – ");
         const datesEn = formatDatePair(bornEn, deathEn);
 
         const showStoryLink = tier === "page" && slug;
@@ -571,11 +572,42 @@
     return `<div class="memories-why memories-why-en">${escapeHtml(t)}</div>`;
   }
 
-  // First 4 chars of a date string → year only (mirrors wall.html toYear)
-  // "1909-09-29" → "1909",  "1909" → "1909",  "" → ""
-  function toYear(val) {
+  // Normalize complete Gregorian dates without truncating slash-formatted
+  // values such as "26/10/1933" to the incorrect "26/1".
+  function formatGregorianDate(val) {
     if (!val) return "";
-    return String(val).trim().substring(0, 4);
+
+    const text = String(val).trim();
+
+    // Preserve values that contain only a year.
+    if (/^\d{4}$/.test(text)) return text;
+
+    // ISO: YYYY-MM-DD -> DD/MM/YYYY
+    let match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\D|$)/);
+    if (match) {
+      const [, year, month, day] = match;
+      return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    }
+
+    // European: DD/MM/YYYY or DD.MM.YYYY -> DD/MM/YYYY
+    match = text.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})(?:\D|$)/);
+    if (match) {
+      const [, day, month, year] = match;
+      return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    }
+
+    // ArcGIS date values may arrive as millisecond timestamps.
+    if (/^\d{12,13}$/.test(text)) {
+      const date = new Date(Number(text));
+      if (!Number.isNaN(date.getTime())) {
+        const day = String(date.getUTCDate()).padStart(2, "0");
+        const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+        return `${day}/${month}/${date.getUTCFullYear()}`;
+      }
+    }
+
+    // Preserve unexpected text instead of displaying a misleading fragment.
+    return text;
   }
 
   // Build "born – death", "b. X", or "d. X". Filters empties.
