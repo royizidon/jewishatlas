@@ -371,6 +371,7 @@ body {
 
 <script>
 const API_BASE = "https://api.jewishatlas.org/api";
+const MEMORIES_LAYER_URL = "https://services-eu1.arcgis.com/FckSU1kja7wbnBnq/arcgis/rest/services/JewishAtlas_Memories_Public_20260513_v5/FeatureServer/0";
 
 const HARDCODED = [
   {
@@ -442,6 +443,7 @@ const emptyState  = document.getElementById("emptyState");
 const backdrop    = document.getElementById("modalBackdrop");
 
 let allBricks = [];
+let modalRequestId = 0;
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, c =>
@@ -512,29 +514,11 @@ function firstPlace(text) {
   return String(text || "").split(/\s+-\s+/)[0].trim();
 }
 
-function openModal(p) {
-  document.getElementById("modalHe").textContent = p.he_name || "";
-  document.getElementById("modalEn").textContent = p.eng_name || "";
-
-  const datesHe = [p.born_str, p.death_str].filter(Boolean).join(" – ");
-  document.getElementById("modalDatesHe").textContent = datesHe;
-
-  const datesEn = [formatGregorianDate(p.born_display), formatGregorianDate(p.death_display)].filter(Boolean).join(" – ");
-  document.getElementById("modalDatesEn").textContent = datesEn;
-
+function setModalOrigin(p, originText) {
   const originEl = document.getElementById("modalOrigin");
-  const originText = (p.origin || "").trim();
+  originText = String(originText || "").trim();
   originEl.textContent = originText;
 
-  // Link the origin to the map — only when there's visible origin text to
-  // click. Precise point (via slug) when available, always paired with the
-  // place-text fallback so memories.js can fall back to a place search if
-  // this person has no matching point in the Memories layer.
-  //
-  // For the place fallback we use firstPlace(): a compound origin like
-  // "London - Tel Aviv" won't geocode as one string, so we send just the
-  // first town. The slug path is unaffected — it targets an exact point by
-  // slug, not by text — and the visible link text still shows the full origin.
   let mapHref = "";
   if (originText) {
     const placeParam = firstPlace(originText);
@@ -563,6 +547,22 @@ function openModal(p) {
     originEl.removeAttribute("target");
     originEl.removeAttribute("rel");
   }
+}
+
+async function openModal(p) {
+  const requestId = ++modalRequestId;
+  document.getElementById("modalHe").textContent = p.he_name || "";
+  document.getElementById("modalEn").textContent = p.eng_name || "";
+
+  const datesHe = [p.born_str, p.death_str].filter(Boolean).join(" – ");
+  document.getElementById("modalDatesHe").textContent = datesHe;
+
+  const datesEn = [formatGregorianDate(p.born_display), formatGregorianDate(p.death_display)].filter(Boolean).join(" – ");
+  document.getElementById("modalDatesEn").textContent = datesEn;
+
+  // `origin` belongs to the Wall/Dedications layer. Exact location belongs
+  // to the Memories layer, so it cannot be read from this wall record.
+  setModalOrigin(p, p.origin);
 
   document.getElementById("modalLinkContainer").innerHTML =
     (p.tier === "page" && p.slug)
@@ -571,9 +571,35 @@ function openModal(p) {
 
   backdrop.classList.add("open");
   document.body.style.overflow = "hidden";
+
+  // Join the Wall and public Memories layers by slug only when the
+  // dedication has no origin. Geometry is not needed here because the
+  // Memories layer already stores the human-readable location_label.
+  if (!String(p.origin || "").trim() && p.slug) {
+    try {
+      const params = new URLSearchParams({
+        where: "slug='" + String(p.slug).replace(/'/g, "''") + "'",
+        outFields: "location_label",
+        returnGeometry: "false",
+        f: "json"
+      });
+      const res = await fetch(MEMORIES_LAYER_URL + "/query?" + params);
+      if (!res.ok) return;
+      const data = await res.json();
+      const memory = data.features?.[0]?.attributes || {};
+      const locationText = String(memory.location_label || "").trim();
+
+      // Ignore a late response if another brick was opened or the modal closed.
+      if (requestId !== modalRequestId || !backdrop.classList.contains("open")) return;
+      if (locationText) setModalOrigin(p, locationText);
+    } catch (err) {
+      console.error("Memory location lookup failed:", err);
+    }
+  }
 }
 
 function closeModal() {
+  modalRequestId++;
   backdrop.classList.remove("open");
   document.body.style.overflow = "";
 }
