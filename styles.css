@@ -87,6 +87,7 @@ html, body {
 .filterBtn[data-cat=""]                { --c: #64748b; }
 .filterBtn[data-cat="Highlights"]      { --c: #f59e0b; }
 .filterBtn[data-cat="Synagogue"]       { --c: #3b82f6; }
+.filterBtn[data-cat="Chabad"]          { --c: #F5B041; }
 .filterBtn[data-cat="Heritage"]        { --c: #ef4444; }
 .filterBtn[data-cat="Community"]       { --c: #8b5cf6; }
 .filterBtn[data-cat="Kosher Restaurant"] { --c: #10b981; }
