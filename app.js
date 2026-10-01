@@ -922,7 +922,8 @@ search.when(() => {
       { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", color: "#5DADE2", outline: { color: "#fff", width: pointOutlineWidth } } },
       { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", color: "#EC7063", outline: { color: "#fff", width: pointOutlineWidth } } },
       { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", color: "#58D68D", outline: { color: "#fff", width: pointOutlineWidth } } },
-      { value: "Community",         symbol: { type: "simple-marker", style: "circle", color: "#8b5cf6", outline: { color: "#fff", width: pointOutlineWidth } } }
+      { value: "Community",         symbol: { type: "simple-marker", style: "circle", color: "#8b5cf6", outline: { color: "#fff", width: pointOutlineWidth } } },
+      { value: "Chabad",            symbol: { type: "simple-marker", style: "circle", color: "#F5B041", outline: { color: "#fff", width: pointOutlineWidth } } }
     ]
   });
 
@@ -962,7 +963,8 @@ search.when(() => {
           { value: "Synagogue",         symbol: { type: "simple-marker", style: "circle", size: 24, color: [93, 173, 226, 0.75],  outline: { color: "#fff", width: 1.5 } } },
           { value: "Heritage",          symbol: { type: "simple-marker", style: "circle", size: 24, color: [236, 112, 99, 0.75],  outline: { color: "#fff", width: 1.5 } } },
           { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", size: 24, color: [88, 214, 141, 0.75],  outline: { color: "#fff", width: 1.5 } } },
-          { value: "Community",         symbol: { type: "simple-marker", style: "circle", size: 24, color: [139, 92, 246, 0.75],  outline: { color: "#fff", width: 1.5 } } }
+          { value: "Community",         symbol: { type: "simple-marker", style: "circle", size: 24, color: [139, 92, 246, 0.75],  outline: { color: "#fff", width: 1.5 } } },
+          { value: "Chabad",            symbol: { type: "simple-marker", style: "circle", size: 24, color: [245, 176, 65, 0.75], outline: { color: "#fff", width: 1.5 } } }
         ]
       },
 
@@ -1287,8 +1289,9 @@ view.when(() => {
   const categories = [
     { name: "All",          cat: "" },
     { name: "Synagogues",   cat: "Synagogue" },
+    {name: "Kosher Food",  cat: "Kosher Restaurant" },
+    { name: "Chabad",       cat: "Chabad" },
     { name: "Heritage",     cat: "Heritage" },
-    { name: "Kosher Food",  cat: "Kosher Restaurant" },
     { name: "Community",    cat: "Community" }
   ];
 
