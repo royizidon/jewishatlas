@@ -81,6 +81,11 @@
 </url>
 
   <url>
+    <loc>https://jewishatlas.org/memory/rosa-roth-1a11283d8d8/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://jewishatlas.org/memory/memorial-1a08aa692d3/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
