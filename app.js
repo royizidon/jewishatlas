@@ -379,6 +379,9 @@ const createPopupTemplate = () => ({
             <div class="tab-content" data-content="feedback">
               <div class="feedback-block">
                 <h3 class="feedback-title">Help us improve</h3>
+                <p class="feedback-text">
+                  Point ID: <strong>${escapeHtml(id)}</strong>
+                </p>
                 <p class="feedback-text">Found an issue or have updates to share?</p>
                 <a href="${feedbackUrl}" ${isMobile ? '' : 'target="_blank" rel="noopener"'} class="primary-button feedback-submit">Submit Feedback</a>
               </div>
