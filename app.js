@@ -296,7 +296,7 @@ const createPopupTemplate = () => ({
           "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
         }[c]));
 
-        const name = full.name || "Location";
+        const name = full.eng_name?.trim() || full.name || "Location";
         const cat = full.main_category || category;
         const address = full.address || "";
         const city = full.city || "";
