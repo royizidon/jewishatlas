@@ -50,6 +50,423 @@ function showToast(message, duration = 3000) {
   }, duration);
 }
 
+// ========================================
+// FULL-SCREEN IMAGE LIGHTBOX
+// ========================================
+
+function openImageLightbox(src, altText = "") {
+  if (!src) return;
+
+  // Fully tear down any existing lightbox before opening a new one. A bare
+  // .remove() would leave its popstate/keydown/focusin listeners attached.
+  // window.__jaLightboxForceClose is set by the previous instance below; it
+  // returns true if that instance had pushed a history entry that hasn't
+  // been consumed by Back yet. history.replaceState can't "remove" the
+  // extra entry a second pushState would add, so instead of pushing again
+  // we inherit that same entry below — one open lightbox "session", however
+  // many photos get swapped in it, costs exactly one Back step.
+  let inheritedHistoryEntry = false;
+  if (typeof window.__jaLightboxForceClose === "function") {
+    inheritedHistoryEntry = window.__jaLightboxForceClose();
+  }
+
+  const LB_STATE_KEY = "jaLightbox";
+  const previouslyFocused = document.activeElement;
+  const previousBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+
+  const overlay = document.createElement("div");
+  overlay.setAttribute("data-lightbox", "true");
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", altText || "Photo");
+  overlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    overflow: hidden;
+    touch-action: none;
+  `;
+
+  const imgWrap = document.createElement("div");
+  imgWrap.style.cssText = `
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+  `;
+
+  const img = document.createElement("img");
+  img.src = src;
+  img.alt = altText || "";
+  img.draggable = false;
+  img.style.cssText = `
+    max-width: 92%;
+    max-height: 92%;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: scale(0.96);
+    transition: transform 200ms ease, opacity 200ms ease;
+    user-select: none;
+    -webkit-user-drag: none;
+    will-change: transform;
+  `;
+
+  const spinner = document.createElement("div");
+  spinner.setAttribute("aria-hidden", "true");
+  spinner.style.cssText = `
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.25);
+    border-top-color: #fff;
+    animation: lbSpin 0.8s linear infinite;
+  `;
+  if (!document.querySelector('style[data-lightbox-css]')) {
+    const s = document.createElement("style");
+    s.setAttribute("data-lightbox-css", "true");
+    s.textContent = `@keyframes lbSpin { to { transform: rotate(360deg); } }`;
+    document.head.appendChild(s);
+  }
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.textContent = "✕";
+  closeBtn.setAttribute("aria-label", "Close photo");
+  closeBtn.style.cssText = `
+    position: fixed;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20001;
+  `;
+
+  // -------- Loading / error state --------
+  let loaded = false;
+  img.addEventListener("load", () => {
+    loaded = true;
+    spinner.remove();
+    img.style.opacity = "1";
+  });
+  img.addEventListener("error", () => {
+    spinner.remove();
+    const errMsg = document.createElement("div");
+    errMsg.textContent = "Couldn't load this photo.";
+    errMsg.style.cssText = "color:#ccc; font-size:14px; text-align:center; padding:16px;";
+    imgWrap.appendChild(errMsg);
+  });
+
+  // -------- Pinch-zoom / double-tap-zoom / pan --------
+  // Implemented manually (rather than relying on native pinch-zoom) because
+  // the map page's viewport typically disables browser pinch-zoom, so the
+  // lightbox needs its own.
+  let scale = 1, tx = 0, ty = 0;
+  const MIN_SCALE = 1, MAX_SCALE = 4;
+  const pointers = new Map();
+  let pinchStartDist = 0, pinchStartScale = 1;
+  let panStart = null; // {x, y, tx, ty}
+  let lastTapTime = 0, lastTapX = 0, lastTapY = 0;
+
+  function applyTransform(withTransition) {
+    img.style.transition = withTransition
+      ? "transform 200ms ease, opacity 200ms ease"
+      : "opacity 200ms ease";
+    img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+  }
+
+  function clampPan() {
+    // Keep the image from being dragged entirely off-screen once zoomed.
+    // offsetWidth/offsetHeight are the image's unscaled layout box (CSS
+    // transform doesn't affect them); getBoundingClientRect() would already
+    // include the current `scale`, and multiplying by scale again would
+    // double-apply it and allow dragging the image far past its edges.
+    const baseW = img.offsetWidth;
+    const baseH = img.offsetHeight;
+    const maxX = Math.max(0, (baseW * scale - baseW) / 2);
+    const maxY = Math.max(0, (baseH * scale - baseH) / 2);
+    tx = Math.min(maxX, Math.max(-maxX, tx));
+    ty = Math.min(maxY, Math.max(-maxY, ty));
+  }
+
+  function resetZoom(withTransition) {
+    scale = 1; tx = 0; ty = 0;
+    applyTransform(withTransition);
+  }
+
+  function zoomAt(clientX, clientY, targetScale) {
+    const rect = img.getBoundingClientRect();
+    const cx = clientX - (rect.left + rect.width / 2);
+    const cy = clientY - (rect.top + rect.height / 2);
+    const ratio = targetScale / scale;
+    tx = cx - (cx - tx) * ratio;
+    ty = cy - (cy - ty) * ratio;
+    scale = targetScale;
+    clampPan();
+    applyTransform(true);
+  }
+
+  function dist(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  // Tap/gesture tracking, kept separate from panStart (which is only used
+  // for the pan math and gets set any time scale > 1, including on a tap
+  // that never moves — relying on it to detect "did the user move" would
+  // wrongly disqualify a clean double-tap while already zoomed in).
+  let downX = 0, downY = 0, movedPastTapThreshold = false, hadMultiTouch = false;
+
+  img.addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+    img.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinchStartDist = dist(a, b);
+      pinchStartScale = scale;
+      panStart = null;
+      hadMultiTouch = true;
+    } else if (pointers.size === 1) {
+      downX = e.clientX;
+      downY = e.clientY;
+      movedPastTapThreshold = false;
+      hadMultiTouch = false;
+      if (scale > 1) {
+        panStart = { x: e.clientX, y: e.clientY, tx, ty };
+      }
+    }
+  });
+
+  img.addEventListener("pointermove", (e) => {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      const newDist = dist(a, b);
+      if (pinchStartDist > 0) {
+        scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (newDist / pinchStartDist)));
+        clampPan();
+        applyTransform(false);
+      }
+    } else if (pointers.size === 1) {
+      // Track movement regardless of zoom level — panStart only exists
+      // when scale > 1, so gating this on it meant a drag at scale === 1
+      // never disqualified itself as a tap, however far it moved.
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 10) {
+        movedPastTapThreshold = true;
+      }
+      if (panStart) {
+        tx = panStart.tx + (e.clientX - panStart.x);
+        ty = panStart.ty + (e.clientY - panStart.y);
+        clampPan();
+        applyTransform(false);
+      }
+    }
+  });
+
+  function endPointer(e, wasCancelled) {
+    // A "tap" is a gesture that only ever had one pointer down, didn't move
+    // far, and actually completed (pointerup) rather than being cancelled
+    // by the browser (pointercancel — e.g. the OS took over the gesture, or
+    // an incoming call/notification interrupted it). A cancelled gesture is
+    // not a real tap and must never count toward the double-tap counter:
+    // otherwise an interrupted touch now could combine with a later,
+    // unrelated tap to trigger an unwanted zoom toggle.
+    const wasSingleTap = !wasCancelled && pointers.size === 1 && !hadMultiTouch && !movedPastTapThreshold;
+    pointers.delete(e.pointerId);
+    panStart = null;
+
+    if (pointers.size === 0) {
+      pinchStartDist = 0;
+      if (scale < 1.02) {
+        resetZoom(true);
+      } else {
+        clampPan();
+        applyTransform(true);
+      }
+
+      // Double-tap to toggle zoom in/out, at any current scale.
+      if (wasSingleTap) {
+        const now = Date.now();
+        const moved = Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY);
+        if (now - lastTapTime < 300 && moved < 30) {
+          zoomAt(e.clientX, e.clientY, scale > 1 ? 1 : 2.5);
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
+          lastTapX = e.clientX;
+          lastTapY = e.clientY;
+        }
+      } else if (wasCancelled) {
+        // Don't let a cancelled gesture arm the double-tap window either —
+        // a stray later tap shouldn't pair up with it.
+        lastTapTime = 0;
+      }
+    }
+  }
+  img.addEventListener("pointerup", (e) => endPointer(e, false));
+  img.addEventListener("pointercancel", (e) => endPointer(e, true));
+
+  // -------- Close handling (history-aware, see below) --------
+  let closedByPopState = false;
+  let historyEntryPushed = false;
+  let isClosed = false;
+  // Separate from isClosed: that only flips once teardown() actually runs,
+  // but the history.back() branch below is asynchronous (it waits for the
+  // popstate event to fire teardown). Without this guard, rapid repeated
+  // close triggers (double-tapping ✕, mashing Escape, tapping the backdrop
+  // and then ✕ before the first back() resolves) would each call
+  // history.back() again, sending the browser back multiple real steps
+  // instead of just closing the lightbox once.
+  let closeRequested = false;
+
+  function detachGlobalListeners() {
+    window.removeEventListener("popstate", onPopState);
+    document.removeEventListener("keydown", onKeyDown);
+    document.removeEventListener("focusin", onFocusIn);
+    document.body.style.overflow = previousBodyOverflow;
+    if (window.__jaLightboxForceClose === forceClose) {
+      window.__jaLightboxForceClose = null;
+    }
+  }
+
+  function teardown() {
+    if (isClosed) return;
+    isClosed = true;
+    detachGlobalListeners();
+    overlay.style.opacity = "0";
+    img.style.transform += " scale(0.97)";
+    setTimeout(() => {
+      overlay.remove();
+      if (previouslyFocused?.focus) previouslyFocused.focus();
+    }, 200);
+  }
+
+  // Used only when a NEW lightbox is about to replace this one without the
+  // user going through Close/Escape/back (see the top of this function).
+  // Removes listeners and the DOM node immediately (no animation — it's
+  // being replaced). Deliberately leaves the history entry alone: there is
+  // no API to pop/remove a pushed entry other than Back itself, so the new
+  // lightbox below inherits this entry (see inheritedHistoryEntry) rather
+  // than pushing a second one on top of it.
+  function forceClose() {
+    if (isClosed) return false;
+    isClosed = true;
+    detachGlobalListeners();
+    overlay.remove();
+    return historyEntryPushed && !closedByPopState;
+  }
+
+  function onPopState() {
+    closedByPopState = true;
+    teardown();
+  }
+
+  // Close via UI (✕, backdrop tap, Escape): if we pushed a history entry
+  // for this lightbox, go back through it so the entry is consumed instead
+  // of left dangling — this is what makes the mobile back gesture / hardware
+  // back button close the lightbox instead of leaving the page.
+  function requestClose() {
+    if (closeRequested || isClosed) return;
+    closeRequested = true;
+    if (historyEntryPushed && !closedByPopState) {
+      history.back();
+    } else {
+      teardown();
+    }
+  }
+
+  function onKeyDown(e) {
+    if (e.key === "Escape") requestClose();
+  }
+
+  // Minimal focus trap: closeBtn is the only focusable element in the
+  // dialog, so if focus ever lands outside the overlay (e.g. Tab cycling
+  // past it into the map controls behind it), pull it straight back.
+  function onFocusIn(e) {
+    if (!overlay.contains(e.target)) {
+      closeBtn.focus();
+    }
+  }
+
+  // The backdrop click target can be either the overlay itself or imgWrap
+  // (the full-size flex container centering the photo) — imgWrap covers
+  // the whole overlay, so a tap anywhere outside the image but still over
+  // the letterboxed area hits imgWrap, not overlay. Checking only
+  // `e.target === overlay` missed that, making most backdrop taps no-ops.
+  overlay.addEventListener("click", (e) => {
+    if ((e.target === overlay || e.target === imgWrap) && scale === 1) requestClose();
+  });
+  closeBtn.addEventListener("click", (e) => { e.stopPropagation(); requestClose(); });
+  document.addEventListener("keydown", onKeyDown);
+  document.addEventListener("focusin", onFocusIn);
+  window.addEventListener("popstate", onPopState);
+  window.__jaLightboxForceClose = forceClose;
+
+  if (inheritedHistoryEntry) {
+    // Reuse the entry the previous (just-replaced) lightbox already pushed,
+    // instead of pushing a second one on top of it.
+    historyEntryPushed = true;
+  } else {
+    try {
+      history.pushState({ [LB_STATE_KEY]: true }, "");
+      historyEntryPushed = true;
+    } catch (_) {
+      // pushState can fail in rare embedded contexts; lightbox still works,
+      // just without the back-button integration.
+    }
+  }
+
+  // Stop these from bubbling to the map underneath
+  ["click", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
+    overlay.addEventListener(evt, e => e.stopPropagation(), { passive: false });
+  });
+
+  // iOS Safari can still rubber-band/bounce the page behind a fixed overlay
+  // even with body overflow hidden (touch-action: none isn't fully honored
+  // on some iOS versions for this). Explicitly block default touchmove on
+  // the backdrop as a safety net; our pinch/pan logic runs on Pointer
+  // Events, which keep firing regardless of this preventDefault.
+  overlay.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+
+  imgWrap.appendChild(spinner);
+  imgWrap.appendChild(img);
+  overlay.appendChild(imgWrap);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+  closeBtn.focus();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      overlay.style.opacity = "1";
+      if (loaded) img.style.opacity = "1";
+      img.style.transform = "scale(1)";
+    });
+  });
+}
+
 // Add CSS animations for toast
 if (!document.querySelector('style[data-toast-css]')) {
   const style = document.createElement('style');
@@ -287,7 +704,14 @@ const createPopupTemplate = () => ({
 
     // Fetch full record from Render API
     fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
-      .then(r => r.json())
+      .then(r => {
+        // Without this, a non-2xx response (404/500) whose body still
+        // happens to parse as JSON (e.g. an error object) would flow into
+        // .then(full => ...) as if it were a real record, instead of
+        // hitting .catch() and showing the "Could not load details" state.
+        if (!r.ok) throw new Error(`Landmark fetch failed: ${r.status}`);
+        return r.json();
+      })
       .then(full => {
         // Escape text before it goes into innerHTML (prevents HTML/script
         // injection from API data). Raw values below are kept unescaped so
@@ -296,7 +720,7 @@ const createPopupTemplate = () => ({
           "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
         }[c]));
 
-        const name = full.eng_name?.trim() || full.name || "Location";
+        const name = full.eng_name?.trim() || full.name || full.full_name || "Location";
         const cat = full.main_category || category;
         const address = full.address || "";
         const city = full.city || "";
@@ -338,7 +762,7 @@ const createPopupTemplate = () => ({
         let html = `<div class="popup-scroll-body">`;
 
         if (photo?.trim()) {
-          html += `<div class="popup-image" style="background-image:url('${escapeHtml(photo.trim())}')"></div>`;
+          html += `<div class="popup-image" data-full-img="${escapeHtml(photo.trim())}" style="background-image:url('${escapeHtml(photo.trim())}');cursor:pointer;"></div>`;
         }
 
         html += `<h2 class="popup-title">${escapeHtml(name)}</h2>`;
@@ -410,6 +834,28 @@ const createPopupTemplate = () => ({
         ["click", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
           container.addEventListener(evt, e => e.stopPropagation(), { passive: false });
         });
+
+        // Tap/click the popup photo to view it full-screen. Also keyboard-
+        // activatable (Enter/Space), since this is a plain <div>, not a
+        // native button or link.
+        const imgEl = container.querySelector(".popup-image");
+        if (imgEl) {
+          imgEl.setAttribute("role", "button");
+          imgEl.setAttribute("tabindex", "0");
+          imgEl.setAttribute("aria-label", `View full photo of ${name}`);
+          imgEl.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openImageLightbox(imgEl.dataset.fullImg, name);
+          });
+          imgEl.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              openImageLightbox(imgEl.dataset.fullImg, name);
+            }
+          });
+        }
       })
       .catch(() => {
         container.querySelector(".popup-loading").innerHTML =
