@@ -37,7 +37,23 @@ require([
       const id = attrs.id ?? attrs.OBJECTID ?? "";
       const container = document.createElement("div");
       container.className = "jppi-landmark";
-      container.textContent = "Loading…";
+      const closeButton = document.createElement("button");
+      closeButton.type = "button";
+      closeButton.className = "custom-close-btn";
+      closeButton.setAttribute("aria-label", "Close landmark details");
+      closeButton.textContent = "✕";
+      closeButton.addEventListener("click", event => {
+        event.stopPropagation();
+        view.popup.close();
+      });
+
+      const body = document.createElement("div");
+      body.className = "popup-scroll-body";
+      body.tabIndex = 0;
+      body.setAttribute("role", "region");
+      body.setAttribute("aria-label", "Landmark information");
+      body.innerHTML = '<p class="popup-status" role="status">Loading…</p>';
+      container.append(closeButton, body);
 
       fetch(`https://api.jewishatlas.org/api/landmarks/points/${encodeURIComponent(id)}`)
         .then(response => {
@@ -67,8 +83,7 @@ require([
               <p class="info-value">${escapeHtml(value)}</p>
             </section>` : "";
 
-          container.innerHTML = `
-            <div class="popup-scroll-body">
+          body.innerHTML = `
               ${photo ? `<button type="button" class="popup-image" aria-label="View full photo of ${escapeHtml(name)}">
                 <img alt="${escapeHtml(name)}">
               </button>` : ""}
@@ -83,7 +98,6 @@ require([
                   ${website ? `<a class="primary-button site-link" href="${escapeHtml(website)}" target="_blank" rel="noopener">Visit Website</a>` : ""}
                 </div>
               </div>
-            </div>
           `;
 
           if (photo) {
@@ -109,7 +123,7 @@ require([
           }
         })
         .catch(() => {
-          container.textContent = "Could not load details. Please try again.";
+          body.innerHTML = '<p class="popup-status" role="status">Could not load details. Please try again.</p>';
         });
 
       return container;
@@ -127,7 +141,7 @@ require([
     popup: {
       dockEnabled: true,
       dockOptions: {
-        position: () => window.matchMedia("(max-width: 544px)").matches ? "bottom-center" : "top-center",
+        position: "top-center",
         buttonEnabled: false,
         breakpoint: false
       },
