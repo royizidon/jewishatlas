@@ -9,7 +9,6 @@ html, body {
   font-family: 'Inter', sans-serif;
 }
 
-
 /* ============================================================
    FILTER BUTTONS (SAFE VERSION)
    ============================================================ */
@@ -120,4 +119,92 @@ html, body {
 .esri-popup__content {
   border-radius: 22px !important;
   overflow: hidden !important;
+}
+
+.esri-popup__content:has(.jppi-landmark) {
+  margin: 0;
+  border-radius: 0 !important;
+}
+
+.jppi-landmark {
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+  background: #fff;
+  color: #1e293b;
+  font: 400 15px/1.55 Inter, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.jppi-landmark:not(:has(.jppi-landmark__body)) {
+  padding: 16px;
+}
+
+.jppi-landmark__photo,
+.jppi-landmark__photo img {
+  display: block;
+  width: 100%;
+}
+
+.jppi-landmark__photo img {
+  aspect-ratio: 2.7;
+  object-fit: cover;
+}
+
+.jppi-landmark__body {
+  padding: 16px;
+}
+
+.jppi-landmark__badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 5px;
+  background: #f5f1eb;
+  color: #805f3e;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.jppi-landmark section,
+.jppi-landmark__links {
+  margin-top: 14px;
+}
+
+.jppi-landmark section:first-child,
+.jppi-landmark__links:first-child {
+  margin-top: 0;
+}
+
+.jppi-landmark h3 {
+  margin: 0 0 4px;
+  color: #596b84;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.jppi-landmark p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.jppi-landmark__links {
+  display: grid;
+  gap: 8px;
+}
+
+.jppi-landmark__links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #2563a6;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
 }
