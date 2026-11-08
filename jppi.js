@@ -12,65 +12,92 @@ require([
   PopupTemplate
 ) => {
 
-  const createPopupTemplate = () => {
-    return {
-      title: "{eng_name}",
-      outFields: ["id", "main_category", "eng_name"],
-      content: (feature) => {
-        const attrs = feature.graphic.attributes || {};
-        const id = attrs.id || attrs.OBJECTID || "";
-        const category = attrs.main_category || "";
+  const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[char]));
 
-        const container = document.createElement("div");
-        container.style.cssText = "background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);border-radius:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;padding:16px;width:100%;box-sizing:border-box;";
-        container.innerHTML = `<div style="padding:24px;text-align:center;color:#888;">Loading...</div>`;
+  function httpUrl(value, allowBareDomain = false) {
+    const input = String(value ?? "").trim();
+    if (!input) return "";
+    try {
+      const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(input);
+      const url = new URL(allowBareDomain && !hasScheme ? `https://${input.replace(/^\/\//, "")}` : input);
+      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
 
-        fetch(`https://api.jewishatlas.org/api/landmarks/points/${id}`)
-          .then(r => r.json())
-          .then(full => {
-            const engName = full.name || full.eng_name || "Unknown";
-            const address = full.address || "";
-            const city = full.city || "";
-            const country = full.country || "";
-            const cat = full.main_category || category;
+  const createPopupTemplate = () => ({
+    title: "",
+    outFields: ["id", "main_category", "eng_name"],
+    content: (feature) => {
+      const attrs = feature.graphic.attributes || {};
+      const id = attrs.id ?? attrs.OBJECTID ?? "";
+      const container = document.createElement("div");
+      container.className = "jppi-landmark";
+      container.textContent = "Loading…";
 
-            const googleUrl = `https://www.google.com/search?q=${encodeURIComponent([engName, address, city, country].filter(Boolean).join(" "))}`;
+      fetch(`https://api.jewishatlas.org/api/landmarks/points/${encodeURIComponent(id)}`)
+        .then(response => {
+          if (!response.ok) throw new Error(`Landmark fetch failed: ${response.status}`);
+          return response.json();
+        })
+        .then(full => {
+          const name = full.eng_name || full.name || attrs.eng_name || "Location";
+          const category = full.main_category || attrs.main_category || "";
+          const addressParts = [full.address, full.city, full.country]
+            .map(value => String(value ?? "").trim())
+            .filter(Boolean);
+          const address = addressParts.filter((part, index) =>
+            !addressParts.slice(0, index).some(previous =>
+              previous.toLowerCase().includes(part.toLowerCase())
+            )
+          ).join(", ");
+          const description = String(full.description ?? "").trim();
+          const photo = httpUrl(full.photo);
+          const website = httpUrl(full.website || full.Website || full.link, true);
+          const google = `https://www.google.com/search?q=${encodeURIComponent([name, address].filter(Boolean).join(" "))}`;
 
-            function normalizeUrl(u) {
-              if (!u) return "";
-              const s = String(u).trim();
-              return /^https?:\/\//i.test(s) ? s : `https://${s}`;
-            }
-            const siteUrl = normalizeUrl(full.website || full.Website || full.link || "");
-
-            container.innerHTML = `
-              <div style="color:#667eea;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">
-                <i class="fas fa-tag" style="font-size:11px;opacity:0.8;margin-right:6px;"></i>${cat}
+          container.innerHTML = `
+            ${photo ? `<a class="jppi-landmark__photo" href="${escapeHtml(photo)}" target="_blank" rel="noopener" aria-label="Open full-size photo">
+              <img alt="${escapeHtml(name)}">
+            </a>` : ""}
+            <div class="jppi-landmark__body">
+              ${category ? `<div class="jppi-landmark__badge">${escapeHtml(category)}</div>` : ""}
+              ${address ? `<section>
+                <h3>Address</h3>
+                <p>${escapeHtml(address)}</p>
+              </section>` : ""}
+              ${description ? `<section>
+                <h3>About</h3>
+                <p>${escapeHtml(description)}</p>
+              </section>` : ""}
+              <div class="jppi-landmark__links">
+                <a href="${escapeHtml(google)}" target="_blank" rel="noopener">
+                  <i class="fas fa-search" aria-hidden="true"></i>Search on Google
+                </a>
+                ${website ? `<a href="${escapeHtml(website)}" target="_blank" rel="noopener">
+                  <i class="fas fa-globe" aria-hidden="true"></i>Visit Website
+                </a>` : ""}
               </div>
-              <div style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid rgba(0,0,0,0.05);">
-                ${address ? `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;line-height:1.4;">
-                  <i class="fas fa-map-marker-alt" style="font-size:13px;color:#667eea;margin-top:2px;"></i><span>${address}</span></div>` : ""}
-                ${city ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;color:#374151;font-size:13px;">
-                  <i class="fas fa-city" style="font-size:13px;color:#667eea;"></i><span>${city}</span></div>` : ""}
-                ${country ? `<div style="display:flex;align-items:center;gap:8px;color:#374151;font-size:13px;">
-                  <i class="fas fa-globe" style="font-size:13px;color:#667eea;"></i><span>${country}</span></div>` : ""}
-              </div>
-              <a href="${googleUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4285f4 0%,#34a853 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;">
-                <i class="fas fa-search" style="font-size:13px;margin-right:8px;"></i>Search on Google
-              </a>
-              ${siteUrl ? `<a href="${siteUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0ea5e9 0%,#2563eb 100%);color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;font-size:13px;width:100%;box-sizing:border-box;margin-top:10px;">
-                <i class="fas fa-globe" style="font-size:13px;margin-right:8px;"></i>Visit Website
-              </a>` : ""}
-            `;
-          })
-          .catch(() => {
-            container.innerHTML = `<div style="padding:24px;text-align:center;color:#c00;">Could not load details. Please try again.</div>`;
-          });
+            </div>
+          `;
 
-        return container;
-      }
-    };
-  };
+          if (photo) {
+            const photoLink = container.querySelector(".jppi-landmark__photo");
+            const image = photoLink.querySelector("img");
+            image.addEventListener("error", () => photoLink.remove(), { once: true });
+            image.src = photo;
+          }
+        })
+        .catch(() => {
+          container.textContent = "Could not load details. Please try again.";
+        });
+
+      return container;
+    }
+  });
 
   const map = new Map({ basemap: "topo-vector" });
   const view = new MapView({
