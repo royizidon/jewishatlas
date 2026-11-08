@@ -30,6 +30,7 @@ require([
 
   const createPopupTemplate = () => ({
     title: "",
+    overwriteActions: true,
     outFields: ["id", "main_category", "eng_name"],
     content: (feature) => {
       const attrs = feature.graphic.attributes || {};
@@ -59,36 +60,52 @@ require([
           const website = httpUrl(full.website || full.Website || full.link, true);
           const google = `https://www.google.com/search?q=${encodeURIComponent([name, address].filter(Boolean).join(" "))}`;
 
+          const hours = String(full.fees_opening_hours ?? "").trim();
+          const infoSection = (label, value) => value ? `
+            <section class="info-section">
+              <h3 class="info-label">${label}</h3>
+              <p class="info-value">${escapeHtml(value)}</p>
+            </section>` : "";
+
           container.innerHTML = `
-            ${photo ? `<a class="jppi-landmark__photo" href="${escapeHtml(photo)}" target="_blank" rel="noopener" aria-label="Open full-size photo">
-              <img alt="${escapeHtml(name)}">
-            </a>` : ""}
-            <div class="jppi-landmark__body">
-              ${category ? `<div class="jppi-landmark__badge">${escapeHtml(category)}</div>` : ""}
-              ${address ? `<section>
-                <h3>Address</h3>
-                <p>${escapeHtml(address)}</p>
-              </section>` : ""}
-              ${description ? `<section>
-                <h3>About</h3>
-                <p>${escapeHtml(description)}</p>
-              </section>` : ""}
-              <div class="jppi-landmark__links">
-                <a href="${escapeHtml(google)}" target="_blank" rel="noopener">
-                  <i class="fas fa-search" aria-hidden="true"></i>Search on Google
-                </a>
-                ${website ? `<a href="${escapeHtml(website)}" target="_blank" rel="noopener">
-                  <i class="fas fa-globe" aria-hidden="true"></i>Visit Website
-                </a>` : ""}
+            <div class="popup-scroll-body">
+              ${photo ? `<button type="button" class="popup-image" aria-label="View full photo of ${escapeHtml(name)}">
+                <img alt="${escapeHtml(name)}">
+              </button>` : ""}
+              ${category ? `<div class="popup-category"><span class="category-badge">${escapeHtml(category)}</span></div>` : ""}
+              <h2 class="popup-info-heading">Info</h2>
+              <div class="popup-content-wrapper">
+                ${infoSection("Address", address)}
+                ${infoSection("About", description)}
+                ${infoSection("Hours &amp; Fees", hours)}
+                <div class="popup-links">
+                  <a class="primary-button" href="${escapeHtml(google)}" target="_blank" rel="noopener">Search on Google</a>
+                  ${website ? `<a class="primary-button site-link" href="${escapeHtml(website)}" target="_blank" rel="noopener">Visit Website</a>` : ""}
+                </div>
               </div>
             </div>
           `;
 
           if (photo) {
-            const photoLink = container.querySelector(".jppi-landmark__photo");
-            const image = photoLink.querySelector("img");
-            image.addEventListener("error", () => photoLink.remove(), { once: true });
+            const photoButton = container.querySelector(".popup-image");
+            const image = photoButton.querySelector("img");
+            image.addEventListener("error", () => photoButton.remove(), { once: true });
             image.src = photo;
+            photoButton.addEventListener("click", event => {
+              event.stopPropagation();
+              const dialog = document.createElement("dialog");
+              dialog.className = "jppi-photo-lightbox";
+              dialog.setAttribute("aria-label", `Photo of ${name}`);
+              dialog.innerHTML = '<button type="button" aria-label="Close photo">×</button>';
+              dialog.append(image.cloneNode());
+              dialog.querySelector("button").addEventListener("click", () => dialog.close());
+              dialog.addEventListener("click", event => {
+                if (event.target === dialog) dialog.close();
+              });
+              dialog.addEventListener("close", () => dialog.remove(), { once: true });
+              document.body.append(dialog);
+              dialog.showModal();
+            });
           }
         })
         .catch(() => {
@@ -106,8 +123,14 @@ require([
     center: [25, 45],
     zoom: 4,
     ui: { components: [] },
+    popupEnabled: false,
     popup: {
-      dockEnabled: false,
+      dockEnabled: true,
+      dockOptions: {
+        position: () => window.matchMedia("(max-width: 544px)").matches ? "bottom-center" : "top-center",
+        buttonEnabled: false,
+        breakpoint: false
+      },
       collapseEnabled: false
     }
   });
@@ -171,7 +194,7 @@ require([
       if (!response.results.length) return;
       const hit = response.results.find(r => r.graphic?.layer === globalLayer);
       if (hit) {
-        view.popup.open({
+        view.openPopup({
           features: [hit.graphic],
           location: hit.mapPoint || event.mapPoint
         });

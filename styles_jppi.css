@@ -121,90 +121,184 @@ html, body {
   overflow: hidden !important;
 }
 
+/* JPPI uses the main app's photo, category and Info layout. */
+.esri-popup__main-container:has(.jppi-landmark) {
+  position: relative;
+  width: min(480px, calc(100vw - 32px)) !important;
+  max-width: 100%;
+  background: #fff !important;
+}
+
+.esri-popup__main-container:has(.jppi-landmark) .esri-popup__header {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 12px;
+  background: transparent;
+  border: 0;
+}
+
+.esri-popup__main-container:has(.jppi-landmark) .esri-popup__header-title {
+  display: none;
+}
+
+.esri-popup__main-container:has(.jppi-landmark) .esri-popup__header-buttons .esri-popup__button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
 .esri-popup__content:has(.jppi-landmark) {
+  min-width: 0;
   margin: 0;
+  padding: 0;
+  border: 0;
   border-radius: 0 !important;
 }
 
 .jppi-landmark {
-  max-height: min(60vh, 520px);
-  overflow-y: auto;
+  min-width: 0;
+  width: 100%;
   background: #fff;
   color: #1e293b;
-  font: 400 15px/1.55 Inter, sans-serif;
+  font: 400 16px/1.5 Inter, sans-serif;
   overflow-wrap: anywhere;
 }
 
-.jppi-landmark:not(:has(.jppi-landmark__body)) {
-  padding: 16px;
+.jppi-landmark:not(:has(.popup-scroll-body)) {
+  box-sizing: border-box;
+  padding: 16px 54px 16px 16px;
 }
 
-.jppi-landmark__photo,
-.jppi-landmark__photo img {
+.jppi-landmark .popup-scroll-body {
+  max-height: min(72vh, 540px);
+  overflow: hidden auto;
+}
+
+.jppi-landmark .popup-image {
   display: block;
   width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  background: #f1f5f9;
+  cursor: zoom-in;
 }
 
-.jppi-landmark__photo img {
-  aspect-ratio: 2.7;
+.jppi-landmark .popup-image img {
+  display: block;
+  width: 100%;
+  height: clamp(110px, 24vh, 176px);
   object-fit: cover;
 }
 
-.jppi-landmark__body {
-  padding: 16px;
+.jppi-landmark .popup-category {
+  padding: 16px 18px 0;
 }
 
-.jppi-landmark__badge {
+.jppi-landmark .popup-scroll-body:not(:has(.popup-image)) {
+  padding-top: 32px;
+}
+
+.jppi-landmark .category-badge {
   display: inline-block;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: 5px;
   background: #f5f1eb;
   color: #805f3e;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.jppi-landmark .popup-info-heading {
+  width: 33.333%;
+  margin: 8px 0 0;
+  padding: 12px 0;
+  border-bottom: 2px solid #c4a37c;
+  color: #0f172a;
+  font: 600 15px/1.5 Inter, sans-serif;
+  text-align: center;
+}
+
+.jppi-landmark .popup-content-wrapper {
+  padding: 16px 18px 20px;
+  border-top: 1px solid #eef1f5;
+}
+
+.jppi-landmark .info-section {
+  margin: 0 0 14px;
+}
+
+.jppi-landmark .info-label {
+  margin: 0 0 5px;
+  color: #596b84;
   font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
-.jppi-landmark section,
-.jppi-landmark__links {
-  margin-top: 14px;
-}
-
-.jppi-landmark section:first-child,
-.jppi-landmark__links:first-child {
-  margin-top: 0;
-}
-
-.jppi-landmark h3 {
-  margin: 0 0 4px;
-  color: #596b84;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.jppi-landmark p {
+.jppi-landmark .info-value {
   margin: 0;
   white-space: pre-line;
 }
 
-.jppi-landmark__links {
-  display: grid;
+.jppi-landmark .popup-links {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
-.jppi-landmark__links a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  background: #2563a6;
-  color: #fff;
+.jppi-landmark .primary-button {
+  padding: 8px 12px;
+  border: 1px solid #ddcbb8;
+  border-radius: 7px;
+  background: #f5f1eb;
+  color: #543b24;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
+}
+
+.jppi-photo-lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.92);
+}
+
+.jppi-photo-lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+
+.jppi-photo-lightbox img {
+  max-width: 92vw;
+  max-height: 88vh;
+  object-fit: contain;
+}
+
+.jppi-photo-lightbox button {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #1e293b;
+  font-size: 24px;
+  cursor: pointer;
 }
