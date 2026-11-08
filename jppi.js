@@ -157,7 +157,7 @@ require([
   const filterDiv = document.getElementById("filterContainer");
   const categories = [
     { name: "All",         cat: "" },
-    { name: "Highlight",   cat: "Highlights" },
+    { name: "Chabad",      cat: "Chabad" },
     { name: "Synagogues",  cat: "Synagogue" },
     { name: "Heritage",    cat: "Heritage" },
     { name: "Kosher Food", cat: "Kosher Restaurant" },
@@ -175,7 +175,7 @@ require([
     field: "main_category",
     defaultSymbol: { type: "simple-marker", style: "circle", size: 10, color: "#888", outline: { color: "#fff", width: 1 } },
     uniqueValueInfos: [
-      { value: "Highlight",        symbol: { type: "simple-marker", style: "circle", size: 10, color: "#f39c12", outline: { color: "#fff", width: 1 } } },
+      { value: "Chabad",            symbol: { type: "simple-marker", style: "circle", size: 10, color: "#F5B041", outline: { color: "#fff", width: 1 } } },
       { value: "Synagogue",        symbol: { type: "simple-marker", style: "circle", size: 10, color: "#5DADE2", outline: { color: "#fff", width: 1 } } },
       { value: "Heritage",         symbol: { type: "simple-marker", style: "circle", size: 10, color: "#EC7063", outline: { color: "#fff", width: 1 } } },
       { value: "Kosher Restaurant", symbol: { type: "simple-marker", style: "circle", size: 10, color: "#58D68D", outline: { color: "#fff", width: 1 } } },

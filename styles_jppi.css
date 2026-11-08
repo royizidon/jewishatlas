@@ -51,7 +51,7 @@ html, body {
 }
 
 /* Category colors (simple version) */
-.filterBtn[data-cat="Highlights"] { --c: #f59e0b; }
+.filterBtn[data-cat="Chabad"] { --c: #F5B041; }
 .filterBtn[data-cat="Synagogue"] { --c: #3b82f6; }
 .filterBtn[data-cat="Heritage"] { --c: #ef4444; }
 .filterBtn[data-cat="Community"] { --c: #8b5cf6; }
