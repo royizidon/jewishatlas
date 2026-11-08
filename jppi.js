@@ -89,16 +89,14 @@ require([
             ${photo ? `<button type="button" class="popup-image" aria-label="View full photo of ${escapeHtml(name)}">
               <img alt="${escapeHtml(name)}">
             </button>` : ""}
+            <h2 class="popup-title">${escapeHtml(name)}</h2>
             ${category ? `<div class="popup-category"><span class="category-badge">${escapeHtml(category)}</span></div>` : ""}
-            <h2 class="popup-info-heading">Info</h2>
             <div class="popup-content-wrapper">
               ${infoSection("Address", address)}
               ${infoSection("About", description)}
               ${infoSection("Hours &amp; Fees", hours)}
-              <div class="popup-links">
-                <a class="primary-button" href="${escapeHtml(google)}" target="_blank" rel="noopener">Search on Google</a>
-                ${website ? `<a class="primary-button site-link" href="${escapeHtml(website)}" target="_blank" rel="noopener">Visit Website</a>` : ""}
-              </div>
+              <a class="primary-button" href="${escapeHtml(google)}" target="_blank" rel="noopener">Search for More Details</a>
+              ${website ? `<a class="primary-button site-link" href="${escapeHtml(website)}" target="_blank" rel="noopener">Visit Website</a>` : ""}
             </div>
         `;
 
