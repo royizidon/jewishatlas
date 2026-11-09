@@ -721,7 +721,7 @@ const createPopupTemplate = () => ({
         }[c]));
 
         const name = full.eng_name?.trim() || full.name || full.full_name || "Location";
-        const cat = full.main_category || category;
+        const cat = full.category || full.main_category || category;
         const address = full.address || "";
         const city = full.city || "";
         const fullAddress = (address && city && address.includes(city))
